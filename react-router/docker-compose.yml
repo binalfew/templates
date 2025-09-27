@@ -1,0 +1,62 @@
+version: '3.8'
+
+services:
+  # PostgreSQL database service
+  postgres:
+    image: postgres:latest
+    container_name: db
+    restart: always
+    environment:
+      POSTGRES_USER: postgres # Default superuser
+      POSTGRES_PASSWORD: postgres # Local dev password (not for production)
+      POSTGRES_DB: development # Default database name
+      PGDATA: /var/lib/postgresql/data # Explicitly set data directory
+    ports:
+      - '5432:5432' # Map default PostgreSQL port
+    volumes:
+      - postgres_data:/var/lib/postgresql/data # Persist data between container restarts
+      # Uncomment to mount initialization scripts
+      # - ./init-scripts:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres']
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - postgres-network # Explicit network for better control
+
+  # Adminer database management UI
+  adminer:
+    image: adminer:latest
+    container_name: adminer_ui
+    restart: always
+    depends_on:
+      postgres:
+        condition: service_healthy # Only start when postgres is healthy
+    ports:
+      - '8080:8080' # Web interface available at localhost:8080
+    environment:
+      # Explicit connection settings
+      ADMINER_DEFAULT_SERVER: postgres # Service name in docker network
+      ADMINER_DESIGN: pepa-linha # Nice theme for better usability
+      ADMINER_PLUGINS: 'tables-filter tinymce' # Useful plugins
+    networks:
+      - postgres-network # Same network as postgres
+
+volumes:
+  postgres_data: # Named volume for PostgreSQL data
+    # Data persists even when containers are removed
+
+networks:
+  postgres-network:
+    driver: bridge # Explicit network for all services
+
+# Connection information for manual connections
+# You can access the PostgreSQL server from your host machine at localhost:5432
+# Connection details:
+#   Host: localhost
+#   Port: 5432
+#   Database: development
+#   Username: postgres
+#   Password: postgres
+
