@@ -1,10 +1,9 @@
-import { Welcome } from '../welcome/welcome'
 import type { Route } from './+types/home'
 
 export function meta({}: Route.MetaArgs) {
 	return [
-		{ title: 'My React Router App' },
-		{ name: 'description', content: 'A modern React Router application' },
+		{ title: 'Home' },
+		{ name: 'description', content: 'Home' },
 	]
 }
 
@@ -13,5 +12,5 @@ export function loader({ context }: Route.LoaderArgs) {
 }
 
 export default function Home({ loaderData }: Route.ComponentProps) {
-	return <Welcome message={loaderData.message} />
+	return <div>Home</div>
 }
