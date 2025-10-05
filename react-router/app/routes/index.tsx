@@ -1,5 +1,3 @@
-import { DropdownExample } from "~/components/dropdown-example";
-
 export function meta() {
   return [{ title: "Home" }, { name: "description", content: "Home" }];
 }
@@ -17,7 +15,6 @@ export default function Home({ loaderData }: any) {
       <p className="mb-8">
         This page demonstrates the dropdown menu component from shadcn/ui.
       </p>
-      <DropdownExample />
     </div>
   );
 }
