@@ -100,3 +100,5 @@ temp/
 
 # Prisma
 prisma/migrations/
+/app/generated/prisma
+/prisma/seed.ts

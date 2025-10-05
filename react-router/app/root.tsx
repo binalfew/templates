@@ -14,6 +14,7 @@ import { HoneypotProvider } from "remix-utils/honeypot/react";
 import { Toaster } from "sonner";
 import type { Route } from "./+types/root";
 import "./app.css";
+import AppLayout from "./components/layout";
 import { useToast } from "./components/toaster";
 import { getUser, getUserId, logout } from "./lib/auth.server";
 import { ClientHintCheck, getHints } from "./lib/client-hints";
@@ -80,9 +81,9 @@ export async function loader({ request }: Route.LoaderArgs) {
       headers: combineHeaders(
         { "Server-Timing": timings.toString() },
         csrfCookieHeader ? { "set-cookie": csrfCookieHeader } : null,
-        toastHeaders,
+        toastHeaders
       ),
-    },
+    }
   );
 }
 
@@ -123,8 +124,10 @@ export default function App({ loaderData }: Route.ComponentProps) {
   return (
     <AuthenticityTokenProvider token={loaderData.csrfToken}>
       <HoneypotProvider {...loaderData.honeyProps}>
-        <Outlet />
-        <Toaster position="top-center" theme={theme} />
+        <AppLayout theme={loaderData.requestInfo.userPrefs.theme}>
+          <Outlet />
+          <Toaster position="top-center" theme={theme} />
+        </AppLayout>
       </HoneypotProvider>
     </AuthenticityTokenProvider>
   );
