@@ -58,12 +58,7 @@ type User = {
 	}>
 }
 
-const navItems = [
-	{ label: 'Events', url: '/events' },
-	{ label: 'Orders', url: '/orders' },
-	{ label: 'Broadcasts', url: '/broadcasts' },
-	{ label: 'Settings', url: '/settings' },
-]
+const navItems = [{ label: 'Home', url: '/home' }]
 
 function TeamDropdownMenu() {
 	return (
