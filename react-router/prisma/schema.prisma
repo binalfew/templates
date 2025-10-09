@@ -11,13 +11,167 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model UserStatus {
+  id          String  @id @default(cuid())
+  name        String  @unique
+  code        String  @unique
+  description String?
+  isActive    Boolean @default(true)
+  metadata    Json?
+  order       Int?
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  users User[]
+
+  @@index([name])
+  @@index([code])
+  @@index([isActive])
+  @@index([deletedAt])
+}
+
 model User {
+  id                  String      @id @default(cuid())
+  email               String      @unique @db.VarChar(255)
+  firstName           String      @db.VarChar(100)
+  lastName            String      @db.VarChar(100)
+  userStatusId        String?
+  userStatus          UserStatus? @relation(fields: [userStatusId], references: [id], onUpdate: Cascade, onDelete: SetNull, map: "user_status_fk")
+  tenantId            String?
+  tenant              Tenant?     @relation(fields: [tenantId], references: [id], onUpdate: Cascade, onDelete: SetNull)
+  failedLoginAttempts Int         @default(0) @map("failed_login_attempts")
+  lastFailedLoginAt   DateTime?
+  lockedAt            DateTime?
+  lockReason          String?     @db.Text
+  lockCount           Int         @default(0)
+  autoUnlockAt        DateTime?
+  lastLoginAt         DateTime?
+  metadata            Json?
+  version             Int         @default(1)
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  roles    Role[]
+  sessions Session[]
+  password Password?
+
+  @@unique([tenantId, email])
+  @@index([tenantId])
+  @@index([tenantId, email, deletedAt])
+  @@index([userStatusId])
+  @@index([deletedAt])
+  @@index([email])
+  @@index([lastLoginAt])
+}
+
+model Password {
+  id     String @id @default(cuid())
+  hash   String @db.VarChar(255)
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+  lastChanged DateTime  @default(now())
+  version     Int       @default(1)
+
+  @@index([hash])
+}
+
+model Session {
   id        String   @id @default(cuid())
-  email     String   @unique
-  username  String   @unique
-  name      String?
-  firstName String   @db.VarChar(100)
-  lastName  String   @db.VarChar(100)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  expiresAt DateTime
+  metadata  Json?
+  version   Int      @default(1)
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@index([userId])
+  @@index([expiresAt])
+  @@index([userId, expiresAt])
+  @@index([createdAt])
+  @@index([deletedAt])
+}
+
+model Verification {
+  id        String    @id @default(cuid())
+  type      String    @db.VarChar(50)
+  target    String    @db.VarChar(255)
+  secret    String    @db.VarChar(255)
+  algorithm String    @db.VarChar(50)
+  digits    Int
+  period    Int
+  charSet   String    @db.VarChar(255)
+  expiresAt DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@unique([target, type])
+  @@index([type])
+  @@index([expiresAt])
+  @@index([deletedAt])
+}
+
+model Role {
+  id          String       @id @default(cuid())
+  name        String       @unique @db.VarChar(100)
+  description String?      @db.Text
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  deletedAt   DateTime?
+  permissions Permission[]
+  users       User[]
+
+  @@index([name])
+  @@index([deletedAt])
+}
+
+model Permission {
+  id          String    @id @default(cuid())
+  action      String    @db.VarChar(100)
+  entity      String    @db.VarChar(100)
+  access      String    @db.VarChar(50)
+  description String?   @db.Text
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+  roles       Role[]
+
+  @@unique([action, entity, access])
+  @@index([action])
+  @@index([entity])
+  @@index([access])
+  @@index([deletedAt])
+}
+
+model Tenant {
+  id    String @id @default(cuid())
+  name  String @unique @db.VarChar(255)
+  email String @unique @db.VarChar(255)
+  phone String @db.VarChar(50)
+  city  String @db.VarChar(100)
+  state String @db.VarChar(100)
+
+  address  String @db.Text
+  metadata Json?
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  users User[]
+
+  @@index([name])
+  @@index([email])
+  @@index([deletedAt])
 }

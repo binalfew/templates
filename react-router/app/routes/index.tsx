@@ -1,17 +1,32 @@
-export function meta() {
-  return [{ title: "Home" }, { name: "description", content: "Home" }];
+import { redirect } from 'react-router'
+import { getUserId } from '~/lib/auth.server'
+import type { Route } from './+types/index'
+
+export function meta({}: Route.MetaArgs) {
+	return [
+		{ title: 'Application' },
+		{
+			name: 'description',
+			content: 'Application',
+		},
+	]
 }
 
-export function loader({ context }: any) {
-  return { message: context.VALUE_FROM_EXPRESS };
+export async function loader({ request }: Route.LoaderArgs) {
+	const userId = await getUserId(request)
+
+	// If user is logged in, redirect to dashboard
+	if (userId) {
+		throw redirect('/home')
+	}
+
+	return { message: 'Welcome to my app' }
 }
 
-export default function Home({ loaderData }: any) {
-  return (
-    <div className="container mx-auto">
-      <h1 className="text-3xl font-bold mb-8">
-        Welcome to React Router with shadcn/ui
-      </h1>
-    </div>
-  );
+export default function Home({ loaderData }: Route.ComponentProps) {
+	return (
+		<div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
+			This is your landing page
+		</div>
+	)
 }

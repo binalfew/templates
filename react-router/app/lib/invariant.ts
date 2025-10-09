@@ -2,10 +2,10 @@
  * @public
  */
 export class InvariantError extends Error {
-  constructor(message: string) {
-    super(message);
-    Object.setPrototypeOf(this, InvariantError.prototype);
-  }
+	constructor(message: string) {
+		super(message)
+		Object.setPrototypeOf(this, InvariantError.prototype)
+	}
 }
 
 /**
@@ -25,14 +25,14 @@ export class InvariantError extends Error {
  * @public
  */
 export function invariant(
-  condition: unknown,
-  message: string | (() => string),
+	condition: unknown,
+	message: string | (() => string),
 ): asserts condition {
-  if (!condition) {
-    throw new InvariantError(
-      typeof message === "function" ? message() : message,
-    );
-  }
+	if (!condition) {
+		throw new InvariantError(
+			typeof message === 'function' ? message() : message,
+		)
+	}
 }
 
 /**
@@ -52,14 +52,14 @@ export function invariant(
  * @public
  */
 export function invariantResponse(
-  condition: unknown,
-  message: string | (() => string),
-  responseInit?: ResponseInit,
+	condition: unknown,
+	message: string | (() => string),
+	responseInit?: ResponseInit,
 ): asserts condition {
-  if (!condition) {
-    throw new Response(typeof message === "function" ? message() : message, {
-      status: 400,
-      ...responseInit,
-    });
-  }
+	if (!condition) {
+		throw new Response(typeof message === 'function' ? message() : message, {
+			status: 400,
+			...responseInit,
+		})
+	}
 }

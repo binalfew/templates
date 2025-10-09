@@ -147,22 +147,22 @@ Create new route files in the `app/routes/` directory:
 
 ```tsx
 // app/routes/about.tsx
-import type { Route } from "./+types/about";
+import type { Route } from './+types/about'
 
 export function meta({}: Route.MetaArgs) {
-  return [
-    { title: "About Us" },
-    { name: "description", content: "Learn more about our company" },
-  ];
+	return [
+		{ title: 'About Us' },
+		{ name: 'description', content: 'Learn more about our company' },
+	]
 }
 
 export default function About() {
-  return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-3xl font-bold">About Us</h1>
-      <p>Welcome to our about page!</p>
-    </div>
-  );
+	return (
+		<div className="container mx-auto p-4">
+			<h1 className="text-3xl font-bold">About Us</h1>
+			<p>Welcome to our about page!</p>
+		</div>
+	)
 }
 ```
 
