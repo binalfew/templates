@@ -1,3 +1,7 @@
+# React Router
+react-router/build/
+react-router/.react-router/
+
 # Dependencies
 node_modules/
 npm-debug.log*
