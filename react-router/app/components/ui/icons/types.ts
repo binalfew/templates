@@ -3,10 +3,14 @@
 export const iconNames = [
   "update",
   "sun",
+  "plus",
   "moon",
   "laptop",
+  "double-arrow-right",
+  "double-arrow-left",
   "cross-1",
   "chevron-right",
+  "chevron-left",
   "check",
 ] as const
 
