@@ -32,7 +32,7 @@ import {
 } from '~/components/catalyst/sidebar'
 import { StackedLayout } from '~/components/catalyst/stacked-layout'
 import type { Theme } from '~/lib/theme.server'
-import { ThemeSwitch } from '~/routes/resources+/theme-switch'
+import { ThemeSwitch } from '~/routes/resources/theme-switch'
 import { UserDropdown } from './user-dropdown'
 
 type User = {

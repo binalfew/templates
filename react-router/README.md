@@ -125,7 +125,7 @@ my-app/
 │   │   └── utils.ts       # Shared utilities
 │   ├── routes/            # Route components
 │   │   ├── home.tsx       # Home page
-│   │   └── resources+/    # Resource routes
+│   │   └── resources/    # Resource routes
 │   ├── root.tsx           # Root layout component
 │   └── app.css            # Global styles
 ├── prisma/                # Database schema and migrations

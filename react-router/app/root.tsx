@@ -28,7 +28,7 @@ import { makeTimings, time } from './lib/timing.server'
 import { getToast } from './lib/toast.server'
 import { useOptionalUser } from './lib/user'
 import { combineHeaders, getDomainUrl } from './lib/utils'
-import { useOptionalTheme, useTheme } from './routes/resources+/theme-switch'
+import { useOptionalTheme, useTheme } from './routes/resources/theme-switch'
 
 export const meta: Route.MetaFunction = ({ data }) => {
 	return [
