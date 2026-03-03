@@ -86,7 +86,7 @@ export default function TemplatesListPage() {
       cell: (row) => (
         <div className="flex items-center gap-2">
           <Mail className="size-4 text-muted-foreground shrink-0" />
-          <Link to={`${base}/templates/${row.id}`} className="hover:underline">
+          <Link to={`${base}/settings/templates/${row.id}`} className="hover:underline">
             {row.name}
           </Link>
         </div>
@@ -185,19 +185,19 @@ export default function TemplatesListPage() {
         searchConfig={{ placeholder: "Search templates..." }}
         toolbarExtra={toolbarExtraNode}
         toolbarActions={[
-          { label: "New Template", icon: Plus, href: `${base}/templates/new` },
+          { label: "New Template", icon: Plus, href: `${base}/settings/templates/new` },
         ]}
         rowActions={[
           {
             label: "Edit",
             icon: Pencil,
-            href: (row) => `${base}/templates/${row.id}/edit`,
+            href: (row) => `${base}/settings/templates/${row.id}/edit`,
             visible: (row) => !row.isSystem,
           },
           {
             label: "Delete",
             icon: Trash2,
-            href: (row) => `${base}/templates/${row.id}/delete`,
+            href: (row) => `${base}/settings/templates/${row.id}/delete`,
             variant: "destructive",
             visible: (row) => !row.isSystem,
           },

@@ -41,7 +41,7 @@ export async function action({ request, params }: Route.ActionArgs) {
   try {
     await updateTemplate(params.templateId, submission.value, ctx);
     const redirectTo = new URL(request.url).searchParams.get("redirectTo");
-    return redirect(redirectTo || `/${params.tenant}/templates`);
+    return redirect(redirectTo || `/${params.tenant}/settings/templates`);
   } catch (error) {
     return handleServiceError(error, { submission });
   }
@@ -52,7 +52,7 @@ export default function EditTemplatePage() {
   const actionData = useActionData<typeof action>();
   const basePrefix = useBasePrefix();
   const [searchParams] = useSearchParams();
-  const cancelUrl = searchParams.get("redirectTo") || `${basePrefix}/templates`;
+  const cancelUrl = searchParams.get("redirectTo") || `${basePrefix}/settings/templates`;
 
   const [form, fields] = useForm({
     lastResult: actionData?.result,

@@ -26,7 +26,7 @@ export async function action({ request, params }: Route.ActionArgs) {
   try {
     await deleteDefinition(params.definitionId);
     const redirectTo = new URL(request.url).searchParams.get("redirectTo");
-    return redirect(redirectTo || `/${params.tenant}/objects`);
+    return redirect(redirectTo || `/${params.tenant}/settings/objects`);
   } catch (error) {
     return handleServiceError(error);
   }
@@ -37,7 +37,7 @@ export default function DeleteCustomObjectPage() {
   const actionData = useActionData<typeof action>();
   const basePrefix = useBasePrefix();
   const [searchParams] = useSearchParams();
-  const cancelUrl = searchParams.get("redirectTo") || `${basePrefix}/objects`;
+  const cancelUrl = searchParams.get("redirectTo") || `${basePrefix}/settings/objects`;
 
   const fields = (definition.fields as unknown as CustomFieldDefinition[]) ?? [];
   const canDelete = definition._count.records === 0;

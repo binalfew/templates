@@ -79,7 +79,7 @@ export default function FormsPage() {
       header: "Name",
       cell: (row) => (
         <Link
-          to={`${base}/forms/${row.id}`}
+          to={`${base}/settings/forms/${row.id}`}
           className="flex items-center gap-2 hover:underline"
         >
           <FileText className="size-4 text-muted-foreground shrink-0" />
@@ -187,22 +187,22 @@ export default function FormsPage() {
         columns={columns}
         searchConfig={{ placeholder: "Search forms..." }}
         toolbarExtra={toolbarExtraNode}
-        toolbarActions={[{ label: "New Form", icon: Plus, href: `${base}/forms/new` }]}
+        toolbarActions={[{ label: "New Form", icon: Plus, href: `${base}/settings/forms/new` }]}
         rowActions={[
           {
             label: "Designer",
             icon: PenTool,
-            href: (row) => `${base}/forms/${row.id}/designer`,
+            href: (row) => `${base}/settings/forms/${row.id}/designer`,
           },
           {
             label: "Edit",
             icon: Pencil,
-            href: (row) => `${base}/forms/${row.id}/edit`,
+            href: (row) => `${base}/settings/forms/${row.id}/edit`,
           },
           {
             label: "Delete",
             icon: Trash2,
-            href: (row) => `${base}/forms/${row.id}/delete`,
+            href: (row) => `${base}/settings/forms/${row.id}/delete`,
             variant: "destructive",
           },
         ]}

@@ -28,7 +28,7 @@ export async function action({ request, params }: Route.ActionArgs) {
   try {
     await deleteBroadcast(params.broadcastId, ctx);
     const redirectTo = new URL(request.url).searchParams.get("redirectTo");
-    return redirect(redirectTo || `/${params.tenant}/broadcasts`);
+    return redirect(redirectTo || `/${params.tenant}/settings/broadcasts`);
   } catch (error) {
     return handleServiceError(error);
   }
@@ -39,7 +39,7 @@ export default function DeleteBroadcastPage() {
   const actionData = useActionData<typeof action>();
   const basePrefix = useBasePrefix();
   const [searchParams] = useSearchParams();
-  const cancelUrl = searchParams.get("redirectTo") || `${basePrefix}/broadcasts`;
+  const cancelUrl = searchParams.get("redirectTo") || `${basePrefix}/settings/broadcasts`;
 
   const canDelete = broadcast.status !== "SENDING";
 

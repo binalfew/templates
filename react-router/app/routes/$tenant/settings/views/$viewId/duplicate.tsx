@@ -18,5 +18,5 @@ export async function loader({ request, params }: Route.LoaderArgs) {
   }
 
   const redirectTo = new URL(request.url).searchParams.get("redirectTo");
-  return redirect(redirectTo || `/${params.tenant}/views`);
+  return redirect(redirectTo || `/${params.tenant}/settings/views`);
 }

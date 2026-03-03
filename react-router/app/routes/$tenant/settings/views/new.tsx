@@ -43,7 +43,7 @@ export async function action({ request, params }: Route.ActionArgs) {
       isShared,
     });
     const redirectTo = new URL(request.url).searchParams.get("redirectTo");
-    return redirect(redirectTo || `/${params.tenant}/views`);
+    return redirect(redirectTo || `/${params.tenant}/settings/views`);
   } catch (error) {
     return handleServiceError(error);
   }
@@ -53,7 +53,7 @@ export default function NewViewPage() {
   const actionData = useActionData<typeof action>();
   const basePrefix = useBasePrefix();
   const [searchParams] = useSearchParams();
-  const cancelUrl = searchParams.get("redirectTo") || `${basePrefix}/views`;
+  const cancelUrl = searchParams.get("redirectTo") || `${basePrefix}/settings/views`;
 
   return (
     <div className="space-y-6">

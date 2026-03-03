@@ -69,7 +69,7 @@ export default function SavedViewsListPage() {
         return (
           <div className="flex items-center gap-2">
             <Icon className="size-4 text-muted-foreground shrink-0" />
-            <Link to={`${base}/views/${row.id}`} className="hover:underline">
+            <Link to={`${base}/settings/views/${row.id}`} className="hover:underline">
               {row.name}
             </Link>
           </div>
@@ -134,25 +134,25 @@ export default function SavedViewsListPage() {
         columns={columns}
         searchConfig={{ placeholder: "Search views..." }}
         toolbarActions={[
-          { label: "New View", icon: Plus, href: `${base}/views/new` },
+          { label: "New View", icon: Plus, href: `${base}/settings/views/new` },
         ]}
         rowActions={[
           {
             label: "Edit",
             icon: Pencil,
-            href: (row) => `${base}/views/${row.id}/edit`,
+            href: (row) => `${base}/settings/views/${row.id}/edit`,
             visible: (row) => row.userId === userId,
           },
           {
             label: "Duplicate",
             icon: Copy,
-            href: (row) => `${base}/views/${row.id}/duplicate`,
+            href: (row) => `${base}/settings/views/${row.id}/duplicate`,
             visible: (row) => row.userId === userId,
           },
           {
             label: "Delete",
             icon: Trash2,
-            href: (row) => `${base}/views/${row.id}/delete`,
+            href: (row) => `${base}/settings/views/${row.id}/delete`,
             variant: "destructive",
             visible: (row) => row.userId === userId,
           },

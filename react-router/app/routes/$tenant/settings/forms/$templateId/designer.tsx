@@ -376,7 +376,7 @@ export default function FormDesignerPage() {
             <div className="min-w-0">
               <div className="flex items-center gap-2">
                 <Button variant="ghost" size="icon" asChild className="size-8 shrink-0">
-                  <Link to={`${basePrefix}/forms`}>
+                  <Link to={`${basePrefix}/settings/forms`}>
                     <ArrowLeft className="size-4" />
                   </Link>
                 </Button>

@@ -55,19 +55,19 @@ export default function FormDetailPage() {
         </div>
         <div className="flex gap-2">
           <Button variant="outline" size="sm" asChild>
-            <Link to={`${base}/forms`}>
+            <Link to={`${base}/settings/forms`}>
               <ArrowLeft className="mr-1.5 size-3.5" />
               Back
             </Link>
           </Button>
           <Button variant="outline" size="sm" asChild>
-            <Link to={`${base}/forms/${template.id}/edit`}>
+            <Link to={`${base}/settings/forms/${template.id}/edit`}>
               <Pencil className="mr-1.5 size-3.5" />
               Edit
             </Link>
           </Button>
           <Button variant="outline" size="sm" asChild>
-            <Link to={`${base}/forms/${template.id}/delete`} className="text-destructive">
+            <Link to={`${base}/settings/forms/${template.id}/delete`} className="text-destructive">
               <Trash2 className="mr-1.5 size-3.5" />
               Delete
             </Link>
@@ -122,13 +122,13 @@ export default function FormDetailPage() {
           <CardContent>
             <div className="flex flex-wrap gap-3">
               <Button variant="outline" size="sm" asChild>
-                <Link to={`${base}/forms/${template.id}/designer`}>
+                <Link to={`${base}/settings/forms/${template.id}/designer`}>
                   <PenTool className="mr-1.5 size-3.5" />
                   Open Designer
                 </Link>
               </Button>
               <Button variant="outline" size="sm" asChild>
-                <Link to={`${base}/forms/${template.id}/edit`}>
+                <Link to={`${base}/settings/forms/${template.id}/edit`}>
                   <Pencil className="mr-1.5 size-3.5" />
                   Edit Details
                 </Link>

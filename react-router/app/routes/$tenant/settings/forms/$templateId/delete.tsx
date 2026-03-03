@@ -26,7 +26,7 @@ export async function action({ request, params }: Route.ActionArgs) {
   try {
     await deleteSectionTemplate(params.templateId, ctx);
     const redirectTo = new URL(request.url).searchParams.get("redirectTo");
-    return redirect(redirectTo || `/${params.tenant}/forms`);
+    return redirect(redirectTo || `/${params.tenant}/settings/forms`);
   } catch (error) {
     return handleServiceError(error);
   }
@@ -37,7 +37,7 @@ export default function DeleteFormPage() {
   const actionData = useActionData<typeof action>();
   const basePrefix = useBasePrefix();
   const [searchParams] = useSearchParams();
-  const cancelUrl = searchParams.get("redirectTo") || `${basePrefix}/forms`;
+  const cancelUrl = searchParams.get("redirectTo") || `${basePrefix}/settings/forms`;
 
   return (
     <div className="space-y-6">

@@ -40,7 +40,7 @@ export async function action({ request, params }: Route.ActionArgs) {
       description: submission.value.description || undefined,
     });
     const redirectTo = new URL(request.url).searchParams.get("redirectTo");
-    return redirect(redirectTo || `/${params.tenant}/objects`);
+    return redirect(redirectTo || `/${params.tenant}/settings/objects`);
   } catch (error) {
     return handleServiceError(error, { submission });
   }
@@ -51,7 +51,7 @@ export default function EditCustomObjectPage() {
   const actionData = useActionData<typeof action>();
   const basePrefix = useBasePrefix();
   const [searchParams] = useSearchParams();
-  const cancelUrl = searchParams.get("redirectTo") || `${basePrefix}/objects`;
+  const cancelUrl = searchParams.get("redirectTo") || `${basePrefix}/settings/objects`;
 
   const [form, fields] = useForm({
     lastResult: actionData?.result,

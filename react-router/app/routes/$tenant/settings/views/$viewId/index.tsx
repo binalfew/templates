@@ -71,7 +71,7 @@ export default function ViewDetailPage() {
         </div>
         <div className="flex gap-2">
           <Button variant="outline" size="sm" asChild>
-            <Link to={`${base}/views`}>
+            <Link to={`${base}/settings/views`}>
               <ArrowLeft className="mr-1.5 size-3.5" />
               Back
             </Link>
@@ -79,19 +79,19 @@ export default function ViewDetailPage() {
           {isOwner && (
             <>
               <Button variant="outline" size="sm" asChild>
-                <Link to={`${base}/views/${view.id}/edit`}>
+                <Link to={`${base}/settings/views/${view.id}/edit`}>
                   <Pencil className="mr-1.5 size-3.5" />
                   Edit
                 </Link>
               </Button>
               <Button variant="outline" size="sm" asChild>
-                <Link to={`${base}/views/${view.id}/duplicate`}>
+                <Link to={`${base}/settings/views/${view.id}/duplicate`}>
                   <Copy className="mr-1.5 size-3.5" />
                   Duplicate
                 </Link>
               </Button>
               <Button variant="outline" size="sm" asChild>
-                <Link to={`${base}/views/${view.id}/delete`} className="text-destructive">
+                <Link to={`${base}/settings/views/${view.id}/delete`} className="text-destructive">
                   <Trash2 className="mr-1.5 size-3.5" />
                   Delete
                 </Link>

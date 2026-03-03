@@ -40,7 +40,7 @@ export async function action({ request, params }: Route.ActionArgs) {
   try {
     await updateSectionTemplate(params.templateId, submission.value, ctx);
     const redirectTo = new URL(request.url).searchParams.get("redirectTo");
-    return redirect(redirectTo || `/${params.tenant}/forms`);
+    return redirect(redirectTo || `/${params.tenant}/settings/forms`);
   } catch (error) {
     return handleServiceError(error, { submission });
   }
@@ -51,7 +51,7 @@ export default function EditFormPage() {
   const actionData = useActionData<typeof action>();
   const basePrefix = useBasePrefix();
   const [searchParams] = useSearchParams();
-  const cancelUrl = searchParams.get("redirectTo") || `${basePrefix}/forms`;
+  const cancelUrl = searchParams.get("redirectTo") || `${basePrefix}/settings/forms`;
 
   const [form, fields] = useForm({
     lastResult: actionData?.result,

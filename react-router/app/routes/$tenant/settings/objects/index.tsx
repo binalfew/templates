@@ -86,7 +86,7 @@ export default function CustomObjectsPage() {
       cell: (row) => (
         <div className="flex items-center gap-2">
           <Box className="size-4 text-muted-foreground shrink-0" />
-          <Link to={`${base}/objects/${row.slug}`} className="hover:underline">
+          <Link to={`${base}/settings/objects/${row.slug}`} className="hover:underline">
             {row.name}
           </Link>
         </div>
@@ -218,23 +218,23 @@ export default function CustomObjectsPage() {
         searchConfig={{ placeholder: "Search objects..." }}
         toolbarExtra={toolbarExtraNode}
         toolbarActions={[
-          { label: "New Object", icon: Plus, href: `${base}/objects/new` },
+          { label: "New Object", icon: Plus, href: `${base}/settings/objects/new` },
         ]}
         rowActions={[
           {
             label: "View Records",
             icon: Database,
-            href: (row) => `${base}/objects/${row.slug}`,
+            href: (row) => `${base}/settings/objects/${row.slug}`,
           },
           {
             label: "Edit",
             icon: Pencil,
-            href: (row) => `${base}/objects/${row.id}/edit`,
+            href: (row) => `${base}/settings/objects/${row.id}/edit`,
           },
           {
             label: "Delete",
             icon: Trash2,
-            href: (row) => `${base}/objects/${row.id}/delete`,
+            href: (row) => `${base}/settings/objects/${row.id}/delete`,
             variant: "destructive",
           },
         ]}

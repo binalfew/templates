@@ -28,7 +28,7 @@ export async function action({ request, params }: Route.ActionArgs) {
 
   try {
     await deleteRecord(params.recordId!);
-    return redirect(`/${params.tenant}/objects/${params.slug}`);
+    return redirect(`/${params.tenant}/settings/objects/${params.slug}`);
   } catch (error) {
     return handleServiceError(error);
   }
@@ -38,7 +38,7 @@ export default function DeleteRecordPage() {
   const { record, fields, slug } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
   const base = useBasePrefix();
-  const cancelUrl = `${base}/objects/${slug}`;
+  const cancelUrl = `${base}/settings/objects/${slug}`;
   const recordData = record.data as Record<string, unknown>;
 
   return (

@@ -109,7 +109,7 @@ export default function BroadcastsPage() {
       cell: (row) => (
         <div className="flex items-center gap-2">
           <Send className="size-4 text-muted-foreground shrink-0" />
-          <Link to={`${base}/broadcasts/${row.id}`} className="hover:underline">
+          <Link to={`${base}/settings/broadcasts/${row.id}`} className="hover:underline">
             {row.subject || "(no subject)"}
           </Link>
         </div>
@@ -214,12 +214,12 @@ export default function BroadcastsPage() {
         columns={columns}
         searchConfig={{ placeholder: "Search broadcasts..." }}
         toolbarExtra={toolbarExtraNode}
-        toolbarActions={[{ label: "New Broadcast", icon: Plus, href: `${base}/broadcasts/new` }]}
+        toolbarActions={[{ label: "New Broadcast", icon: Plus, href: `${base}/settings/broadcasts/new` }]}
         rowActions={[
           {
             label: "Edit",
             icon: Pencil,
-            href: (row) => `${base}/broadcasts/${row.id}/edit`,
+            href: (row) => `${base}/settings/broadcasts/${row.id}/edit`,
             visible: (row) => row.status === "DRAFT",
           },
           {
@@ -248,7 +248,7 @@ export default function BroadcastsPage() {
           {
             label: "Delete",
             icon: Trash2,
-            href: (row) => `${base}/broadcasts/${row.id}/delete`,
+            href: (row) => `${base}/settings/broadcasts/${row.id}/delete`,
             variant: "destructive",
             visible: (row) => row.status !== "SENDING",
           },

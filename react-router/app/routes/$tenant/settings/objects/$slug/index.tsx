@@ -103,7 +103,7 @@ export default function CustomObjectRecordsPage() {
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-        <Link to={`${base}/objects`}>
+        <Link to={`${base}/settings/objects`}>
           <Button variant="ghost" size="sm">
             <ArrowLeft className="mr-1 size-4" /> Back
           </Button>
@@ -133,19 +133,19 @@ export default function CustomObjectRecordsPage() {
         columns={columns}
         searchConfig={{ placeholder: "Search records..." }}
         toolbarActions={[
-          { label: "New Record", icon: Plus, href: `${base}/objects/${slug}/new` },
-          { label: "Add Field", icon: Settings, href: `${base}/objects/${slug}/add-field`, variant: "outline" },
+          { label: "New Record", icon: Plus, href: `${base}/settings/objects/${slug}/new` },
+          { label: "Add Field", icon: Settings, href: `${base}/settings/objects/${slug}/add-field`, variant: "outline" },
         ]}
         rowActions={[
           {
             label: "Edit",
             icon: Pencil,
-            href: (row) => `${base}/objects/${slug}/${row.id}/edit`,
+            href: (row) => `${base}/settings/objects/${slug}/${row.id}/edit`,
           },
           {
             label: "Delete",
             icon: Trash2,
-            href: (row) => `${base}/objects/${slug}/${row.id}/delete`,
+            href: (row) => `${base}/settings/objects/${slug}/${row.id}/delete`,
             variant: "destructive",
           },
         ]}

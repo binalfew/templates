@@ -47,14 +47,14 @@ export default function BroadcastDetailPage() {
         </div>
         <div className="flex gap-2">
           <Button variant="outline" size="sm" asChild>
-            <Link to={`${base}/broadcasts`}>
+            <Link to={`${base}/settings/broadcasts`}>
               <ArrowLeft className="mr-1.5 size-3.5" />
               Back
             </Link>
           </Button>
           {broadcast.status === "DRAFT" && (
             <Button variant="outline" size="sm" asChild>
-              <Link to={`${base}/broadcasts/${broadcast.id}/edit`}>
+              <Link to={`${base}/settings/broadcasts/${broadcast.id}/edit`}>
                 <Pencil className="mr-1.5 size-3.5" />
                 Edit
               </Link>
@@ -63,7 +63,7 @@ export default function BroadcastDetailPage() {
           {broadcast.status !== "SENDING" && (
             <Button variant="outline" size="sm" asChild>
               <Link
-                to={`${base}/broadcasts/${broadcast.id}/delete`}
+                to={`${base}/settings/broadcasts/${broadcast.id}/delete`}
                 className="text-destructive"
               >
                 <Trash2 className="mr-1.5 size-3.5" />

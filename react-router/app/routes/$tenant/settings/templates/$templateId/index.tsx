@@ -40,19 +40,19 @@ export default function TemplateDetailPage() {
         </div>
         <div className="flex gap-2">
           <Button variant="outline" size="sm" asChild>
-            <Link to={`${base}/templates`}>
+            <Link to={`${base}/settings/templates`}>
               <ArrowLeft className="mr-1.5 size-3.5" />
               Back
             </Link>
           </Button>
           <Button variant="outline" size="sm" asChild>
-            <Link to={`${base}/templates/${template.id}/edit`}>
+            <Link to={`${base}/settings/templates/${template.id}/edit`}>
               <Pencil className="mr-1.5 size-3.5" />
               Edit
             </Link>
           </Button>
           <Button variant="outline" size="sm" asChild>
-            <Link to={`${base}/templates/${template.id}/delete`} className="text-destructive">
+            <Link to={`${base}/settings/templates/${template.id}/delete`} className="text-destructive">
               <Trash2 className="mr-1.5 size-3.5" />
               Delete
             </Link>

@@ -28,7 +28,7 @@ export async function action({ request, params }: Route.ActionArgs) {
   try {
     await deleteTemplate(params.templateId, ctx);
     const redirectTo = new URL(request.url).searchParams.get("redirectTo");
-    return redirect(redirectTo || `/${params.tenant}/templates`);
+    return redirect(redirectTo || `/${params.tenant}/settings/templates`);
   } catch (error) {
     return handleServiceError(error);
   }
@@ -39,7 +39,7 @@ export default function DeleteTemplatePage() {
   const actionData = useActionData<typeof action>();
   const basePrefix = useBasePrefix();
   const [searchParams] = useSearchParams();
-  const cancelUrl = searchParams.get("redirectTo") || `${basePrefix}/templates`;
+  const cancelUrl = searchParams.get("redirectTo") || `${basePrefix}/settings/templates`;
 
   const canDelete = !template.isSystem;
 

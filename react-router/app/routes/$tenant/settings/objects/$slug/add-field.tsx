@@ -80,7 +80,7 @@ export async function action({ request, params }: Route.ActionArgs) {
 
   try {
     await updateDefinition(definition.id, { fields });
-    return redirect(`/${params.tenant}/objects/${params.slug}`);
+    return redirect(`/${params.tenant}/settings/objects/${params.slug}`);
   } catch (error) {
     return handleServiceError(error, { submission });
   }
@@ -90,7 +90,7 @@ export default function AddFieldPage() {
   const { definition, fields } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
   const base = useBasePrefix();
-  const cancelUrl = `${base}/objects/${definition.slug}`;
+  const cancelUrl = `${base}/settings/objects/${definition.slug}`;
 
   const [form, formFields] = useForm({
     lastResult: actionData?.result,

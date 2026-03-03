@@ -42,7 +42,7 @@ export async function action({ request, params }: Route.ActionArgs) {
   try {
     await createBroadcast(submission.value, ctx);
     const redirectTo = new URL(request.url).searchParams.get("redirectTo");
-    return redirect(redirectTo || `/${params.tenant}/broadcasts`);
+    return redirect(redirectTo || `/${params.tenant}/settings/broadcasts`);
   } catch (error) {
     return handleServiceError(error, { submission });
   }
@@ -53,7 +53,7 @@ export default function NewBroadcastPage() {
   const actionData = useActionData<typeof action>();
   const basePrefix = useBasePrefix();
   const [searchParams] = useSearchParams();
-  const cancelUrl = searchParams.get("redirectTo") || `${basePrefix}/broadcasts`;
+  const cancelUrl = searchParams.get("redirectTo") || `${basePrefix}/settings/broadcasts`;
 
   const [form, fields] = useForm({
     lastResult: actionData?.result,

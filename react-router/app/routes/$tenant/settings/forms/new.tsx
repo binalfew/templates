@@ -38,7 +38,7 @@ export async function action({ request, params }: Route.ActionArgs) {
 
   try {
     const template = await createSectionTemplate(submission.value, ctx);
-    return redirect(`/${params.tenant}/forms/${template.id}/designer`);
+    return redirect(`/${params.tenant}/settings/forms/${template.id}/designer`);
   } catch (error) {
     return handleServiceError(error, { submission });
   }
@@ -48,7 +48,7 @@ export default function NewFormPage() {
   const actionData = useActionData<typeof action>();
   const basePrefix = useBasePrefix();
   const [searchParams] = useSearchParams();
-  const cancelUrl = searchParams.get("redirectTo") || `${basePrefix}/forms`;
+  const cancelUrl = searchParams.get("redirectTo") || `${basePrefix}/settings/forms`;
 
   const [form, fields] = useForm({
     lastResult: actionData?.result,
