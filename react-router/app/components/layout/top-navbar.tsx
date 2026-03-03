@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Form, Link, useMatches, useNavigate } from "react-router";
+import { Form, Link, NavLink, useLocation, useMatches, useNavigate } from "react-router";
 import { useTranslation } from "react-i18next";
 import { LogOut, Search, User } from "lucide-react";
 import { CommandPalette } from "~/components/layout/command-palette";
@@ -33,6 +33,8 @@ import { NotificationBell } from "~/components/notification-bell";
 import { OfflineIndicator } from "~/components/offline-indicator";
 import { LanguageSwitcher } from "~/components/layout/language-switcher";
 import { ThemeSwitch } from "~/routes/resources/theme-switch";
+import { cn } from "~/lib/utils";
+import type { NavChild } from "~/config/navigation";
 import type { Theme } from "~/lib/theme.server";
 
 interface NotificationItem {
@@ -55,6 +57,7 @@ type TopNavbarProps = {
   shortcutsEnabled?: boolean;
   i18nEnabled?: boolean;
   offlineEnabled?: boolean;
+  settingsChildren?: NavChild[];
 };
 
 type BreadcrumbEntry = {
@@ -73,6 +76,18 @@ function useBreadcrumbs(): BreadcrumbEntry[] {
         label: handle.breadcrumb,
         to: match.pathname,
       });
+    }
+  }
+
+  // Merge "Settings" + child into a single "Settings | Child" breadcrumb
+  for (let i = 0; i < crumbs.length - 1; i++) {
+    if (crumbs[i].label === "Settings") {
+      crumbs[i] = {
+        label: `Settings | ${crumbs[i + 1].label}`,
+        to: crumbs[i + 1].to,
+      };
+      crumbs.splice(i + 1, 1);
+      break;
     }
   }
 
@@ -102,10 +117,13 @@ export function TopNavbar({
   shortcutsEnabled = false,
   i18nEnabled = false,
   offlineEnabled = false,
+  settingsChildren = [],
 }: TopNavbarProps) {
   const breadcrumbs = useBreadcrumbs();
   const navigate = useNavigate();
+  const location = useLocation();
   const { t } = useTranslation("common");
+  const { t: tNav } = useTranslation("nav");
   const [searchOpen, setSearchOpen] = useState(false);
   const [shortcutHelpOpen, setShortcutHelpOpen] = useState(false);
 
@@ -170,7 +188,12 @@ export function TopNavbar({
 
   const shortcutInfoList = useMemo(() => getShortcutInfo(shortcuts), [shortcuts]);
 
+  const settingsPrefix = `${basePrefix}/settings`;
+  const isSettingsPage =
+    settingsChildren.length > 0 && location.pathname.startsWith(settingsPrefix);
+
   return (
+    <>
     <header className="flex h-12 shrink-0 items-center gap-2 border-b bg-primary text-primary-foreground">
       <div className="flex flex-1 items-center gap-2 px-4">
         <SidebarTrigger className="-ml-1 text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground" />
@@ -306,5 +329,30 @@ export function TopNavbar({
         shortcuts={shortcutInfoList}
       />
     </header>
+
+    {isSettingsPage && (
+      <nav className="flex shrink-0 overflow-x-auto border-b bg-background">
+        <div className="flex items-center px-4">
+          {settingsChildren.map((child) => (
+            <NavLink
+              key={child.url}
+              to={child.url}
+              end={child.end}
+              className={({ isActive }) =>
+                cn(
+                  "whitespace-nowrap px-3 py-2 text-sm font-medium transition-colors",
+                  isActive
+                    ? "border-b-2 border-primary text-primary"
+                    : "text-muted-foreground hover:text-foreground",
+                )
+              }
+            >
+              {child.tKey ? tNav(child.tKey) : child.title}
+            </NavLink>
+          ))}
+        </div>
+      </nav>
+    )}
+    </>
   );
 }

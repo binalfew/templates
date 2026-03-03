@@ -2,7 +2,7 @@ import { useState } from "react";
 import { data, Form, useLoaderData, useActionData, useFetcher } from "react-router";
 import { Pencil, X, Check } from "lucide-react";
 
-export const handle = { breadcrumb: "Settings" };
+export const handle = { breadcrumb: "General" };
 
 import { requireAnyRole } from "~/lib/auth/require-auth.server";
 import { getAllSettings, setSetting, deleteSetting } from "~/lib/config/settings.server";

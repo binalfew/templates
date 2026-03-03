@@ -9,16 +9,8 @@ import {
   BarChart3,
   ClipboardList,
   Bell,
-  Database,
-  Webhook,
-  Key,
   Search,
-  Bookmark,
-  Boxes,
-  MessageSquare,
-  Send,
   Upload,
-  FormInput,
   Download,
 } from "lucide-react";
 
@@ -47,6 +39,17 @@ export type NavGroup = {
   tKey?: string;
   items: NavItem[];
 };
+
+function isVisibleEntry(
+  entry: { roles?: string[]; featureFlag?: string },
+  userRoles: string[],
+  enabledFeatures?: Record<string, boolean>,
+): boolean {
+  return (
+    (!entry.roles || entry.roles.some((r) => userRoles.includes(r))) &&
+    (!entry.featureFlag || !!enabledFeatures?.[entry.featureFlag])
+  );
+}
 
 export function buildNavigationGroups(basePrefix: string): NavGroup[] {
   return [
@@ -116,46 +119,11 @@ export function buildNavigationGroups(basePrefix: string): NavGroup[] {
       tKey: "content",
       items: [
         {
-          title: "Views",
-          tKey: "savedViews",
-          url: `${basePrefix}/views`,
-          icon: Bookmark,
-          featureFlag: "FF_SAVED_VIEWS",
-        },
-        {
-          title: "Objects",
-          tKey: "customObjects",
-          url: `${basePrefix}/objects`,
-          icon: Boxes,
-          featureFlag: "FF_CUSTOM_OBJECTS",
-        },
-        {
-          title: "Templates",
-          tKey: "messageTemplates",
-          url: `${basePrefix}/templates`,
-          icon: MessageSquare,
-          featureFlag: "FF_BROADCASTS",
-        },
-        {
-          title: "Broadcasts",
-          tKey: "broadcasts",
-          url: `${basePrefix}/broadcasts`,
-          icon: Send,
-          featureFlag: "FF_BROADCASTS",
-        },
-        {
           title: "File Uploads",
           tKey: "fileUploads",
           url: `${basePrefix}/uploads`,
           icon: Upload,
           featureFlag: "FF_FILE_UPLOADS",
-        },
-        {
-          title: "Forms",
-          tKey: "formDesigner",
-          url: `${basePrefix}/forms`,
-          icon: FormInput,
-          featureFlag: "FF_FORM_DESIGNER",
         },
         {
           title: "Import",
@@ -204,59 +172,102 @@ export function buildNavigationGroups(basePrefix: string): NavGroup[] {
           url: `${basePrefix}/settings`,
           icon: Settings,
           roles: ["ADMIN", "TENANT_ADMIN"],
-          children: [
-            { title: "General", tKey: "general", url: `${basePrefix}/settings`, end: true },
-            {
-              title: "Organization",
-              tKey: "organization",
-              url: `${basePrefix}/settings/organization`,
-              roles: ["ADMIN", "TENANT_ADMIN"],
-            },
-            {
-              title: "Features",
-              tKey: "featureFlags",
-              url: `${basePrefix}/settings/features`,
-              roles: ["ADMIN"],
-            },
-            {
-              title: "API Keys",
-              tKey: "apiKeys",
-              url: `${basePrefix}/settings/api-keys`,
-              roles: ["ADMIN", "TENANT_ADMIN"],
-              featureFlag: "FF_REST_API",
-            },
-            {
-              title: "Webhooks",
-              tKey: "webhooks",
-              url: `${basePrefix}/settings/webhooks`,
-              roles: ["ADMIN", "TENANT_ADMIN"],
-              featureFlag: "FF_WEBHOOKS",
-            },
-            {
-              title: "Fields",
-              tKey: "customFields",
-              url: `${basePrefix}/settings/fields`,
-              roles: ["ADMIN", "TENANT_ADMIN"],
-              featureFlag: "FF_CUSTOM_FIELDS",
-            },
-            {
-              title: "References",
-              tKey: "referenceData",
-              url: `${basePrefix}/settings/references`,
-              roles: ["ADMIN"],
-            },
-            {
-              title: "Security",
-              tKey: "security",
-              url: `${basePrefix}/settings/security`,
-              roles: ["ADMIN", "TENANT_ADMIN"],
-              featureFlag: "FF_TWO_FACTOR",
-            },
-          ],
         },
       ],
     },
   ];
+}
+
+export function buildSettingsChildren(basePrefix: string): NavChild[] {
+  return [
+    { title: "General", tKey: "general", url: `${basePrefix}/settings`, end: true },
+    {
+      title: "Organization",
+      tKey: "organization",
+      url: `${basePrefix}/settings/organization`,
+      roles: ["ADMIN", "TENANT_ADMIN"],
+    },
+    {
+      title: "Features",
+      tKey: "featureFlags",
+      url: `${basePrefix}/settings/features`,
+      roles: ["ADMIN"],
+    },
+    {
+      title: "API Keys",
+      tKey: "apiKeys",
+      url: `${basePrefix}/settings/api-keys`,
+      roles: ["ADMIN", "TENANT_ADMIN"],
+      featureFlag: "FF_REST_API",
+    },
+    {
+      title: "Webhooks",
+      tKey: "webhooks",
+      url: `${basePrefix}/settings/webhooks`,
+      roles: ["ADMIN", "TENANT_ADMIN"],
+      featureFlag: "FF_WEBHOOKS",
+    },
+    {
+      title: "Fields",
+      tKey: "customFields",
+      url: `${basePrefix}/settings/fields`,
+      roles: ["ADMIN", "TENANT_ADMIN"],
+      featureFlag: "FF_CUSTOM_FIELDS",
+    },
+    {
+      title: "References",
+      tKey: "referenceData",
+      url: `${basePrefix}/settings/references`,
+      roles: ["ADMIN"],
+    },
+    {
+      title: "Security",
+      tKey: "security",
+      url: `${basePrefix}/settings/security`,
+      roles: ["ADMIN", "TENANT_ADMIN"],
+      featureFlag: "FF_TWO_FACTOR",
+    },
+    {
+      title: "Views",
+      tKey: "savedViews",
+      url: `${basePrefix}/settings/views`,
+      featureFlag: "FF_SAVED_VIEWS",
+    },
+    {
+      title: "Objects",
+      tKey: "customObjects",
+      url: `${basePrefix}/settings/objects`,
+      featureFlag: "FF_CUSTOM_OBJECTS",
+    },
+    {
+      title: "Templates",
+      tKey: "messageTemplates",
+      url: `${basePrefix}/settings/templates`,
+      featureFlag: "FF_BROADCASTS",
+    },
+    {
+      title: "Broadcasts",
+      tKey: "broadcasts",
+      url: `${basePrefix}/settings/broadcasts`,
+      featureFlag: "FF_BROADCASTS",
+    },
+    {
+      title: "Forms",
+      tKey: "formDesigner",
+      url: `${basePrefix}/settings/forms`,
+      featureFlag: "FF_FORM_DESIGNER",
+    },
+  ];
+}
+
+export function getVisibleSettingsChildren(
+  roles: string[],
+  basePrefix = "/admin",
+  enabledFeatures?: Record<string, boolean>,
+): NavChild[] {
+  return buildSettingsChildren(basePrefix).filter((child) =>
+    isVisibleEntry(child, roles, enabledFeatures),
+  );
 }
 
 export function getVisibleGroups(
@@ -268,14 +279,11 @@ export function getVisibleGroups(
     .map((group) => ({
       ...group,
       items: group.items
-        .filter((item) => !item.roles || item.roles.some((r) => roles.includes(r)))
-        .filter((item) => !item.featureFlag || enabledFeatures?.[item.featureFlag])
+        .filter((item) => isVisibleEntry(item, roles, enabledFeatures))
         .map((item) => ({
           ...item,
-          children: item.children?.filter(
-            (child) =>
-              (!child.roles || child.roles.some((r) => roles.includes(r))) &&
-              (!child.featureFlag || enabledFeatures?.[child.featureFlag]),
+          children: item.children?.filter((child) =>
+            isVisibleEntry(child, roles, enabledFeatures),
           ),
         })),
     }))
