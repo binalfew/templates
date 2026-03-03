@@ -1,0 +1,47 @@
+# Version control
+.git
+.gitignore
+
+# Dependencies
+node_modules
+
+# Build output
+build
+
+# Environment files (except example)
+.env
+.env.*
+!.env.example
+
+# Test files
+tests/
+**/*.test.ts
+**/*.spec.ts
+coverage/
+playwright-report/
+test-results/
+
+# Documentation
+docs/
+modules/
+tasks/
+*.md
+!README.md
+
+# IDE / Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# CI/CD
+.github/
+
+# Git hooks
+.husky/
+
+# Misc
+.DS_Store
+.cache/
+*.tsbuildinfo
+.react-router/

@@ -1,0 +1,771 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─── Enums ───────────────────────────────────────────────
+
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+  LOCKED
+  SUSPENDED
+}
+
+enum RoleScope {
+  GLOBAL
+  TENANT
+  EVENT
+}
+
+enum AuditAction {
+  CREATE
+  UPDATE
+  DELETE
+  LOGIN
+  LOGOUT
+  CONFIGURE
+  RATE_LIMIT
+  TWO_FACTOR_ENABLE
+  TWO_FACTOR_DISABLE
+}
+
+enum JobStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
+enum InvitationStatus {
+  PENDING
+  ACCEPTED
+  EXPIRED
+  REVOKED
+}
+
+enum ApiKeyStatus {
+  ACTIVE
+  ROTATED
+  REVOKED
+  EXPIRED
+}
+
+enum RateLimitTier {
+  STANDARD
+  ELEVATED
+  PREMIUM
+  CUSTOM
+}
+
+enum WebhookStatus {
+  ACTIVE
+  PAUSED
+  DISABLED
+  SUSPENDED
+}
+
+enum DeliveryStatus {
+  PENDING
+  DELIVERED
+  FAILED
+  RETRYING
+  DEAD_LETTER
+}
+
+enum FormTemplateStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+// ─── Models ─────────────────────────────────────────────
+
+model Tenant {
+  id               String   @id @default(cuid())
+  name             String
+  slug             String   @unique
+  email            String
+  phone            String   @default("")
+  website          String?
+  address          String   @default("")
+  city             String   @default("")
+  state            String   @default("")
+  zip              String   @default("")
+  country          String   @default("")
+  subscriptionPlan String   @default("free")
+  logoUrl          String?
+  brandTheme       String   @default("")
+  featureFlags     Json     @default("{}")
+  extras           Json     @default("{}")
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  users                User[]
+  roles                Role[]
+  settings             SystemSetting[]
+  notifications        Notification[]
+  apiKeys              ApiKey[]
+  webhookSubscriptions WebhookSubscription[]
+  invitations          Invitation[]
+}
+
+model User {
+  id                  String     @id @default(cuid())
+  email               String     @unique
+  username            String?    @unique
+  name                String?
+  photoUrl            String?
+  status              UserStatus @default(ACTIVE)
+  tenantId            String?
+  failedLoginAttempts Int        @default(0)
+  lastFailedLoginAt   DateTime?
+  lockedAt            DateTime?
+  lockReason          String?
+  lockCount           Int        @default(0)
+  autoUnlockAt        DateTime?
+  twoFactorEnabled    Boolean    @default(false)
+  extras              Json       @default("{}")
+  deletedAt           DateTime?
+  createdAt           DateTime   @default(now())
+  updatedAt           DateTime   @updatedAt
+
+  tenant        Tenant?        @relation(fields: [tenantId], references: [id])
+  password      Password?
+  sessions      Session[]
+  userRoles     UserRole[]
+  notifications Notification[]
+  verifications Verification[]
+  auditLogs          AuditLog[]
+  savedViews         SavedView[]
+  messageDeliveries  MessageDelivery[]
+  recoveryCodes      RecoveryCode[]
+  invitationsSent    Invitation[]
+  @@index([tenantId])
+  @@index([deletedAt])
+}
+
+model Password {
+  id     String @id @default(cuid())
+  hash   String
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Session {
+  id             String   @id @default(cuid())
+  userId         String
+  expirationDate DateTime
+  fingerprint    String?
+  createdAt      DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model Role {
+  id          String    @id @default(cuid())
+  tenantId    String
+  name        String
+  description String?
+  scope       RoleScope @default(TENANT)
+  deletedAt   DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  tenant          Tenant           @relation(fields: [tenantId], references: [id])
+  rolePermissions RolePermission[]
+  userRoles       UserRole[]
+
+  @@unique([tenantId, name])
+  @@index([deletedAt])
+}
+
+model Permission {
+  id          String   @id @default(cuid())
+  resource    String
+  action      String
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  rolePermissions RolePermission[]
+
+  @@unique([resource, action], name: "resource_action")
+}
+
+model RolePermission {
+  id           String @id @default(cuid())
+  roleId       String
+  permissionId String
+  access       String @default("any") // "own" | "any"
+
+  role       Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@unique([roleId, permissionId])
+}
+
+model UserRole {
+  id      String  @id @default(cuid())
+  userId  String
+  roleId  String
+  eventId String?
+  stepId  String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([roleId])
+}
+
+model FeatureFlag {
+  id                String   @id @default(cuid())
+  key               String   @unique
+  description       String?
+  enabled           Boolean  @default(false)
+  enabledForTenants String[] @default([])
+  enabledForRoles   String[] @default([])
+  enabledForUsers   String[] @default([])
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+model SystemSetting {
+  id        String   @id @default(cuid())
+  tenantId  String?
+  key       String
+  value     String
+  type      String   @default("string") // string, number, boolean, json
+  category  String   @default("general")
+  scope     String   @default("global") // global, tenant, user
+  scopeId   String   @default("")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  tenant Tenant? @relation(fields: [tenantId], references: [id])
+
+  @@unique([key, scope, scopeId])
+  @@index([tenantId])
+}
+
+model AuditLog {
+  id          String   @id @default(cuid())
+  tenantId    String?
+  userId      String?
+  action      String
+  entityType  String
+  entityId    String?
+  description String?
+  metadata    Json?
+  ipAddress   String?
+  userAgent   String?
+  createdAt   DateTime @default(now())
+
+  user User? @relation(fields: [userId], references: [id])
+
+  @@index([tenantId])
+  @@index([userId])
+  @@index([createdAt])
+}
+
+model Notification {
+  id        String    @id @default(cuid())
+  userId    String
+  tenantId  String
+  type      String
+  title     String
+  message   String
+  data      Json?
+  read      Boolean   @default(false)
+  readAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@index([userId, read])
+  @@index([userId, createdAt])
+  @@index([tenantId])
+}
+
+model Verification {
+  id        String   @id @default(cuid())
+  userId    String?
+  type      String
+  target    String
+  secret    String
+  algorithm String
+  digits    Int
+  period    Int
+  charSet   String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  user User? @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([target, type])
+}
+
+// ─── API Keys & Webhooks ──────────────────────────────
+
+model ApiKey {
+  id               String        @id @default(cuid())
+  tenantId         String
+  tenant           Tenant        @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  name             String
+  description      String?
+  keyHash          String        @unique
+  keyPrefix        String
+  permissions      String[]
+  scopes           Json?
+  rateLimitTier    RateLimitTier @default(STANDARD)
+  rateLimitCustom  Int?
+  status           ApiKeyStatus  @default(ACTIVE)
+  expiresAt        DateTime?
+  lastUsedAt       DateTime?
+  lastUsedIp       String?
+  usageCount       Int           @default(0)
+  allowedIps       String[]
+  allowedOrigins   String[]
+  rotatedFromId    String?       @unique
+  rotatedFrom      ApiKey?       @relation("KeyRotation", fields: [rotatedFromId], references: [id])
+  rotatedTo        ApiKey?       @relation("KeyRotation")
+  rotationGraceEnd DateTime?
+  createdBy        String
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+  revokedAt        DateTime?
+
+  @@index([tenantId, status])
+  @@index([keyHash])
+  @@index([keyPrefix])
+}
+
+model WebhookSubscription {
+  id                    String        @id @default(cuid())
+  tenantId              String
+  tenant                Tenant        @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  url                   String
+  description           String?
+  events                String[]
+  secret                String
+  status                WebhookStatus @default(ACTIVE)
+  version               String        @default("v1")
+  maxRetries            Int           @default(5)
+  retryBackoffMs        Int[]         @default([1000, 5000, 30000, 300000, 1800000])
+  timeoutMs             Int           @default(10000)
+  consecutiveFailures   Int           @default(0)
+  circuitBreakerOpen    Boolean       @default(false)
+  circuitBreakerResetAt DateTime?
+  headers               Json?
+  metadata              Json?
+  createdBy             String
+  deletedAt             DateTime?
+  createdAt             DateTime      @default(now())
+  updatedAt             DateTime      @updatedAt
+
+  deliveries WebhookDelivery[]
+
+  @@index([tenantId, status])
+  @@index([deletedAt])
+}
+
+model WebhookDelivery {
+  id              String              @id @default(cuid())
+  tenantId        String
+  subscriptionId  String
+  subscription    WebhookSubscription @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+  eventType       String
+  eventId         String
+  payload         Json
+  status          DeliveryStatus      @default(PENDING)
+  attempts        Int                 @default(0)
+  maxAttempts     Int                 @default(5)
+  nextRetryAt     DateTime?
+  responseCode    Int?
+  responseBody    String?
+  responseHeaders Json?
+  latencyMs       Int?
+  errorMessage    String?
+  errorType       String?
+  deliveredAt     DateTime?
+  createdAt       DateTime            @default(now())
+  updatedAt       DateTime            @updatedAt
+
+  @@index([subscriptionId, status])
+  @@index([tenantId, eventType, createdAt])
+  @@index([status, nextRetryAt])
+  @@index([eventId])
+}
+
+// ─── Reference Data ───────────────────────────────────
+
+model Country {
+  id          String   @id @default(cuid())
+  code        String   @unique // ISO 3166-1 alpha-2
+  name        String
+  alpha3      String? // ISO 3166-1 alpha-3
+  numericCode String? // ISO 3166-1 numeric
+  phoneCode   String?
+  flag        String? // emoji flag
+  sortOrder   Int      @default(0)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([isActive, sortOrder])
+}
+
+model Title {
+  id        String   @id @default(cuid())
+  code      String   @unique
+  name      String
+  sortOrder Int      @default(0)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([isActive, sortOrder])
+}
+
+model Language {
+  id         String   @id @default(cuid())
+  code       String   @unique // ISO 639-1
+  name       String
+  nativeName String?
+  sortOrder  Int      @default(0)
+  isActive   Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([isActive, sortOrder])
+}
+
+model Currency {
+  id            String   @id @default(cuid())
+  code          String   @unique // ISO 4217
+  name          String
+  symbol        String?
+  decimalDigits Int      @default(2)
+  sortOrder     Int      @default(0)
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([isActive, sortOrder])
+}
+
+model DocumentType {
+  id          String   @id @default(cuid())
+  code        String   @unique
+  name        String
+  description String?
+  category    String?
+  sortOrder   Int      @default(0)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([isActive, sortOrder])
+}
+
+// ─── Analytics ──────────────────────────────────────────
+
+model AnalyticsSnapshot {
+  id         String   @id @default(cuid())
+  tenantId   String
+  metric     String
+  value      Float
+  dimensions Json     @default("{}")
+  period     String
+  timestamp  DateTime
+  createdAt  DateTime @default(now())
+
+  @@index([tenantId, metric, period, timestamp])
+}
+
+// ─── Saved Views ────────────────────────────────────────
+
+enum ViewType {
+  TABLE
+  KANBAN
+  CALENDAR
+  GALLERY
+}
+
+model SavedView {
+  id         String   @id @default(cuid())
+  tenantId   String
+  userId     String
+  name       String
+  entityType String
+  viewType   ViewType @default(TABLE)
+  filters    Json     @default("[]")
+  sorts      Json     @default("[]")
+  columns    String[] @default([])
+  config     Json     @default("{}")
+  isShared   Boolean  @default(false)
+  isDefault  Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  owner User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId, entityType])
+  @@index([userId])
+}
+
+// ─── Custom Fields ──────────────────────────────────────
+
+enum FieldDataType {
+  TEXT
+  LONG_TEXT
+  NUMBER
+  BOOLEAN
+  DATE
+  DATETIME
+  ENUM
+  MULTI_ENUM
+  EMAIL
+  URL
+  PHONE
+  FILE
+  IMAGE
+  REFERENCE
+  FORMULA
+  JSON
+}
+
+model FieldDefinition {
+  id           String        @id @default(cuid())
+  tenantId     String
+  entityType   String        @default("Generic")
+  name         String
+  label        String
+  description  String?
+  dataType     FieldDataType @default(TEXT)
+  sortOrder    Int           @default(0)
+  isRequired   Boolean       @default(false)
+  isUnique     Boolean       @default(false)
+  isSearchable Boolean       @default(false)
+  isFilterable Boolean       @default(false)
+  defaultValue String?
+  config       Json          @default("{}")
+  validation   Json          @default("[]")
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  @@unique([tenantId, entityType, name])
+  @@index([tenantId, entityType, sortOrder])
+}
+
+// ─── Custom Objects ─────────────────────────────────────
+
+model CustomObjectDefinition {
+  id          String    @id @default(cuid())
+  tenantId    String
+  name        String
+  slug        String
+  description String?
+  icon        String?
+  fields      Json      @default("[]")
+  isActive    Boolean   @default(true)
+  createdBy   String?
+  deletedAt   DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  records CustomObjectRecord[]
+
+  @@unique([tenantId, slug])
+  @@index([tenantId, isActive])
+  @@index([deletedAt])
+}
+
+model CustomObjectRecord {
+  id           String   @id @default(cuid())
+  definitionId String
+  tenantId     String
+  data         Json     @default("{}")
+  createdBy    String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  definition CustomObjectDefinition @relation(fields: [definitionId], references: [id], onDelete: Cascade)
+
+  @@index([definitionId, tenantId])
+}
+
+// ─── Message Templates & Broadcasts ─────────────────────
+
+enum MessageChannel {
+  EMAIL
+  SMS
+  PUSH
+  IN_APP
+}
+
+enum BroadcastStatus {
+  DRAFT
+  SCHEDULED
+  SENDING
+  SENT
+  FAILED
+  CANCELLED
+}
+
+model MessageTemplate {
+  id        String         @id @default(cuid())
+  tenantId  String
+  name      String
+  subject   String?
+  body      String
+  channel   MessageChannel @default(EMAIL)
+  isSystem  Boolean        @default(false)
+  variables String[]       @default([])
+  createdBy String?
+  updatedBy String?
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+
+  broadcasts BroadcastMessage[]
+
+  @@unique([tenantId, name])
+  @@index([tenantId, channel])
+}
+
+model BroadcastMessage {
+  id             String          @id @default(cuid())
+  tenantId       String
+  templateId     String?
+  subject        String?
+  body           String
+  channel        MessageChannel  @default(EMAIL)
+  status         BroadcastStatus @default(DRAFT)
+  filters        Json            @default("{}")
+  recipientCount Int             @default(0)
+  sentCount      Int             @default(0)
+  failedCount    Int             @default(0)
+  scheduledAt    DateTime?
+  sentAt         DateTime?
+  createdBy      String?
+  cancelledBy    String?
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+
+  template   MessageTemplate?  @relation(fields: [templateId], references: [id])
+  deliveries MessageDelivery[]
+
+  @@index([tenantId, status])
+}
+
+model MessageDelivery {
+  id           String   @id @default(cuid())
+  broadcastId  String
+  userId       String
+  channel      String
+  recipient    String?
+  status       String   @default("PENDING")
+  sentAt       DateTime?
+  error        String?
+  errorMessage String?
+  createdAt    DateTime @default(now())
+
+  broadcast BroadcastMessage @relation(fields: [broadcastId], references: [id], onDelete: Cascade)
+  user      User             @relation(fields: [userId], references: [id])
+
+  @@index([broadcastId, status])
+}
+
+// ─── File Uploads ───────────────────────────────────────
+
+model UploadedFile {
+  id           String   @id @default(cuid())
+  tenantId     String
+  originalName String
+  storagePath  String
+  mimeType     String
+  sizeBytes    Int
+  uploadedBy   String
+  metadata     Json     @default("{}")
+  createdAt    DateTime @default(now())
+
+  @@index([tenantId])
+}
+
+// ─── Section Templates (Form Designer) ──────────────────
+
+model SectionTemplate {
+  id          String             @id @default(cuid())
+  tenantId    String
+  name        String
+  description String?
+  entityType  String             @default("Generic")
+  definition  Json               @default("{}")
+  isActive    Boolean            @default(true)
+  status      FormTemplateStatus @default(DRAFT)
+  publishedAt DateTime?
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+
+  @@unique([tenantId, name])
+  @@index([tenantId, isActive])
+  @@index([tenantId, status])
+  @@index([tenantId, entityType, status])
+}
+
+// ─── Background Jobs ──────────────────────────────────
+
+model Job {
+  id          String    @id @default(cuid())
+  type        String
+  payload     Json
+  status      JobStatus @default(PENDING)
+  attempts    Int       @default(0)
+  maxAttempts Int       @default(3)
+  nextRunAt   DateTime  @default(now())
+  lastError   String?
+  createdAt   DateTime  @default(now())
+  completedAt DateTime?
+
+  @@index([status, nextRunAt])
+}
+
+// ─── 2FA Recovery Codes ────────────────────────────────
+
+model RecoveryCode {
+  id       String    @id @default(cuid())
+  userId   String
+  codeHash String
+  usedAt   DateTime?
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+// ─── User Invitations ──────────────────────────────────
+
+model Invitation {
+  id          String           @id @default(cuid())
+  email       String
+  tenantId    String
+  roleIds     String[]
+  token       String           @unique
+  status      InvitationStatus @default(PENDING)
+  invitedById String
+  expiresAt   DateTime
+  createdAt   DateTime         @default(now())
+
+  tenant    Tenant @relation(fields: [tenantId], references: [id])
+  invitedBy User   @relation(fields: [invitedById], references: [id])
+
+  @@index([token])
+  @@index([tenantId])
+}

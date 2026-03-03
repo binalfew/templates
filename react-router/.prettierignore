@@ -1,0 +1,7 @@
+build/
+node_modules/
+.react-router/
+app/generated/
+coverage/
+playwright-report/
+*.lock

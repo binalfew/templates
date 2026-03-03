@@ -1,0 +1,22 @@
+{
+  "title": "Notifications",
+  "subtitle": "Consultez et gérez vos notifications.",
+  "markAllRead": "Tout marquer comme lu",
+  "markAsRead": "Marquer comme lu",
+  "noNotifications": "Aucune notification",
+  "noNotificationsDesc": "Vous êtes à jour !",
+  "unread_one": "{{count}} notification non lue",
+  "unread_other": "{{count}} notifications non lues",
+  "viewAll": "Voir toutes les notifications",
+  "justNow": "À l'instant",
+  "minutesAgo_one": "Il y a {{count}} minute",
+  "minutesAgo_other": "Il y a {{count}} minutes",
+  "hoursAgo_one": "Il y a {{count}} heure",
+  "hoursAgo_other": "Il y a {{count}} heures",
+  "daysAgo_one": "Il y a {{count}} jour",
+  "daysAgo_other": "Il y a {{count}} jours",
+  "settings": "Paramètres de notification",
+  "emailNotifications": "Notifications par e-mail",
+  "pushNotifications": "Notifications push",
+  "inAppNotifications": "Notifications dans l'application"
+}

@@ -1,0 +1,23 @@
+.DS_Store
+.env
+.env.*
+!.env.example
+/node_modules/
+*.tsbuildinfo
+
+# React Router
+/.react-router/
+/build/
+
+# Testing
+tests/coverage/
+tests/playwright-report/
+tests/test-results/
+
+# Cache
+.cache/
+
+/app/generated/prisma
+
+# File uploads
+/data/uploads/
