@@ -1,4 +1,4 @@
-import { useLoaderData } from "react-router";
+import { Link, useLoaderData } from "react-router";
 import { Box, Plus, Pencil, Trash2, Database } from "lucide-react";
 
 export const handle = { breadcrumb: "Objects" };
@@ -86,7 +86,9 @@ export default function CustomObjectsPage() {
       cell: (row) => (
         <div className="flex items-center gap-2">
           <Box className="size-4 text-muted-foreground shrink-0" />
-          <span>{row.name}</span>
+          <Link to={`${base}/objects/${row.slug}`} className="hover:underline">
+            {row.name}
+          </Link>
         </div>
       ),
       sortable: true,
@@ -146,49 +148,58 @@ export default function CustomObjectsPage() {
     },
   ];
 
-  const toolbarExtraNode = savedViewsEnabled ? (
+  const toolbarExtraNode = savedViewsEnabled && availableViews.length > 0 ? (
     <ViewSwitcher availableViews={availableViews} activeViewId={activeViewId} />
   ) : undefined;
-
-  const objectCard = (def: DefinitionRow) => {
-    const fields = (def.fields as unknown as CustomFieldDefinition[]) ?? [];
-    return (
-      <div>
-        <p className="font-semibold text-sm">{def.name}</p>
-        <Badge variant="outline" className="mt-1 text-xs">
-          {def.slug}
-        </Badge>
-        <p className="mt-2 text-sm text-muted-foreground">
-          {def.description || "No description"}
-        </p>
-        <div className="mt-2 flex flex-wrap gap-2">
-          <Badge variant="secondary" className="text-xs">
-            {fields.length} field{fields.length !== 1 ? "s" : ""}
-          </Badge>
-          <Badge variant="secondary" className="text-xs">
-            {def._count.records} record{def._count.records !== 1 ? "s" : ""}
-          </Badge>
-          <span
-            className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${
-              def.isActive ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"
-            }`}
-          >
-            {def.isActive ? "Active" : "Inactive"}
-          </span>
-        </div>
-      </div>
-    );
-  };
 
   const viewConfig: ViewConfig<DefinitionRow> = {
     kanban: {
       groupBy: "status",
       getGroupValue: (def) => (def.isActive ? "Active" : "Inactive"),
-      renderCard: objectCard,
+      renderCard: (def) => {
+        const fields = (def.fields as unknown as CustomFieldDefinition[]) ?? [];
+        return (
+          <div>
+            <p className="font-semibold text-sm">{def.name}</p>
+            <p className="mt-1 text-sm text-muted-foreground">
+              {def.description || "No description"}
+            </p>
+            <div className="mt-2 flex flex-wrap gap-2">
+              <Badge variant="secondary" className="text-xs">
+                {fields.length} field{fields.length !== 1 ? "s" : ""}
+              </Badge>
+              <Badge variant="secondary" className="text-xs">
+                {def._count.records} record{def._count.records !== 1 ? "s" : ""}
+              </Badge>
+            </div>
+          </div>
+        );
+      },
       columnOrder: ["Active", "Inactive"],
     },
     gallery: {
-      renderCard: objectCard,
+      renderCard: (def) => {
+        const fields = (def.fields as unknown as CustomFieldDefinition[]) ?? [];
+        return (
+          <div>
+            <p className="font-semibold text-sm">{def.name}</p>
+            <Badge variant="outline" className="mt-1 text-xs">
+              {def.slug}
+            </Badge>
+            <p className="mt-2 text-sm text-muted-foreground">
+              {def.description || "No description"}
+            </p>
+            <div className="mt-2 flex flex-wrap gap-2">
+              <Badge variant="secondary" className="text-xs">
+                {fields.length} field{fields.length !== 1 ? "s" : ""}
+              </Badge>
+              <Badge variant="secondary" className="text-xs">
+                {def._count.records} record{def._count.records !== 1 ? "s" : ""}
+              </Badge>
+            </div>
+          </div>
+        );
+      },
     },
   };
 

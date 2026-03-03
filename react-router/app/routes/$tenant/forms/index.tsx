@@ -79,7 +79,7 @@ export default function FormsPage() {
       header: "Name",
       cell: (row) => (
         <Link
-          to={`${base}/forms/${row.id}/designer`}
+          to={`${base}/forms/${row.id}`}
           className="flex items-center gap-2 hover:underline"
         >
           <FileText className="size-4 text-muted-foreground shrink-0" />
@@ -96,9 +96,7 @@ export default function FormsPage() {
         const variant =
           row.status === "PUBLISHED"
             ? "outline"
-            : row.status === "ARCHIVED"
-              ? "secondary"
-              : "secondary";
+            : "secondary";
         const className =
           row.status === "PUBLISHED"
             ? "border-green-500 text-green-700 dark:text-green-400"
@@ -126,7 +124,7 @@ export default function FormsPage() {
       id: "description",
       header: "Description",
       cell: (row) => (
-        <span className="text-muted-foreground">{row.description || "—"}</span>
+        <span className="text-muted-foreground">{row.description || "\u2014"}</span>
       ),
       hideOnMobile: true,
     },
@@ -140,40 +138,38 @@ export default function FormsPage() {
     },
   ];
 
-  const toolbarExtraNode = savedViewsEnabled ? (
+  const toolbarExtraNode = savedViewsEnabled && availableViews.length > 0 ? (
     <ViewSwitcher availableViews={availableViews as any} activeViewId={activeViewId} />
   ) : undefined;
 
-  const templateCard = (row: TemplateRow) => (
-    <div>
-      <div className="flex items-center gap-2">
-        <h3 className="font-semibold text-foreground">{row.name}</h3>
-        <Badge
-          variant={row.status === "PUBLISHED" ? "outline" : "secondary"}
-          className={
-            row.status === "PUBLISHED"
-              ? "border-green-500 text-green-700 dark:text-green-400"
-              : row.status === "ARCHIVED"
-                ? "text-muted-foreground"
-                : undefined
-          }
-        >
-          {row.status}
-        </Badge>
-        <Badge variant="secondary">{row.entityType}</Badge>
-      </div>
-      {row.description && (
-        <p className="mt-1 text-sm text-muted-foreground line-clamp-2">{row.description}</p>
-      )}
-      <p className="mt-2 text-xs text-muted-foreground">
-        {new Date(row.updatedAt).toLocaleDateString()}
-      </p>
-    </div>
-  );
-
   const viewConfig: ViewConfig<TemplateRow> = {
     gallery: {
-      renderCard: templateCard,
+      renderCard: (row) => (
+        <div>
+          <div className="flex items-center gap-2">
+            <h3 className="font-semibold text-foreground">{row.name}</h3>
+            <Badge
+              variant={row.status === "PUBLISHED" ? "outline" : "secondary"}
+              className={
+                row.status === "PUBLISHED"
+                  ? "border-green-500 text-green-700 dark:text-green-400"
+                  : row.status === "ARCHIVED"
+                    ? "text-muted-foreground"
+                    : undefined
+              }
+            >
+              {row.status}
+            </Badge>
+            <Badge variant="secondary">{row.entityType}</Badge>
+          </div>
+          {row.description && (
+            <p className="mt-1 text-sm text-muted-foreground line-clamp-2">{row.description}</p>
+          )}
+          <p className="mt-2 text-xs text-muted-foreground">
+            {new Date(row.updatedAt).toLocaleDateString()}
+          </p>
+        </div>
+      ),
     },
   };
 

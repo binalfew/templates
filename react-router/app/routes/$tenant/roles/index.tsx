@@ -1,4 +1,4 @@
-import { useLoaderData } from "react-router";
+import { Link, useLoaderData } from "react-router";
 import { invariantResponse } from "@epic-web/invariant";
 import { Shield, Plus, Pencil, Trash2, KeyRound } from "lucide-react";
 
@@ -8,7 +8,6 @@ import { requirePermission } from "~/lib/auth/require-auth.server";
 import { listRolesPaginated } from "~/services/roles.server";
 import { resolveViewContext } from "~/services/view-filters.server";
 import { useBasePrefix } from "~/hooks/use-base-prefix";
-import { Badge } from "~/components/ui/badge";
 import { DataTable } from "~/components/data-table/data-table";
 import type { ColumnDef, PaginationMeta, ViewConfig } from "~/components/data-table/data-table-types";
 import { ViewSwitcher } from "~/components/views/view-switcher";
@@ -75,7 +74,9 @@ export default function RolesListPage() {
       cell: (row) => (
         <div className="flex items-center gap-2">
           <Shield className="size-4 text-muted-foreground shrink-0" />
-          <span>{row.name}</span>
+          <Link to={`${base}/roles/${row.id}`} className="hover:underline">
+            {row.name}
+          </Link>
         </div>
       ),
       sortable: true,
@@ -110,43 +111,33 @@ export default function RolesListPage() {
     },
   ];
 
-  const toolbarExtraNode = savedViewsEnabled ? (
+  const toolbarExtraNode = savedViewsEnabled && availableViews.length > 0 ? (
     <ViewSwitcher availableViews={availableViews as any} activeViewId={activeViewId} />
   ) : undefined;
-
-  const roleCard = (role: RoleRow) => (
-    <div>
-      <h3 className="font-semibold text-foreground">{role.name}</h3>
-      {role.description && (
-        <p className="mt-1 text-sm text-muted-foreground">{role.description}</p>
-      )}
-      <div className="mt-3 flex gap-3">
-        <Badge variant="secondary" className="text-xs">
-          {role._count.userRoles} user{role._count.userRoles !== 1 ? "s" : ""}
-        </Badge>
-        <Badge variant="outline" className="text-xs">
-          {role._count.rolePermissions} permission
-          {role._count.rolePermissions !== 1 ? "s" : ""}
-        </Badge>
-      </div>
-    </div>
-  );
 
   const viewConfig: ViewConfig<RoleRow> = {
     kanban: {
       groupBy: "scope",
       getGroupValue: (role) => role.scope,
-      renderCard: roleCard,
+      renderCard: (role) => (
+        <div>
+          <h3 className="font-semibold text-foreground">{role.name}</h3>
+          {role.description && (
+            <p className="mt-1 text-sm text-muted-foreground">{role.description}</p>
+          )}
+        </div>
+      ),
       columnOrder: ["GLOBAL", "TENANT", "EVENT"],
     },
-    calendar: {
-      getDate: (role) => role.createdAt,
-      renderItem: (role) => (
-        <span className="text-xs font-medium">{role.name}</span>
-      ),
-    },
     gallery: {
-      renderCard: roleCard,
+      renderCard: (role) => (
+        <div>
+          <h3 className="font-semibold text-foreground">{role.name}</h3>
+          {role.description && (
+            <p className="mt-1 text-sm text-muted-foreground">{role.description}</p>
+          )}
+        </div>
+      ),
     },
   };
 

@@ -1,5 +1,5 @@
-import { useLoaderData } from "react-router";
-import { Mail, Plus, Pencil, Copy, Trash2 } from "lucide-react";
+import { Link, useLoaderData } from "react-router";
+import { Mail, Plus, Pencil, Trash2 } from "lucide-react";
 
 export const handle = { breadcrumb: "Templates" };
 
@@ -86,7 +86,9 @@ export default function TemplatesListPage() {
       cell: (row) => (
         <div className="flex items-center gap-2">
           <Mail className="size-4 text-muted-foreground shrink-0" />
-          <span>{row.name}</span>
+          <Link to={`${base}/templates/${row.id}`} className="hover:underline">
+            {row.name}
+          </Link>
         </div>
       ),
       sortable: true,
@@ -133,43 +135,38 @@ export default function TemplatesListPage() {
     },
   ];
 
-  const toolbarExtraNode = savedViewsEnabled ? (
+  const toolbarExtraNode = savedViewsEnabled && availableViews.length > 0 ? (
     <ViewSwitcher availableViews={availableViews} activeViewId={activeViewId} />
   ) : undefined;
-
-  const templateCard = (t: TemplateRow) => (
-    <div>
-      <p className="font-semibold text-sm">{t.name}</p>
-      <span
-        className={`mt-1 inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${CHANNEL_COLORS[t.channel] ?? "bg-gray-100 text-gray-800"}`}
-      >
-        {t.channel.replace(/_/g, " ")}
-      </span>
-      {t.subject && (
-        <p className="mt-2 text-sm text-muted-foreground">{t.subject}</p>
-      )}
-      <div className="mt-2 flex flex-wrap gap-2">
-        {t.isSystem && (
-          <Badge variant="secondary" className="text-xs">
-            System
-          </Badge>
-        )}
-        <span className="text-xs text-muted-foreground">
-          Updated {new Date(t.updatedAt).toLocaleDateString()}
-        </span>
-      </div>
-    </div>
-  );
 
   const viewConfig: ViewConfig<TemplateRow> = {
     kanban: {
       groupBy: "channel",
       getGroupValue: (t) => t.channel.replace(/_/g, " "),
-      renderCard: templateCard,
+      renderCard: (t) => (
+        <div>
+          <p className="font-semibold text-sm">{t.name}</p>
+          {t.subject && (
+            <p className="mt-1 text-sm text-muted-foreground">{t.subject}</p>
+          )}
+        </div>
+      ),
       columnOrder: ["EMAIL", "SMS", "PUSH", "IN APP"],
     },
     gallery: {
-      renderCard: templateCard,
+      renderCard: (t) => (
+        <div>
+          <p className="font-semibold text-sm">{t.name}</p>
+          <span
+            className={`mt-1 inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${CHANNEL_COLORS[t.channel] ?? "bg-gray-100 text-gray-800"}`}
+          >
+            {t.channel.replace(/_/g, " ")}
+          </span>
+          {t.subject && (
+            <p className="mt-2 text-sm text-muted-foreground">{t.subject}</p>
+          )}
+        </div>
+      ),
     },
   };
 

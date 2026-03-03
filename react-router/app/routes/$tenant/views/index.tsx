@@ -1,4 +1,4 @@
-import { useLoaderData } from "react-router";
+import { Link, useLoaderData } from "react-router";
 import {
   Plus,
   Trash2,
@@ -69,7 +69,9 @@ export default function SavedViewsListPage() {
         return (
           <div className="flex items-center gap-2">
             <Icon className="size-4 text-muted-foreground shrink-0" />
-            <span>{row.name}</span>
+            <Link to={`${base}/views/${row.id}`} className="hover:underline">
+              {row.name}
+            </Link>
           </div>
         );
       },

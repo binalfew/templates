@@ -110,11 +110,13 @@ app/routes/$tenant/<entity>/
   index.tsx          — List page with DataTable, search, pagination, views
   new.tsx            — Create form (Conform + Zod validation, Card layout)
   $<entityId>/
+    index.tsx        — Detail/view page (read-only, shows entity data, Back/Edit/Delete buttons)
     edit.tsx         — Edit form (loads entity in loader, pre-fills form)
     delete.tsx       — Delete confirmation page (shows entity details, guards)
 ```
 
-- **Index** uses `DataTable` with `toolbarActions` linking to `/new` and `rowActions` linking to `/$id/edit`, `/$id/delete`
+- **Index** uses `DataTable` with `toolbarActions` linking to `/new` and `rowActions` linking to `/$id/edit`, `/$id/delete`. The first column (name/title) MUST be a `<Link>` to the detail view route (`/$id`).
+- **Detail** (`$<entityId>/index.tsx`) is a read-only page showing entity data in Cards. Header includes the entity icon + name, with a button group: Back (ArrowLeft, links to list), Edit (Pencil, links to edit), Delete (Trash2, links to delete). Use `getEntityWithCounts` or similar service method for richer data.
 - **New/Edit** use Conform `useForm` + `parseWithZod` with the entity's Zod schema, `redirectTo` query param support, and Cancel link back to the list
 - **Delete** shows entity details in a read-only Card, includes validation guards (e.g. "cannot delete while sending"), and a destructive submit button
 - Domain-specific status transitions (send, cancel, approve) stay as fetcher-based row actions on the index page

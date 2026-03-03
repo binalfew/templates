@@ -1,4 +1,4 @@
-import { useLoaderData } from "react-router";
+import { Link, useLoaderData } from "react-router";
 import { KeyRound, Plus, Pencil, Trash2 } from "lucide-react";
 
 export const handle = { breadcrumb: "Permissions" };
@@ -86,7 +86,9 @@ export default function PermissionsListPage() {
       cell: (row) => (
         <div className="flex items-center gap-2">
           <KeyRound className="size-4 text-muted-foreground shrink-0" />
-          <span>{row.resource}</span>
+          <Link to={`${base}/permissions/${row.id}`} className="hover:underline">
+            {row.resource}
+          </Link>
         </div>
       ),
       cellClassName: "font-medium text-foreground",
@@ -119,24 +121,9 @@ export default function PermissionsListPage() {
     },
   ];
 
-  const toolbarExtraNode = savedViewsEnabled ? (
+  const toolbarExtraNode = savedViewsEnabled && availableViews.length > 0 ? (
     <ViewSwitcher availableViews={availableViews} activeViewId={activeViewId} />
   ) : undefined;
-
-  const permissionCard = (p: PermissionRow) => (
-    <div>
-      <p className="font-semibold text-sm">{p.resource}</p>
-      <Badge variant="default" className="mt-1 text-xs">
-        {p.action}
-      </Badge>
-      <p className="mt-2 text-sm text-muted-foreground">
-        {p.description || "No description"}
-      </p>
-      <Badge variant="outline" className="mt-2 text-xs">
-        {p._count.rolePermissions} role{p._count.rolePermissions !== 1 ? "s" : ""}
-      </Badge>
-    </div>
-  );
 
   const viewConfig: ViewConfig<PermissionRow> = {
     kanban: {
@@ -152,14 +139,21 @@ export default function PermissionsListPage() {
           <p className="mt-1 text-xs text-muted-foreground line-clamp-2">
             {p.description || "No description"}
           </p>
-          <p className="mt-1 text-[10px] text-muted-foreground">
-            {p._count.rolePermissions} role{p._count.rolePermissions !== 1 ? "s" : ""}
-          </p>
         </div>
       ),
     },
     gallery: {
-      renderCard: permissionCard,
+      renderCard: (p) => (
+        <div>
+          <p className="font-semibold text-sm">{p.resource}</p>
+          <Badge variant="default" className="mt-1 text-xs">
+            {p.action}
+          </Badge>
+          <p className="mt-2 text-sm text-muted-foreground">
+            {p.description || "No description"}
+          </p>
+        </div>
+      ),
     },
   };
 

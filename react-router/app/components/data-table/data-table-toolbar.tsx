@@ -124,21 +124,22 @@ export function DataTableToolbar({
 
       {hasFilters &&
         filters!.map((filter) => (
-          <NativeSelect
-            key={filter.paramKey}
-            value={searchParams.get(filter.paramKey) ?? ""}
-            onChange={(e) => handleFilterChange(filter.paramKey, e.target.value)}
-            className="w-full sm:w-auto sm:min-w-[140px]"
-          >
-            <NativeSelectOption value="">
-              {filter.placeholder ?? filter.label}
-            </NativeSelectOption>
-            {filter.options.map((opt) => (
-              <NativeSelectOption key={opt.value} value={opt.value}>
-                {opt.label}
+          <div key={filter.paramKey} className="w-full sm:w-auto">
+            <NativeSelect
+              value={searchParams.get(filter.paramKey) ?? ""}
+              onChange={(e) => handleFilterChange(filter.paramKey, e.target.value)}
+              className="w-full sm:w-auto sm:min-w-[140px]"
+            >
+              <NativeSelectOption value="">
+                {filter.placeholder ?? filter.label}
               </NativeSelectOption>
-            ))}
-          </NativeSelect>
+              {filter.options.map((opt) => (
+                <NativeSelectOption key={opt.value} value={opt.value}>
+                  {opt.label}
+                </NativeSelectOption>
+              ))}
+            </NativeSelect>
+          </div>
         ))}
 
       {hasSearch && (

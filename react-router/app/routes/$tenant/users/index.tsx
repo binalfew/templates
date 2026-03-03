@@ -1,4 +1,4 @@
-import { useLoaderData } from "react-router";
+import { Link, useLoaderData } from "react-router";
 import { invariantResponse } from "@epic-web/invariant";
 import { useTranslation } from "react-i18next";
 import { Users, User, Plus, Mail, Pencil, Shield, Trash2 } from "lucide-react";
@@ -104,7 +104,9 @@ export default function UsersListPage() {
       cell: (row) => (
         <div className="flex items-center gap-2">
           <User className="size-4 text-muted-foreground shrink-0" />
-          <span>{row.name || <span className="text-muted-foreground italic">No name</span>}</span>
+          <Link to={`${base}/users/${row.id}`} className="hover:underline">
+            {row.name || <span className="text-muted-foreground italic">No name</span>}
+          </Link>
         </div>
       ),
       cellClassName: "font-medium text-foreground",
@@ -167,7 +169,7 @@ export default function UsersListPage() {
     },
   ];
 
-  const toolbarExtraNode = savedViewsEnabled ? (
+  const toolbarExtraNode = savedViewsEnabled && availableViews.length > 0 ? (
     <ViewSwitcher availableViews={availableViews as any} activeViewId={activeViewId} />
   ) : undefined;
 
@@ -190,22 +192,6 @@ export default function UsersListPage() {
       ),
       columnOrder: ["ACTIVE", "INACTIVE", "SUSPENDED", "LOCKED"],
     },
-    calendar: {
-      getDate: (u) => u.createdAt,
-      renderItem: (u) => (
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-sm font-medium">{u.name || u.email}</p>
-            <p className="text-xs text-muted-foreground">{u.email}</p>
-          </div>
-          <span
-            className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${statusColors[u.status] ?? "bg-gray-100 text-gray-800"}`}
-          >
-            {u.status}
-          </span>
-        </div>
-      ),
-    },
     gallery: {
       renderCard: (u) => (
         <div>
@@ -218,13 +204,6 @@ export default function UsersListPage() {
             >
               {u.status}
             </span>
-          </div>
-          <div className="mt-2 flex flex-wrap gap-1">
-            {u.userRoles.map((ur) => (
-              <Badge key={ur.id} variant="secondary" className="text-[10px]">
-                {ur.role.name}
-              </Badge>
-            ))}
           </div>
         </div>
       ),

@@ -1,7 +1,7 @@
 import { prisma } from "~/lib/db/db.server";
 import { hashPassword } from "~/lib/auth/auth.server";
 import { ServiceError } from "~/lib/errors/service-error.server";
-import type { ServiceContext } from "~/lib/types.server";
+import type { PaginatedQueryOptions, ServiceContext } from "~/lib/types.server";
 
 export class TenantError extends ServiceError {
   constructor(message: string, status: number) {
@@ -18,6 +18,29 @@ export async function listTenants() {
       _count: { select: { users: true, roles: true } },
     },
   });
+}
+
+export async function listTenantsPaginated(options: PaginatedQueryOptions) {
+  const baseWhere = { slug: { not: "admin" } };
+  const where = options.where && Object.keys(options.where).length > 0
+    ? { AND: [baseWhere, options.where] }
+    : baseWhere;
+  const orderBy = options.orderBy?.length ? (options.orderBy as any) : { name: "asc" };
+
+  const [items, totalCount] = await Promise.all([
+    prisma.tenant.findMany({
+      where: where as any,
+      orderBy,
+      skip: (options.page - 1) * options.pageSize,
+      take: options.pageSize,
+      include: {
+        _count: { select: { users: true, roles: true } },
+      },
+    }),
+    prisma.tenant.count({ where: where as any }),
+  ]);
+
+  return { items, totalCount };
 }
 
 export async function getTenant(id: string) {

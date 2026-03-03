@@ -206,3 +206,24 @@ export async function listRecords(definitionId: string, tenantId: string) {
     orderBy: { createdAt: "desc" },
   });
 }
+
+export async function listRecordsPaginated(
+  definitionId: string,
+  tenantId: string,
+  options: PaginatedQueryOptions,
+) {
+  const where = { definitionId, tenantId, ...(options.where ?? {}) } as any;
+  const orderBy = options.orderBy?.length ? (options.orderBy as any) : { createdAt: "desc" };
+
+  const [items, totalCount] = await Promise.all([
+    prisma.customObjectRecord.findMany({
+      where,
+      orderBy,
+      skip: (options.page - 1) * options.pageSize,
+      take: options.pageSize,
+    }),
+    prisma.customObjectRecord.count({ where }),
+  ]);
+
+  return { items, totalCount };
+}

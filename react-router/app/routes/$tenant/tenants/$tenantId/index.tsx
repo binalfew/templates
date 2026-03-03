@@ -5,6 +5,7 @@ import {
   Phone,
   Globe,
   MapPin,
+  ArrowLeft,
   Pencil,
   Trash2,
   Users,
@@ -77,6 +78,12 @@ export default function TenantDetailPage() {
           </div>
         </div>
         <div className="flex gap-2">
+          <Button variant="outline" size="sm" asChild>
+            <Link to={`${basePrefix}/tenants`}>
+              <ArrowLeft className="mr-1.5 size-3.5" />
+              Back
+            </Link>
+          </Button>
           <Button variant="outline" size="sm" asChild>
             <Link to={`${basePrefix}/tenants/${tenant.id}/edit`}>
               <Pencil className="mr-1.5 size-3.5" />

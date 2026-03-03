@@ -1,4 +1,4 @@
-import { data, useLoaderData, useFetcher } from "react-router";
+import { data, Link, useLoaderData, useFetcher } from "react-router";
 import { Send, XCircle, Plus, Pencil, Trash2 } from "lucide-react";
 import { requireFeature } from "~/lib/auth/require-auth.server";
 import { FEATURE_FLAG_KEYS } from "~/lib/config/feature-flags.server";
@@ -109,7 +109,9 @@ export default function BroadcastsPage() {
       cell: (row) => (
         <div className="flex items-center gap-2">
           <Send className="size-4 text-muted-foreground shrink-0" />
-          <span>{row.subject || "(no subject)"}</span>
+          <Link to={`${base}/broadcasts/${row.id}`} className="hover:underline">
+            {row.subject || "(no subject)"}
+          </Link>
         </div>
       ),
       sortable: true,
@@ -149,36 +151,46 @@ export default function BroadcastsPage() {
     },
   ];
 
-  const toolbarExtraNode = savedViewsEnabled ? (
+  const toolbarExtraNode = savedViewsEnabled && availableViews.length > 0 ? (
     <ViewSwitcher availableViews={availableViews as any} activeViewId={activeViewId} />
   ) : undefined;
-
-  const broadcastCard = (row: BroadcastRow) => (
-    <div>
-      <h3 className="font-semibold text-foreground">{row.subject || "(no subject)"}</h3>
-      <div className="mt-2 flex flex-wrap gap-2">
-        <Badge variant="secondary" className={CHANNEL_COLORS[row.channel]}>
-          {row.channel}
-        </Badge>
-        <Badge variant={BROADCAST_STATUS_COLORS[row.status] ?? "secondary"}>
-          {row.status}
-        </Badge>
-      </div>
-      <p className="mt-2 text-xs text-muted-foreground">
-        {new Date(row.createdAt).toLocaleDateString()}
-      </p>
-    </div>
-  );
 
   const viewConfig: ViewConfig<BroadcastRow> = {
     kanban: {
       groupBy: "status",
       getGroupValue: (row) => row.status,
-      renderCard: broadcastCard,
+      renderCard: (row) => (
+        <div>
+          <h3 className="font-semibold text-foreground">{row.subject || "(no subject)"}</h3>
+          <div className="mt-2 flex flex-wrap gap-2">
+            <Badge variant="secondary" className={CHANNEL_COLORS[row.channel]}>
+              {row.channel}
+            </Badge>
+          </div>
+          <p className="mt-2 text-xs text-muted-foreground">
+            {new Date(row.createdAt).toLocaleDateString()}
+          </p>
+        </div>
+      ),
       columnOrder: ["DRAFT", "SCHEDULED", "SENDING", "SENT", "CANCELLED", "FAILED"],
     },
     gallery: {
-      renderCard: broadcastCard,
+      renderCard: (row) => (
+        <div>
+          <h3 className="font-semibold text-foreground">{row.subject || "(no subject)"}</h3>
+          <div className="mt-2 flex flex-wrap gap-2">
+            <Badge variant="secondary" className={CHANNEL_COLORS[row.channel]}>
+              {row.channel}
+            </Badge>
+            <Badge variant={BROADCAST_STATUS_COLORS[row.status] ?? "secondary"}>
+              {row.status}
+            </Badge>
+          </div>
+          <p className="mt-2 text-xs text-muted-foreground">
+            {new Date(row.createdAt).toLocaleDateString()}
+          </p>
+        </div>
+      ),
     },
     calendar: {
       getDate: (row) => row.createdAt,
