@@ -2,9 +2,9 @@ import { data, redirect, useLoaderData, useActionData, Form, Link } from "react-
 
 export const handle = { breadcrumb: "Delete Tenant" };
 
-import { requireAnyRole } from "~/lib/require-auth.server";
+import { requireAnyRole } from "~/lib/auth/require-auth.server";
 import { getTenantWithCounts, deleteTenant } from "~/services/tenants.server";
-import { handleServiceError } from "~/lib/handle-service-error.server";
+import { handleServiceError } from "~/lib/errors/handle-service-error.server";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { useBasePrefix } from "~/hooks/use-base-prefix";

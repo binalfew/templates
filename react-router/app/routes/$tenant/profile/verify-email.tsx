@@ -3,14 +3,14 @@ import { parseWithZod } from "@conform-to/zod/v4";
 import { data, Form, Link, redirect, useParams } from "react-router";
 import { z } from "zod/v4";
 import { ShieldCheck, ArrowLeft } from "lucide-react";
-import { prisma } from "~/lib/db.server";
-import { logger } from "~/lib/logger.server";
+import { prisma } from "~/lib/db/db.server";
+import { logger } from "~/lib/monitoring/logger.server";
 import {
   isCodeValid,
   getVerifySession,
   destroyVerifySession,
   prepareVerification,
-} from "~/lib/verification.server";
+} from "~/lib/auth/verification.server";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";

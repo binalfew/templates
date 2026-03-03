@@ -15,7 +15,7 @@ import {
 
 export const handle = { breadcrumb: "Details" };
 
-import { requireAnyRole } from "~/lib/require-auth.server";
+import { requireAnyRole } from "~/lib/auth/require-auth.server";
 import { getTenantDetail } from "~/services/tenants.server";
 import { BRAND_THEMES } from "~/lib/schemas/tenant";
 import { Button } from "~/components/ui/button";

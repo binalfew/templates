@@ -1,5 +1,5 @@
-import { prisma } from "~/lib/db.server";
-import { logger } from "~/lib/logger.server";
+import { prisma } from "~/lib/db/db.server";
+import { logger } from "~/lib/monitoring/logger.server";
 
 /**
  * Soft-delete a user by setting their `deletedAt` timestamp.

@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { isDeleted } from "../soft-delete.server";
+import { isDeleted } from "../db/soft-delete.server";
 
 describe("isDeleted", () => {
   it("returns true when deletedAt is set", () => {

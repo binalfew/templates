@@ -1,12 +1,12 @@
 import { describe, it, expect, vi } from "vitest";
 
-vi.mock("~/lib/env.server", () => ({
+vi.mock("~/lib/config/env.server", () => ({
   env: {
     BCRYPT_ROUNDS: 4,
   },
 }));
 
-import { hashPassword, verifyPassword } from "../auth.server";
+import { hashPassword, verifyPassword } from "../auth/auth.server";
 
 describe("auth.server", () => {
   describe("hashPassword", () => {

@@ -5,9 +5,9 @@ import { useState, useEffect, useRef } from "react";
 
 export const handle = { breadcrumb: "New Tenant" };
 
-import { requireAnyRole } from "~/lib/require-auth.server";
+import { requireAnyRole } from "~/lib/auth/require-auth.server";
 import { createTenant } from "~/services/tenants.server";
-import { handleServiceError } from "~/lib/handle-service-error.server";
+import { handleServiceError } from "~/lib/errors/handle-service-error.server";
 import { createTenantSchema } from "~/lib/schemas/tenant";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";

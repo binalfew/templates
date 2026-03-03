@@ -1,4 +1,4 @@
-import { env } from "~/lib/env.server";
+import { env } from "~/lib/config/env.server";
 
 interface EmailTemplate {
   subject: string;

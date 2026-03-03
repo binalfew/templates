@@ -5,9 +5,9 @@ import { invariantResponse } from "@epic-web/invariant";
 
 export const handle = { breadcrumb: "Edit Country" };
 
-import { requireUser } from "~/lib/session.server";
+import { requireUser } from "~/lib/auth/session.server";
 import { getCountry, updateCountry } from "~/services/reference-data.server";
-import { handleServiceError } from "~/lib/handle-service-error.server";
+import { handleServiceError } from "~/lib/errors/handle-service-error.server";
 import { updateCountrySchema } from "~/lib/schemas/reference-data";
 import { Input } from "~/components/ui/input";
 import { Field } from "~/components/ui/field";

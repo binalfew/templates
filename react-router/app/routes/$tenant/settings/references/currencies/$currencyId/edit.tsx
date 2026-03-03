@@ -5,9 +5,9 @@ import { invariantResponse } from "@epic-web/invariant";
 
 export const handle = { breadcrumb: "Edit Currency" };
 
-import { requireUser } from "~/lib/session.server";
+import { requireUser } from "~/lib/auth/session.server";
 import { getCurrency, updateCurrency } from "~/services/reference-data.server";
-import { handleServiceError } from "~/lib/handle-service-error.server";
+import { handleServiceError } from "~/lib/errors/handle-service-error.server";
 import { updateCurrencySchema } from "~/lib/schemas/reference-data";
 import { Input } from "~/components/ui/input";
 import { Field } from "~/components/ui/field";

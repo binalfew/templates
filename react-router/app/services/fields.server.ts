@@ -1,11 +1,11 @@
-import { prisma } from "~/lib/db.server";
-import { logger } from "~/lib/logger.server";
+import { prisma } from "~/lib/db/db.server";
+import { logger } from "~/lib/monitoring/logger.server";
 import { FIELD_LIMITS } from "~/config/fields";
 import { ConflictError, isPrismaNotFoundError } from "~/services/optimistic-lock.server";
 import type { CreateFieldInput, UpdateFieldInput, ReorderFieldsInput } from "~/lib/schemas/field";
 
 import type { TenantServiceContext } from "~/lib/types.server";
-import { ServiceError } from "~/lib/service-error.server";
+import { ServiceError } from "~/lib/errors/service-error.server";
 
 export async function listFields(
   tenantId: string,

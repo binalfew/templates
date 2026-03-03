@@ -6,7 +6,7 @@ import {
   type SavedViewFilter,
   type SavedViewSort,
 } from "~/services/saved-views.server";
-import { isFeatureEnabled, FEATURE_FLAG_KEYS } from "~/lib/feature-flags.server";
+import { isFeatureEnabled, FEATURE_FLAG_KEYS } from "~/lib/config/feature-flags.server";
 
 /**
  * Mapping from filter field names to Prisma field paths.

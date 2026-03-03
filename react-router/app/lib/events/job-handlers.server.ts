@@ -1,7 +1,7 @@
-import { sendEmail } from "~/lib/email.server";
-import { registerJobHandler } from "~/lib/job-queue.server";
-import { logger } from "~/lib/logger.server";
-import type { SendEmailOptions } from "~/lib/email.server";
+import { sendEmail } from "~/lib/email/email.server";
+import { registerJobHandler } from "~/lib/events/job-queue.server";
+import { logger } from "~/lib/monitoring/logger.server";
+import type { SendEmailOptions } from "~/lib/email/email.server";
 
 // --- Send Email Handler ---
 

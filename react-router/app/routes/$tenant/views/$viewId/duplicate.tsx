@@ -1,9 +1,9 @@
 import { redirect } from "react-router";
 import { invariantResponse } from "@epic-web/invariant";
 
-import { requireAuth } from "~/lib/require-auth.server";
+import { requireAuth } from "~/lib/auth/require-auth.server";
 import { duplicateView } from "~/services/saved-views.server";
-import { handleServiceError } from "~/lib/handle-service-error.server";
+import { handleServiceError } from "~/lib/errors/handle-service-error.server";
 import type { Route } from "./+types/duplicate";
 
 export async function loader({ request, params }: Route.LoaderArgs) {

@@ -1,6 +1,6 @@
 import type { Prisma } from "~/generated/prisma/client.js";
-import { prisma } from "~/lib/db.server";
-import { eventBus } from "~/lib/event-bus.server";
+import { prisma } from "~/lib/db/db.server";
+import { eventBus } from "~/lib/events/event-bus.server";
 
 // ─── Types ───────────────────────────────────────────────
 

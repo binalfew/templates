@@ -10,10 +10,10 @@ import {
   Columns2,
   Eye,
 } from "lucide-react";
-import { requireFeature } from "~/lib/require-auth.server";
-import { FEATURE_FLAG_KEYS } from "~/lib/feature-flags.server";
+import { requireFeature } from "~/lib/auth/require-auth.server";
+import { FEATURE_FLAG_KEYS } from "~/lib/config/feature-flags.server";
 import { buildServiceContext } from "~/lib/request-context.server";
-import { prisma } from "~/lib/db.server";
+import { prisma } from "~/lib/db/db.server";
 import { listFields } from "~/services/fields.server";
 import {
   getSectionTemplate,

@@ -9,7 +9,7 @@ const mockApiKeyCount = vi.fn();
 const mockAuditLogCreate = vi.fn();
 const mockTransaction = vi.fn();
 
-vi.mock("~/lib/db.server", () => ({
+vi.mock("~/lib/db/db.server", () => ({
   prisma: {
     apiKey: {
       create: (...args: unknown[]) => mockApiKeyCreate(...args),
@@ -26,11 +26,11 @@ vi.mock("~/lib/db.server", () => ({
   },
 }));
 
-vi.mock("~/lib/logger.server", () => ({
+vi.mock("~/lib/monitoring/logger.server", () => ({
   logger: { info: vi.fn(), warn: vi.fn(), error: vi.fn() },
 }));
 
-vi.mock("~/lib/env.server", () => ({
+vi.mock("~/lib/config/env.server", () => ({
   env: { BCRYPT_ROUNDS: 4 },
 }));
 

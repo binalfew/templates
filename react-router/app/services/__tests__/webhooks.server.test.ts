@@ -7,7 +7,7 @@ const mockSubscriptionUpdate = vi.fn();
 const mockSubscriptionCount = vi.fn();
 const mockAuditLogCreate = vi.fn();
 
-vi.mock("~/lib/db.server", () => ({
+vi.mock("~/lib/db/db.server", () => ({
   prisma: {
     webhookSubscription: {
       create: (...args: unknown[]) => mockSubscriptionCreate(...args),
@@ -22,11 +22,11 @@ vi.mock("~/lib/db.server", () => ({
   },
 }));
 
-vi.mock("~/lib/logger.server", () => ({
+vi.mock("~/lib/monitoring/logger.server", () => ({
   logger: { info: vi.fn(), warn: vi.fn(), error: vi.fn(), debug: vi.fn() },
 }));
 
-vi.mock("~/lib/feature-flags.server", () => ({
+vi.mock("~/lib/config/feature-flags.server", () => ({
   isFeatureEnabled: vi.fn().mockResolvedValue(true),
   FEATURE_FLAG_KEYS: { WEBHOOKS: "FF_WEBHOOKS" },
 }));

@@ -1,4 +1,4 @@
-import { requireAnyRole } from "~/lib/require-auth.server";
+import { requireAnyRole } from "~/lib/auth/require-auth.server";
 import type { Route } from "./+types/index";
 
 export const handle = { breadcrumb: "Settings" };

@@ -1,9 +1,9 @@
 import { data, Form, useLoaderData } from "react-router";
 import { invariantResponse } from "@epic-web/invariant";
 import { Upload, Trash2, FileText } from "lucide-react";
-import { requireAuth, requireFeature } from "~/lib/require-auth.server";
-import { FEATURE_FLAG_KEYS } from "~/lib/feature-flags.server";
-import { prisma } from "~/lib/db.server";
+import { requireAuth, requireFeature } from "~/lib/auth/require-auth.server";
+import { FEATURE_FLAG_KEYS } from "~/lib/config/feature-flags.server";
+import { prisma } from "~/lib/db/db.server";
 import { Button } from "~/components/ui/button";
 import { Badge } from "~/components/ui/badge";
 import { Separator } from "~/components/ui/separator";

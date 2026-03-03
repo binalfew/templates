@@ -3,7 +3,7 @@ import { Globe, User, Languages, Banknote, FileText } from "lucide-react";
 
 export const handle = { breadcrumb: "References" };
 
-import { requireUser } from "~/lib/session.server";
+import { requireUser } from "~/lib/auth/session.server";
 import { getReferenceDataCounts } from "~/services/reference-data.server";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { useBasePrefix } from "~/hooks/use-base-prefix";

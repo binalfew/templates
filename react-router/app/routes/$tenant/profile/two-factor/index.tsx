@@ -8,10 +8,10 @@ import {
   ShieldOff,
   Smartphone,
 } from "lucide-react";
-import { twoFAVerificationType, twoFAVerifyVerificationType } from "~/lib/2fa-constants";
-import { prisma } from "~/lib/db.server";
-import { isFeatureEnabled, FEATURE_FLAG_KEYS } from "~/lib/feature-flags.server";
-import { requireUserId } from "~/lib/session.server";
+import { twoFAVerificationType, twoFAVerifyVerificationType } from "~/lib/auth/2fa-constants";
+import { prisma } from "~/lib/db/db.server";
+import { isFeatureEnabled, FEATURE_FLAG_KEYS } from "~/lib/config/feature-flags.server";
+import { requireUserId } from "~/lib/auth/session.server";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
 import type { Route } from "./+types/index";

@@ -1,6 +1,6 @@
 import crypto from "node:crypto";
-import { prisma } from "~/lib/db.server";
-import { logger } from "~/lib/logger.server";
+import { prisma } from "~/lib/db/db.server";
+import { logger } from "~/lib/monitoring/logger.server";
 
 // ─── HMAC Signing ─────────────────────────────────────────
 

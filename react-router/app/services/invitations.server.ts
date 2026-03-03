@@ -1,8 +1,8 @@
 import crypto from "node:crypto";
-import { prisma } from "~/lib/db.server";
-import { sendEmail } from "~/lib/email.server";
-import { invitationEmail } from "~/lib/email-templates.server";
-import { logger } from "~/lib/logger.server";
+import { prisma } from "~/lib/db/db.server";
+import { sendEmail } from "~/lib/email/email.server";
+import { invitationEmail } from "~/lib/email/email-templates.server";
+import { logger } from "~/lib/monitoring/logger.server";
 
 const INVITE_EXPIRY_DAYS = 7;
 

@@ -4,9 +4,9 @@ import { invariantResponse } from "@epic-web/invariant";
 
 export const handle = { breadcrumb: "Permissions" };
 
-import { requirePermission } from "~/lib/require-auth.server";
+import { requirePermission } from "~/lib/auth/require-auth.server";
 import { getRole, assignPermissions, listPermissions } from "~/services/roles.server";
-import { handleServiceError } from "~/lib/handle-service-error.server";
+import { handleServiceError } from "~/lib/errors/handle-service-error.server";
 import { Button } from "~/components/ui/button";
 import { Checkbox } from "~/components/ui/checkbox";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";

@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 
 const mockCount = vi.fn();
 
-vi.mock("~/lib/env.server", () => ({
+vi.mock("~/lib/config/env.server", () => ({
   env: {
     SESSION_SECRET: "test-secret-at-least-16-chars-long",
     SESSION_MAX_AGE: 2592000000,
@@ -10,7 +10,7 @@ vi.mock("~/lib/env.server", () => ({
   },
 }));
 
-vi.mock("~/lib/db.server", () => ({
+vi.mock("~/lib/db/db.server", () => ({
   prisma: {
     user: {
       findFirst: vi.fn(),
@@ -21,7 +21,7 @@ vi.mock("~/lib/db.server", () => ({
   },
 }));
 
-vi.mock("~/lib/session.server", () => ({
+vi.mock("~/lib/auth/session.server", () => ({
   requireUser: vi.fn(),
   getUserId: vi.fn(),
 }));
@@ -34,7 +34,7 @@ describe("require-auth.server", () => {
   describe("hasPermission", () => {
     it("should return true when user has the permission", async () => {
       mockCount.mockResolvedValue(1);
-      const { hasPermission } = await import("../require-auth.server");
+      const { hasPermission } = await import("../auth/require-auth.server");
 
       const result = await hasPermission("user-1", "participant", "read");
       expect(result).toBe(true);
@@ -54,7 +54,7 @@ describe("require-auth.server", () => {
 
     it("should return false when user lacks the permission", async () => {
       mockCount.mockResolvedValue(0);
-      const { hasPermission } = await import("../require-auth.server");
+      const { hasPermission } = await import("../auth/require-auth.server");
 
       const result = await hasPermission("user-1", "settings", "manage");
       expect(result).toBe(false);
@@ -62,7 +62,7 @@ describe("require-auth.server", () => {
 
     it("should return false on database error (fail-safe)", async () => {
       mockCount.mockRejectedValue(new Error("DB error"));
-      const { hasPermission } = await import("../require-auth.server");
+      const { hasPermission } = await import("../auth/require-auth.server");
 
       const result = await hasPermission("user-1", "participant", "read");
       expect(result).toBe(false);

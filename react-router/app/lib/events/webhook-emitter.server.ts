@@ -1,6 +1,6 @@
 import crypto from "node:crypto";
-import { logger } from "~/lib/logger.server";
-import { isFeatureEnabled, FEATURE_FLAG_KEYS } from "~/lib/feature-flags.server";
+import { logger } from "~/lib/monitoring/logger.server";
+import { isFeatureEnabled, FEATURE_FLAG_KEYS } from "~/lib/config/feature-flags.server";
 import { dispatchWebhookEvent } from "~/services/webhook-dispatcher.server";
 
 export async function emitWebhookEvent(

@@ -5,10 +5,10 @@ import { invariantResponse } from "@epic-web/invariant";
 
 export const handle = { breadcrumb: "Invite User" };
 
-import { requirePermission } from "~/lib/require-auth.server";
+import { requirePermission } from "~/lib/auth/require-auth.server";
 import { inviteUserSchema } from "~/lib/schemas/invitation";
 import { createInvitation } from "~/services/invitations.server";
-import { prisma } from "~/lib/db.server";
+import { prisma } from "~/lib/db/db.server";
 import { useBasePrefix } from "~/hooks/use-base-prefix";
 import { Button } from "~/components/ui/button";
 import { Checkbox } from "~/components/ui/checkbox";

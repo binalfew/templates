@@ -1,11 +1,11 @@
 import { data, useLoaderData } from "react-router";
 import { RouteErrorBoundary } from "~/components/route-error-boundary";
-import { requireAuth, toClientUser } from "~/lib/require-auth.server";
+import { requireAuth, toClientUser } from "~/lib/auth/require-auth.server";
 import { resolveTenant } from "~/lib/tenant.server";
 import { getSidebarState, getSidebarGroupState } from "~/lib/sidebar.server";
 import { getTheme } from "~/lib/theme.server";
-import { isFeatureEnabled, FEATURE_FLAG_KEYS } from "~/lib/feature-flags.server";
-import { env } from "~/lib/env.server";
+import { isFeatureEnabled, FEATURE_FLAG_KEYS } from "~/lib/config/feature-flags.server";
+import { env } from "~/lib/config/env.server";
 import { DashboardLayout } from "~/components/layout/dashboard-layout";
 import type { Route } from "./+types/_layout";
 

@@ -3,7 +3,7 @@ import { KeyRound, Plus, Pencil, Trash2 } from "lucide-react";
 
 export const handle = { breadcrumb: "Permissions" };
 
-import { requirePermission } from "~/lib/require-auth.server";
+import { requirePermission } from "~/lib/auth/require-auth.server";
 import { listPermissionsPaginated } from "~/services/permissions.server";
 import { resolveViewContext } from "~/services/view-filters.server";
 import { Badge } from "~/components/ui/badge";

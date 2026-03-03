@@ -1,4 +1,4 @@
-import { requireAuth } from "~/lib/require-auth.server";
+import { requireAuth } from "~/lib/auth/require-auth.server";
 import {
   TableSkeleton,
   FormSkeleton,

@@ -1,8 +1,8 @@
-import { prisma } from "~/lib/db.server";
-import { logger } from "~/lib/logger.server";
+import { prisma } from "~/lib/db/db.server";
+import { logger } from "~/lib/monitoring/logger.server";
 import { SLUG_REGEX } from "~/lib/schemas/custom-object";
 import type { PaginatedQueryOptions } from "~/lib/types.server";
-import { ServiceError } from "~/lib/service-error.server";
+import { ServiceError } from "~/lib/errors/service-error.server";
 
 export interface CustomFieldDefinition {
   name: string;

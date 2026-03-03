@@ -3,10 +3,10 @@ import { useForm, getFormProps, getInputProps } from "@conform-to/react";
 import { parseWithZod } from "@conform-to/zod/v4";
 import { z } from "zod/v4";
 
-import { requireAnyRole } from "~/lib/require-auth.server";
+import { requireAnyRole } from "~/lib/auth/require-auth.server";
 import { resolveTenant } from "~/lib/tenant.server";
 import { updateTenant } from "~/services/tenants.server";
-import { handleServiceError } from "~/lib/handle-service-error.server";
+import { handleServiceError } from "~/lib/errors/handle-service-error.server";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";

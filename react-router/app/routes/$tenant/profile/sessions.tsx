@@ -1,7 +1,7 @@
 import { Form, Link, redirect, useLoaderData, useParams } from "react-router";
 import { ArrowLeft, Monitor, LogOut, ShieldCheck } from "lucide-react";
-import { prisma } from "~/lib/db.server";
-import { requireUserId, getSession } from "~/lib/session.server";
+import { prisma } from "~/lib/db/db.server";
+import { requireUserId, getSession } from "~/lib/auth/session.server";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
 import { Badge } from "~/components/ui/badge";

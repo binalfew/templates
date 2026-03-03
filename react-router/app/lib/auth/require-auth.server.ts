@@ -1,6 +1,6 @@
 import { data } from "react-router";
-import { requireUser, logout } from "~/lib/session.server";
-import { isFeatureEnabled } from "~/lib/feature-flags.server";
+import { requireUser, logout } from "~/lib/auth/session.server";
+import { isFeatureEnabled } from "~/lib/config/feature-flags.server";
 import type { RoleScope } from "~/generated/prisma/client.js";
 
 // --- Types ---
@@ -160,7 +160,7 @@ export async function hasPermission(
   resource: PermissionResource,
   action: PermissionAction,
 ): Promise<boolean> {
-  const { prisma } = await import("~/lib/db.server");
+  const { prisma } = await import("~/lib/db/db.server");
   try {
     const count = await prisma.userRole.count({
       where: {

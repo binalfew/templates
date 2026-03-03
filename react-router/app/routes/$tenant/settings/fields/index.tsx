@@ -3,15 +3,15 @@ import { invariantResponse } from "@epic-web/invariant";
 
 export const handle = { breadcrumb: "Fields" };
 
-import { requirePermission, requireFeature } from "~/lib/require-auth.server";
-import { FEATURE_FLAG_KEYS } from "~/lib/feature-flags.server";
+import { requirePermission, requireFeature } from "~/lib/auth/require-auth.server";
+import { FEATURE_FLAG_KEYS } from "~/lib/config/feature-flags.server";
 import {
   listFields,
   deleteField,
   reorderFields,
   getFieldDataCount,
 } from "~/services/fields.server";
-import { handleServiceError } from "~/lib/handle-service-error.server";
+import { handleServiceError } from "~/lib/errors/handle-service-error.server";
 import { Button } from "~/components/ui/button";
 import { NativeSelect, NativeSelectOption } from "~/components/ui/native-select";
 import { Separator } from "~/components/ui/separator";

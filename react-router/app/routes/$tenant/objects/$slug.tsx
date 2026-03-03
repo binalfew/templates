@@ -1,8 +1,8 @@
 import { data, Form, Link, useLoaderData, redirect, useParams } from "react-router";
 import { invariantResponse } from "@epic-web/invariant";
 import { Plus, Trash2, ArrowLeft } from "lucide-react";
-import { requireAuth, requireFeature } from "~/lib/require-auth.server";
-import { FEATURE_FLAG_KEYS } from "~/lib/feature-flags.server";
+import { requireAuth, requireFeature } from "~/lib/auth/require-auth.server";
+import { FEATURE_FLAG_KEYS } from "~/lib/config/feature-flags.server";
 import {
   getDefinitionBySlug,
   listRecords,
@@ -11,7 +11,7 @@ import {
   updateDefinition,
   type CustomFieldDefinition,
 } from "~/services/custom-objects.server";
-import { handleServiceError } from "~/lib/handle-service-error.server";
+import { handleServiceError } from "~/lib/errors/handle-service-error.server";
 import { Button } from "~/components/ui/button";
 import { Checkbox } from "~/components/ui/checkbox";
 import { Badge } from "~/components/ui/badge";

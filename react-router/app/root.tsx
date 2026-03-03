@@ -11,12 +11,12 @@ import {
 } from "react-router";
 
 import type { Route } from "./+types/root";
-import { initSentryClient, captureException as captureClientException } from "~/lib/sentry.client";
+import { initSentryClient, captureException as captureClientException } from "~/lib/monitoring/sentry.client";
 import { useNonce } from "~/lib/nonce-provider";
 import { getTheme } from "~/lib/theme.server";
 import { useOptimisticThemeMode } from "~/routes/resources/theme-switch";
 import { initI18n, getLanguageDir } from "~/lib/i18n";
-import { isFeatureEnabled, FEATURE_FLAG_KEYS } from "~/lib/feature-flags.server";
+import { isFeatureEnabled, FEATURE_FLAG_KEYS } from "~/lib/config/feature-flags.server";
 import type { Theme } from "~/lib/theme.server";
 import "./app.css";
 

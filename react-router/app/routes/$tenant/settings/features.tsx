@@ -1,12 +1,12 @@
 import { useLoaderData, useFetcher } from "react-router";
 import { useTranslation } from "react-i18next";
 import { RouteErrorBoundary } from "~/components/route-error-boundary";
-import { requireAnyRole } from "~/lib/require-auth.server";
+import { requireAnyRole } from "~/lib/auth/require-auth.server";
 
 export function ErrorBoundary() {
   return <RouteErrorBoundary context="feature flags" />;
 }
-import { prisma } from "~/lib/db.server";
+import { prisma } from "~/lib/db/db.server";
 import {
   Table,
   TableBody,

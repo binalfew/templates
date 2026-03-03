@@ -3,9 +3,9 @@ import { invariantResponse } from "@epic-web/invariant";
 
 export const handle = { breadcrumb: "Edit View" };
 
-import { requireAuth } from "~/lib/require-auth.server";
+import { requireAuth } from "~/lib/auth/require-auth.server";
 import { getView, updateView } from "~/services/saved-views.server";
-import { handleServiceError } from "~/lib/handle-service-error.server";
+import { handleServiceError } from "~/lib/errors/handle-service-error.server";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { NativeSelect, NativeSelectOption } from "~/components/ui/native-select";

@@ -1,5 +1,5 @@
 import { data } from "react-router";
-import { ServiceError } from "~/lib/service-error.server";
+import { ServiceError } from "~/lib/errors/service-error.server";
 
 export function handleServiceError(
   error: unknown,

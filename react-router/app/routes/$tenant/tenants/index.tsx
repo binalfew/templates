@@ -4,7 +4,7 @@ import { Building2, Plus, Search, ExternalLink } from "lucide-react";
 
 export const handle = { breadcrumb: "Tenants" };
 
-import { requireAnyRole } from "~/lib/require-auth.server";
+import { requireAnyRole } from "~/lib/auth/require-auth.server";
 import { listTenants } from "~/services/tenants.server";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";

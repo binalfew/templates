@@ -10,14 +10,14 @@ import {
   twoFAVerificationType,
   twoFAVerifyVerificationType,
   unverifiedSessionIdKey,
-} from "~/lib/2fa-constants";
-import { prisma } from "~/lib/db.server";
-import { env } from "~/lib/env.server";
+} from "~/lib/auth/2fa-constants";
+import { prisma } from "~/lib/db/db.server";
+import { env } from "~/lib/config/env.server";
 import {
   getVerifySession,
   isCodeValid,
   handleTwoFAVerification,
-} from "~/lib/verification.server";
+} from "~/lib/auth/verification.server";
 import { generateRecoveryCodes } from "~/services/recovery-codes.server";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";

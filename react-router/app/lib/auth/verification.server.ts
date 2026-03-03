@@ -1,13 +1,13 @@
 import { generateTOTP, verifyTOTP } from "@epic-web/totp";
 import { createCookieSessionStorage, redirect } from "react-router";
-import { prisma } from "~/lib/db.server";
-import { env } from "~/lib/env.server";
-import { sessionStorage, getSession, generateFingerprint } from "~/lib/session.server";
+import { prisma } from "~/lib/db/db.server";
+import { env } from "~/lib/config/env.server";
+import { sessionStorage, getSession, generateFingerprint } from "~/lib/auth/session.server";
 import {
   twoFAVerificationType,
   unverifiedSessionIdKey,
   verifiedTimeKey,
-} from "~/lib/2fa-constants";
+} from "~/lib/auth/2fa-constants";
 
 // ─── Verify Session Storage ─────────────────────────────
 

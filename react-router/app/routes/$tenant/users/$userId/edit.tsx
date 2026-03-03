@@ -14,11 +14,11 @@ import { invariantResponse } from "@epic-web/invariant";
 export const handle = { breadcrumb: "Edit User" };
 
 import { ShieldCheck, ShieldOff } from "lucide-react";
-import { requirePermission } from "~/lib/require-auth.server";
-import { isFeatureEnabled, FEATURE_FLAG_KEYS } from "~/lib/feature-flags.server";
+import { requirePermission } from "~/lib/auth/require-auth.server";
+import { isFeatureEnabled, FEATURE_FLAG_KEYS } from "~/lib/config/feature-flags.server";
 import { getUser, updateUser, changePassword, UserError } from "~/services/users.server";
 import { hasUserSetUp2FA, resetUserTwoFA } from "~/services/2fa-enforcement.server";
-import { handleServiceError } from "~/lib/handle-service-error.server";
+import { handleServiceError } from "~/lib/errors/handle-service-error.server";
 import { updateUserSchema, changePasswordSchema } from "~/lib/schemas/user";
 import { loadExtrasForEntity, parseExtrasForEntity } from "~/services/section-templates.server";
 import { FormRenderer } from "~/components/form-renderer/form-renderer";

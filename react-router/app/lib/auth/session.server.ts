@@ -1,7 +1,7 @@
 import crypto from "node:crypto";
 import { createCookieSessionStorage, redirect } from "react-router";
-import { env } from "~/lib/env.server";
-import { prisma } from "~/lib/db.server";
+import { env } from "~/lib/config/env.server";
+import { prisma } from "~/lib/db/db.server";
 
 export const sessionStorage = createCookieSessionStorage({
   cookie: {

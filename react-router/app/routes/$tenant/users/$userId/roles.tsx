@@ -3,9 +3,9 @@ import { invariantResponse } from "@epic-web/invariant";
 
 export const handle = { breadcrumb: "Assign Roles" };
 
-import { requirePermission } from "~/lib/require-auth.server";
+import { requirePermission } from "~/lib/auth/require-auth.server";
 import { getUser, assignRoles } from "~/services/users.server";
-import { handleServiceError } from "~/lib/handle-service-error.server";
+import { handleServiceError } from "~/lib/errors/handle-service-error.server";
 import { listRoles } from "~/services/roles.server";
 import { Button } from "~/components/ui/button";
 import { Checkbox } from "~/components/ui/checkbox";

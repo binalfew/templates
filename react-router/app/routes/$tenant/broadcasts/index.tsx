@@ -1,13 +1,13 @@
 import { data, useLoaderData, useFetcher } from "react-router";
 import { Send, XCircle, Plus, Pencil, Trash2 } from "lucide-react";
-import { requireFeature } from "~/lib/require-auth.server";
-import { FEATURE_FLAG_KEYS } from "~/lib/feature-flags.server";
+import { requireFeature } from "~/lib/auth/require-auth.server";
+import { FEATURE_FLAG_KEYS } from "~/lib/config/feature-flags.server";
 import { listBroadcastsPaginated, sendBroadcast, cancelBroadcast } from "~/services/broadcasts.server";
-import { handleServiceError } from "~/lib/handle-service-error.server";
+import { handleServiceError } from "~/lib/errors/handle-service-error.server";
 import { resolveViewContext } from "~/services/view-filters.server";
 import { buildServiceContext } from "~/lib/request-context.server";
 import { useBasePrefix } from "~/hooks/use-base-prefix";
-import { BROADCAST_STATUS_COLORS, CHANNEL_COLORS } from "~/lib/messaging-constants";
+import { BROADCAST_STATUS_COLORS, CHANNEL_COLORS } from "~/lib/email/messaging-constants";
 import { Badge } from "~/components/ui/badge";
 import { DataTable } from "~/components/data-table/data-table";
 import type { ColumnDef, PaginationMeta, ViewConfig } from "~/components/data-table/data-table-types";

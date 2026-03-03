@@ -3,8 +3,8 @@ import { useState, useRef } from "react";
 
 export const handle = { breadcrumb: "Webhooks" };
 
-import { requirePermission } from "~/lib/require-auth.server";
-import { isFeatureEnabled, FEATURE_FLAG_KEYS } from "~/lib/feature-flags.server";
+import { requirePermission } from "~/lib/auth/require-auth.server";
+import { isFeatureEnabled, FEATURE_FLAG_KEYS } from "~/lib/config/feature-flags.server";
 import {
   listWebhookSubscriptions,
   createWebhookSubscription,
@@ -14,7 +14,7 @@ import {
   testWebhookEndpoint,
   getDeliveryLog,
 } from "~/services/webhooks.server";
-import { getEventsByDomain } from "~/lib/webhook-events";
+import { getEventsByDomain } from "~/lib/events/webhook-events";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";

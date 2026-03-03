@@ -3,7 +3,7 @@ import { Globe, Plus } from "lucide-react";
 
 export const handle = { breadcrumb: "Countries" };
 
-import { requireUser } from "~/lib/session.server";
+import { requireUser } from "~/lib/auth/session.server";
 import { listCountries } from "~/services/reference-data.server";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";

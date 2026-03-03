@@ -3,8 +3,8 @@ import { Box, Plus, Pencil, Trash2, Database } from "lucide-react";
 
 export const handle = { breadcrumb: "Objects" };
 
-import { requireFeature } from "~/lib/require-auth.server";
-import { FEATURE_FLAG_KEYS } from "~/lib/feature-flags.server";
+import { requireFeature } from "~/lib/auth/require-auth.server";
+import { FEATURE_FLAG_KEYS } from "~/lib/config/feature-flags.server";
 import { listDefinitionsPaginated } from "~/services/custom-objects.server";
 import type { CustomFieldDefinition } from "~/services/custom-objects.server";
 import { resolveViewContext } from "~/services/view-filters.server";

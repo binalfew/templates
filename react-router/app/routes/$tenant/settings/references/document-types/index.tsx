@@ -3,7 +3,7 @@ import { FileText, Plus } from "lucide-react";
 
 export const handle = { breadcrumb: "Document Types" };
 
-import { requireUser } from "~/lib/session.server";
+import { requireUser } from "~/lib/auth/session.server";
 import { listDocumentTypes } from "~/services/reference-data.server";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";

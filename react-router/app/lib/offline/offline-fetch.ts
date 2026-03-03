@@ -1,4 +1,4 @@
-import { enqueue } from "~/lib/offline-store";
+import { enqueue } from "~/lib/offline/offline-store";
 
 export interface OfflineConfig {
   type: string;

@@ -3,8 +3,8 @@ import { Mail, Plus, Pencil, Copy, Trash2 } from "lucide-react";
 
 export const handle = { breadcrumb: "Templates" };
 
-import { requireFeature } from "~/lib/require-auth.server";
-import { FEATURE_FLAG_KEYS } from "~/lib/feature-flags.server";
+import { requireFeature } from "~/lib/auth/require-auth.server";
+import { FEATURE_FLAG_KEYS } from "~/lib/config/feature-flags.server";
 import { listTemplatesPaginated } from "~/services/message-templates.server";
 import { resolveViewContext } from "~/services/view-filters.server";
 import { Badge } from "~/components/ui/badge";
@@ -12,7 +12,7 @@ import { DataTable } from "~/components/data-table/data-table";
 import type { ColumnDef, PaginationMeta, ViewConfig } from "~/components/data-table/data-table-types";
 import { useBasePrefix } from "~/hooks/use-base-prefix";
 import { ViewSwitcher } from "~/components/views/view-switcher";
-import { CHANNEL_COLORS } from "~/lib/messaging-constants";
+import { CHANNEL_COLORS } from "~/lib/email/messaging-constants";
 import type { Route } from "./+types/index";
 
 const TEMPLATE_FIELD_MAP: Record<string, string> = {

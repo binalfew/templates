@@ -1,11 +1,11 @@
 import { useLoaderData, useSearchParams, Link } from "react-router";
 import { ClipboardList } from "lucide-react";
-import { prisma } from "~/lib/db.server";
-import { requireRole } from "~/lib/require-auth.server";
+import { prisma } from "~/lib/db/db.server";
+import { requireRole } from "~/lib/auth/require-auth.server";
 import {
   isFeatureEnabled,
   FEATURE_FLAG_KEYS,
-} from "~/lib/feature-flags.server";
+} from "~/lib/config/feature-flags.server";
 import {
   resolveActiveView,
   buildPrismaWhere,

@@ -1,8 +1,8 @@
 import crypto from "node:crypto";
-import { prisma } from "~/lib/db.server";
-import { logger } from "~/lib/logger.server";
-import { ServiceError } from "~/lib/service-error.server";
-import { validateEventTypes } from "~/lib/webhook-events";
+import { prisma } from "~/lib/db/db.server";
+import { logger } from "~/lib/monitoring/logger.server";
+import { ServiceError } from "~/lib/errors/service-error.server";
+import { validateEventTypes } from "~/lib/events/webhook-events";
 import { deliverWebhook } from "~/services/webhook-delivery.server";
 import type { TenantServiceContext } from "~/lib/types.server";
 

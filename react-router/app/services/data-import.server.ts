@@ -1,6 +1,6 @@
-import { prisma } from "~/lib/db.server";
-import { hashPassword } from "~/lib/auth.server";
-import { logger } from "~/lib/logger.server";
+import { prisma } from "~/lib/db/db.server";
+import { hashPassword } from "~/lib/auth/auth.server";
+import { logger } from "~/lib/monitoring/logger.server";
 
 interface ImportRow {
   [key: string]: string;

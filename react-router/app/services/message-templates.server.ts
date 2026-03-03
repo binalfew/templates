@@ -1,8 +1,8 @@
-import { prisma } from "~/lib/db.server";
-import { logger } from "~/lib/logger.server";
+import { prisma } from "~/lib/db/db.server";
+import { logger } from "~/lib/monitoring/logger.server";
 import type { CreateTemplateInput, UpdateTemplateInput } from "~/lib/schemas/message-template";
 import type { PaginatedQueryOptions, TenantServiceContext } from "~/lib/types.server";
-import { ServiceError } from "~/lib/service-error.server";
+import { ServiceError } from "~/lib/errors/service-error.server";
 
 // ─── Types ────────────────────────────────────────────────
 

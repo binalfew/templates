@@ -132,7 +132,7 @@ tests/
 
 - **`.server.ts` suffix** — server-only code, excluded from client bundles. Use for anything that touches the database, environment variables, or Node APIs.
 - **Route files** — file-based routing via `react-router-auto-routes`. File path determines URL path (e.g., `app/routes/$tenant/users/index.tsx` → `/:tenant/users`).
-- **Path alias** — `~/*` maps to `./app/*`. Import as `import { prisma } from "~/lib/db.server"`.
+- **Path alias** — `~/*` maps to `./app/*`. Import as `import { prisma } from "~/lib/db/db.server"`.
 
 ---
 
@@ -182,7 +182,7 @@ All limiters skip the `/up` health check endpoint. Rate limit keys are user-awar
 Pino-based structured JSON logger with automatic sensitive field redaction.
 
 ```typescript
-import { logger } from "~/lib/logger.server";
+import { logger } from "~/lib/monitoring/logger.server";
 
 logger.info({ userId, action }, "User performed action");
 logger.error({ error, context }, "Something failed");
@@ -200,7 +200,7 @@ logger.error({ error, context }, "Something failed");
 All environment variables are validated at startup using Zod. If any required variable is missing or invalid, the server exits with a clear error message. See [Appendix A](#appendix-a-environment-variables) for the complete list.
 
 ```typescript
-import { env } from "~/lib/env.server";
+import { env } from "~/lib/config/env.server";
 
 env.DATABASE_URL;    // string (required)
 env.SESSION_SECRET;  // string, min 16 chars (required)
@@ -314,7 +314,7 @@ import {
   requireAnonymous,
   createUserSession,
   logout,
-} from "~/lib/session.server";
+} from "~/lib/auth/session.server";
 ```
 
 | Helper | Returns | Behavior |
@@ -437,7 +437,7 @@ import {
   requirePermission,
   requireGlobalAdmin,
   hasPermission,
-} from "~/lib/require-auth.server";
+} from "~/lib/auth/require-auth.server";
 ```
 
 | Helper | Purpose |
@@ -593,7 +593,7 @@ The email service supports two providers with automatic selection:
 2. **SMTP/Nodemailer** (fallback) — configure `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`
 
 ```typescript
-import { sendEmail } from "~/lib/email.server";
+import { sendEmail } from "~/lib/email/email.server";
 
 await sendEmail({
   to: "user@example.com",        // string or string[]
@@ -631,7 +631,7 @@ In development, Docker Compose starts Mailpit to catch all SMTP emails:
 The job queue uses the `Job` database model for persistence. No external services (Redis, RabbitMQ) required.
 
 ```typescript
-import { enqueueJob } from "~/lib/job-queue.server";
+import { enqueueJob } from "~/lib/events/job-queue.server";
 
 // Basic
 await enqueueJob("send-email", { to: "user@example.com", subject: "Hi", html: "..." });
@@ -668,7 +668,7 @@ Job {
 Register handlers for job types:
 
 ```typescript
-import { registerJobHandler } from "~/lib/job-queue.server";
+import { registerJobHandler } from "~/lib/events/job-queue.server";
 
 registerJobHandler("my-job-type", async (payload) => {
   const data = payload as MyPayloadType;
@@ -714,7 +714,7 @@ API keys are created and managed via the UI or the `app/services/api-keys.server
 ### Auth Middleware (`app/lib/api-auth.server.ts`)
 
 ```typescript
-import { apiAuth, requireApiPermission } from "~/lib/api-auth.server";
+import { apiAuth, requireApiPermission } from "~/lib/auth/api-auth.server";
 
 // In a loader/action:
 const auth = await apiAuth(request);
@@ -840,7 +840,7 @@ import {
   WEBHOOK_EVENT_TYPES,
   validateEventTypes,
   getEventsByDomain,
-} from "~/lib/webhook-events";
+} from "~/lib/events/webhook-events";
 ```
 
 ### Delivery (`app/services/webhook-delivery.server.ts`)
@@ -1687,7 +1687,7 @@ Detection order: cookie (`i18n_lang`) → browser navigator. Cookie persists for
 ### Cache Utility (`app/lib/cache.server.ts`)
 
 ```typescript
-import { generateETag, handleConditionalRequest, CACHE_HEADERS } from "~/lib/cache.server";
+import { generateETag, handleConditionalRequest, CACHE_HEADERS } from "~/lib/db/cache.server";
 ```
 
 **ETag generation:**
@@ -1760,7 +1760,7 @@ npm run test:integration
 ### Writing Tests
 
 Follow existing patterns in `app/services/__tests__/`. Key conventions:
-- Mock Prisma with `vi.mock("~/lib/db.server")`
+- Mock Prisma with `vi.mock("~/lib/db/db.server")`
 - Use factories for test data
 - Test both success and error paths
 - Verify audit log creation for state-changing operations
@@ -1834,7 +1834,7 @@ All flags are stored in the `FeatureFlag` database model and managed at `/$tenan
 ### Feature Flag Evaluation
 
 ```typescript
-import { isFeatureEnabled, getAllFlags, setFlag, FEATURE_FLAG_KEYS } from "~/lib/feature-flags.server";
+import { isFeatureEnabled, getAllFlags, setFlag, FEATURE_FLAG_KEYS } from "~/lib/config/feature-flags.server";
 
 // Check a single flag
 const enabled = await isFeatureEnabled(FEATURE_FLAG_KEYS.ANALYTICS, {

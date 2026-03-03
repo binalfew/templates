@@ -1,5 +1,5 @@
-import { prisma } from "~/lib/db.server";
-import { apiAuth, requireApiPermission } from "~/lib/api-auth.server";
+import { prisma } from "~/lib/db/db.server";
+import { apiAuth, requireApiPermission } from "~/lib/auth/api-auth.server";
 import { jsonPaginated, parsePagination } from "~/lib/api-response.server";
 import type { Route } from "./+types/permissions";
 

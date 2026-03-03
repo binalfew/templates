@@ -1,5 +1,5 @@
-import { getPending, markSyncing, markSynced, markFailed, cleanup, getStats } from "~/lib/offline-store";
-import type { QueuedMutation, QueueStats } from "~/lib/offline-store";
+import { getPending, markSyncing, markSynced, markFailed, cleanup, getStats } from "~/lib/offline/offline-store";
+import type { QueuedMutation, QueueStats } from "~/lib/offline/offline-store";
 
 export type SyncStatus = "idle" | "syncing" | "online" | "offline" | "error";
 

@@ -10,8 +10,8 @@ import {
   Image,
   Eye,
 } from "lucide-react";
-import { requireFeature } from "~/lib/require-auth.server";
-import { FEATURE_FLAG_KEYS } from "~/lib/feature-flags.server";
+import { requireFeature } from "~/lib/auth/require-auth.server";
+import { FEATURE_FLAG_KEYS } from "~/lib/config/feature-flags.server";
 import { listViews } from "~/services/saved-views.server";
 import { Badge } from "~/components/ui/badge";
 import { useBasePrefix } from "~/hooks/use-base-prefix";

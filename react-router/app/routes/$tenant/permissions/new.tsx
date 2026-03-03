@@ -5,9 +5,9 @@ import { invariantResponse } from "@epic-web/invariant";
 
 export const handle = { breadcrumb: "New Permission" };
 
-import { requirePermission } from "~/lib/require-auth.server";
+import { requirePermission } from "~/lib/auth/require-auth.server";
 import { createPermission } from "~/services/permissions.server";
-import { handleServiceError } from "~/lib/handle-service-error.server";
+import { handleServiceError } from "~/lib/errors/handle-service-error.server";
 import { createPermissionSchema } from "~/lib/schemas/permission";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";

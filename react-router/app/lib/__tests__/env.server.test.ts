@@ -15,7 +15,7 @@ describe("env validation", () => {
     process.env.DATABASE_URL = "postgresql://test:test@localhost:5432/testdb";
     process.env.SESSION_SECRET = "test-session-secret-at-least-16-chars";
 
-    const { env } = await import("../env.server");
+    const { env } = await import("../config/env.server");
     expect(env).toBeDefined();
     expect(env.NODE_ENV).toBeDefined();
     expect(env.PORT).toBeTypeOf("number");
@@ -31,7 +31,7 @@ describe("env validation", () => {
       throw new Error("process.exit called");
     });
 
-    await expect(import("../env.server")).rejects.toThrow("process.exit called");
+    await expect(import("../config/env.server")).rejects.toThrow("process.exit called");
     expect(exitSpy).toHaveBeenCalledWith(1);
 
     exitSpy.mockRestore();
@@ -45,7 +45,7 @@ describe("env validation", () => {
       throw new Error("process.exit called");
     });
 
-    await expect(import("../env.server")).rejects.toThrow("process.exit called");
+    await expect(import("../config/env.server")).rejects.toThrow("process.exit called");
     expect(exitSpy).toHaveBeenCalledWith(1);
 
     exitSpy.mockRestore();

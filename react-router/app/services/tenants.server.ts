@@ -1,6 +1,6 @@
-import { prisma } from "~/lib/db.server";
-import { hashPassword } from "~/lib/auth.server";
-import { ServiceError } from "~/lib/service-error.server";
+import { prisma } from "~/lib/db/db.server";
+import { hashPassword } from "~/lib/auth/auth.server";
+import { ServiceError } from "~/lib/errors/service-error.server";
 import type { ServiceContext } from "~/lib/types.server";
 
 export class TenantError extends ServiceError {

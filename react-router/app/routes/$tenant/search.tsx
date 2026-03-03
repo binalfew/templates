@@ -1,7 +1,7 @@
 import { Form, Link, useLoaderData, useSearchParams } from "react-router";
 import { Search as SearchIcon, Users, Shield, KeyRound, Box, ClipboardList } from "lucide-react";
-import { requireFeature } from "~/lib/require-auth.server";
-import { FEATURE_FLAG_KEYS } from "~/lib/feature-flags.server";
+import { requireFeature } from "~/lib/auth/require-auth.server";
+import { FEATURE_FLAG_KEYS } from "~/lib/config/feature-flags.server";
 import { globalSearch } from "~/services/search.server";
 import type { SearchResults, SearchResult } from "~/services/search.server";
 import { Button } from "~/components/ui/button";

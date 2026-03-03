@@ -8,7 +8,7 @@ const mockFindUniqueOrThrow = vi.fn();
 const mockFindMany = vi.fn();
 const mockFindFirst = vi.fn();
 
-vi.mock("~/lib/db.server", () => ({
+vi.mock("~/lib/db/db.server", () => ({
   prisma: {
     savedView: {
       create: (...args: unknown[]) => mockCreate(...args),
@@ -22,7 +22,7 @@ vi.mock("~/lib/db.server", () => ({
   },
 }));
 
-vi.mock("~/lib/logger.server", () => ({
+vi.mock("~/lib/monitoring/logger.server", () => ({
   logger: { info: vi.fn(), warn: vi.fn(), error: vi.fn() },
 }));
 

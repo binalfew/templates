@@ -5,9 +5,9 @@ import { invariantResponse } from "@epic-web/invariant";
 
 export const handle = { breadcrumb: "New Title" };
 
-import { requireUser } from "~/lib/session.server";
+import { requireUser } from "~/lib/auth/session.server";
 import { createTitle } from "~/services/reference-data.server";
-import { handleServiceError } from "~/lib/handle-service-error.server";
+import { handleServiceError } from "~/lib/errors/handle-service-error.server";
 import { createTitleSchema } from "~/lib/schemas/reference-data";
 import { ReferenceDataForm } from "~/components/reference-data/reference-data-form";
 import { useBasePrefix } from "~/hooks/use-base-prefix";

@@ -1,7 +1,7 @@
 import crypto from "node:crypto";
 import { hash, compare } from "bcryptjs";
-import { prisma } from "~/lib/db.server";
-import { env } from "~/lib/env.server";
+import { prisma } from "~/lib/db/db.server";
+import { env } from "~/lib/config/env.server";
 
 const CODE_COUNT = 10;
 const CODE_LENGTH = 8;

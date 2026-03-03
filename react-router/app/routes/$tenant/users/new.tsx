@@ -13,8 +13,8 @@ import { invariantResponse } from "@epic-web/invariant";
 
 export const handle = { breadcrumb: "New User" };
 
-import { requirePermission } from "~/lib/require-auth.server";
-import { handleServiceError } from "~/lib/handle-service-error.server";
+import { requirePermission } from "~/lib/auth/require-auth.server";
+import { handleServiceError } from "~/lib/errors/handle-service-error.server";
 import { createUser } from "~/services/users.server";
 import { listTenants } from "~/services/tenants.server";
 import { createUserSchema } from "~/lib/schemas/user";

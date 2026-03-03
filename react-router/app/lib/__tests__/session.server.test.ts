@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
-vi.mock("~/lib/env.server", () => ({
+vi.mock("~/lib/config/env.server", () => ({
   env: {
     SESSION_SECRET: "test-secret-at-least-16-chars-long",
     SESSION_MAX_AGE: 2592000000,
@@ -8,7 +8,7 @@ vi.mock("~/lib/env.server", () => ({
   },
 }));
 
-vi.mock("~/lib/db.server", () => ({
+vi.mock("~/lib/db/db.server", () => ({
   prisma: {
     user: {
       findFirst: vi.fn(),
@@ -23,7 +23,7 @@ describe("session.server", () => {
 
   describe("getUserId", () => {
     it("should return null when no session cookie is present", async () => {
-      const { getUserId } = await import("../session.server");
+      const { getUserId } = await import("../auth/session.server");
       const request = new Request("http://localhost:3000/admin");
       const userId = await getUserId(request);
       expect(userId).toBeNull();
@@ -32,7 +32,7 @@ describe("session.server", () => {
 
   describe("requireUserId", () => {
     it("should throw a redirect to /auth/login when no session", async () => {
-      const { requireUserId } = await import("../session.server");
+      const { requireUserId } = await import("../auth/session.server");
       const request = new Request("http://localhost:3000/admin");
 
       try {
@@ -49,7 +49,7 @@ describe("session.server", () => {
     });
 
     it("should preserve custom redirectTo path", async () => {
-      const { requireUserId } = await import("../session.server");
+      const { requireUserId } = await import("../auth/session.server");
       const request = new Request("http://localhost:3000/admin/settings");
 
       try {

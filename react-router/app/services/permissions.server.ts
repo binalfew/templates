@@ -1,6 +1,6 @@
-import { prisma } from "~/lib/db.server";
+import { prisma } from "~/lib/db/db.server";
 import type { PaginatedQueryOptions, TenantServiceContext } from "~/lib/types.server";
-import { ServiceError } from "~/lib/service-error.server";
+import { ServiceError } from "~/lib/errors/service-error.server";
 
 export class PermissionError extends ServiceError {
   constructor(message: string, status: number) {

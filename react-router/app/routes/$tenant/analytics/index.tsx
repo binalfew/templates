@@ -1,11 +1,11 @@
 import { RouteErrorBoundary } from "~/components/route-error-boundary";
-import { requireAnyRole } from "~/lib/require-auth.server";
+import { requireAnyRole } from "~/lib/auth/require-auth.server";
 
 export function ErrorBoundary() {
   return <RouteErrorBoundary context="analytics dashboard" />;
 }
-import { isFeatureEnabled, FEATURE_FLAG_KEYS } from "~/lib/feature-flags.server";
-import { prisma } from "~/lib/db.server";
+import { isFeatureEnabled, FEATURE_FLAG_KEYS } from "~/lib/config/feature-flags.server";
+import { prisma } from "~/lib/db/db.server";
 import {
   getUserGrowth,
   getLoginActivity,

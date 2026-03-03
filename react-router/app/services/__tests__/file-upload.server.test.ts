@@ -3,7 +3,7 @@ import * as fs from "node:fs/promises";
 
 const mockAuditCreate = vi.fn();
 
-vi.mock("~/lib/db.server", () => ({
+vi.mock("~/lib/db/db.server", () => ({
   prisma: {
     auditLog: {
       create: mockAuditCreate,
@@ -11,7 +11,7 @@ vi.mock("~/lib/db.server", () => ({
   },
 }));
 
-vi.mock("~/lib/logger.server", () => ({
+vi.mock("~/lib/monitoring/logger.server", () => ({
   logger: {
     info: vi.fn(),
     warn: vi.fn(),
@@ -19,7 +19,7 @@ vi.mock("~/lib/logger.server", () => ({
   },
 }));
 
-vi.mock("~/lib/env.server", () => ({
+vi.mock("~/lib/config/env.server", () => ({
   env: {
     FILE_UPLOAD_MAX_SIZE_MB: 10,
     FILE_UPLOAD_DIR: "/tmp/test-uploads",

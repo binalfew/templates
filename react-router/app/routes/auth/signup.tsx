@@ -3,17 +3,17 @@ import { parseWithZod } from "@conform-to/zod/v4";
 import { data, Form, Link, redirect } from "react-router";
 import { useTranslation } from "react-i18next";
 import { z } from "zod/v4";
-import { prisma } from "~/lib/db.server";
-import { sendEmail } from "~/lib/email.server";
-import { otpEmail } from "~/lib/email-templates.server";
-import { logger } from "~/lib/logger.server";
-import { requireAnonymous } from "~/lib/session.server";
+import { prisma } from "~/lib/db/db.server";
+import { sendEmail } from "~/lib/email/email.server";
+import { otpEmail } from "~/lib/email/email-templates.server";
+import { logger } from "~/lib/monitoring/logger.server";
+import { requireAnonymous } from "~/lib/auth/session.server";
 import { SignupEmailSchema } from "~/lib/schemas/user";
 import {
   prepareVerification,
   getVerifySession,
   commitVerifySession,
-} from "~/lib/verification.server";
+} from "~/lib/auth/verification.server";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
 import { Input } from "~/components/ui/input";

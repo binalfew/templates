@@ -1,5 +1,5 @@
-import { prisma } from "~/lib/db.server";
-import { logger } from "~/lib/logger.server";
+import { prisma } from "~/lib/db/db.server";
+import { logger } from "~/lib/monitoring/logger.server";
 import type { UpsertSettingInput } from "~/lib/schemas/settings";
 import type { ServiceContext } from "~/lib/types.server";
 

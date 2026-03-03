@@ -1,4 +1,4 @@
-import { prisma } from "~/lib/db.server";
+import { prisma } from "~/lib/db/db.server";
 
 export interface SearchResult {
   id: string;

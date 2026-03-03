@@ -1,7 +1,7 @@
 import { data, Form, useActionData } from "react-router";
 import { invariantResponse } from "@epic-web/invariant";
 import { Upload } from "lucide-react";
-import { requirePermission } from "~/lib/require-auth.server";
+import { requirePermission } from "~/lib/auth/require-auth.server";
 import { parseCsv, parseJson, importData } from "~/services/data-import.server";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";

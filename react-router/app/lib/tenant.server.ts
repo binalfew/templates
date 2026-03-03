@@ -1,5 +1,5 @@
 import { data } from "react-router";
-import { prisma } from "~/lib/db.server";
+import { prisma } from "~/lib/db/db.server";
 
 /**
  * Resolve a tenant by URL slug.

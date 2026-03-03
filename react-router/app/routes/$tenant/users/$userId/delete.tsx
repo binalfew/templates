@@ -3,10 +3,10 @@ import { invariantResponse } from "@epic-web/invariant";
 
 export const handle = { breadcrumb: "Delete User" };
 
-import { requirePermission } from "~/lib/require-auth.server";
-import { prisma } from "~/lib/db.server";
+import { requirePermission } from "~/lib/auth/require-auth.server";
+import { prisma } from "~/lib/db/db.server";
 import { getUserWithCounts, deleteUser } from "~/services/users.server";
-import { handleServiceError } from "~/lib/handle-service-error.server";
+import { handleServiceError } from "~/lib/errors/handle-service-error.server";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { useBasePrefix } from "~/hooks/use-base-prefix";

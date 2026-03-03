@@ -3,9 +3,9 @@ import { invariantResponse } from "@epic-web/invariant";
 
 export const handle = { breadcrumb: "Delete View" };
 
-import { requireAuth } from "~/lib/require-auth.server";
+import { requireAuth } from "~/lib/auth/require-auth.server";
 import { getView, deleteView } from "~/services/saved-views.server";
-import { handleServiceError } from "~/lib/handle-service-error.server";
+import { handleServiceError } from "~/lib/errors/handle-service-error.server";
 import { Button } from "~/components/ui/button";
 import { Badge } from "~/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";

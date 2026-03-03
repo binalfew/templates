@@ -1,5 +1,5 @@
 import { hash, compare } from "bcryptjs";
-import { env } from "~/lib/env.server";
+import { env } from "~/lib/config/env.server";
 
 export async function hashPassword(password: string): Promise<string> {
   return hash(password, env.BCRYPT_ROUNDS);

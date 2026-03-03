@@ -1,7 +1,7 @@
 import nodemailer from "nodemailer";
 import { Resend } from "resend";
-import { env } from "~/lib/env.server";
-import { logger } from "~/lib/logger.server";
+import { env } from "~/lib/config/env.server";
+import { logger } from "~/lib/monitoring/logger.server";
 
 // --- Types ---
 

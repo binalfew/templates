@@ -3,10 +3,10 @@ import { invariantResponse } from "@epic-web/invariant";
 
 export const handle = { breadcrumb: "New Field" };
 
-import { requirePermission, requireFeature } from "~/lib/require-auth.server";
-import { FEATURE_FLAG_KEYS } from "~/lib/feature-flags.server";
+import { requirePermission, requireFeature } from "~/lib/auth/require-auth.server";
+import { FEATURE_FLAG_KEYS } from "~/lib/config/feature-flags.server";
 import { createField } from "~/services/fields.server";
-import { handleServiceError } from "~/lib/handle-service-error.server";
+import { handleServiceError } from "~/lib/errors/handle-service-error.server";
 import { FieldForm } from "~/components/fields/FieldForm";
 import { buildServiceContext } from "~/lib/request-context.server";
 import type { Route } from "./+types/new";

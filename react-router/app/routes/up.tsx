@@ -1,5 +1,5 @@
 import { data } from "react-router";
-import { prisma } from "~/lib/db.server";
+import { prisma } from "~/lib/db/db.server";
 
 export async function loader() {
   try {
