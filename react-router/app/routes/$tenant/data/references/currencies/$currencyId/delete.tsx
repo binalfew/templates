@@ -3,7 +3,8 @@ import { invariantResponse } from "@epic-web/invariant";
 
 export const handle = { breadcrumb: "Delete Currency" };
 
-import { requireUser } from "~/lib/auth/session.server";
+import { requireAnyRole } from "~/lib/auth/require-auth.server";
+import { ADMIN_ONLY } from "~/lib/auth/roles";
 import { getCurrency, deleteCurrency } from "~/services/reference-data.server";
 import { handleServiceError } from "~/lib/errors/handle-service-error.server";
 import { Button } from "~/components/ui/button";
@@ -13,13 +14,13 @@ import { buildServiceContext } from "~/lib/request-context.server";
 import type { Route } from "./+types/delete";
 
 export async function loader({ request, params }: Route.LoaderArgs) {
-  await requireUser(request);
+  await requireAnyRole(request, [...ADMIN_ONLY]);
   const currency = await getCurrency(params.currencyId);
   return { currency };
 }
 
 export async function action({ request, params }: Route.ActionArgs) {
-  const user = await requireUser(request);
+  const { user } = await requireAnyRole(request, [...ADMIN_ONLY]);
   const tenantId = user.tenantId;
   invariantResponse(tenantId, "User is not associated with a tenant", { status: 403 });
 

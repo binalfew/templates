@@ -3,14 +3,15 @@ import { Globe, User, Languages, Banknote, FileText } from "lucide-react";
 
 export const handle = { breadcrumb: "References" };
 
-import { requireUser } from "~/lib/auth/session.server";
+import { requireAnyRole } from "~/lib/auth/require-auth.server";
+import { ADMIN_ONLY } from "~/lib/auth/roles";
 import { getReferenceDataCounts } from "~/services/reference-data.server";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { useBasePrefix } from "~/hooks/use-base-prefix";
 import type { Route } from "./+types/index";
 
 export async function loader({ request }: Route.LoaderArgs) {
-  await requireUser(request);
+  await requireAnyRole(request, [...ADMIN_ONLY]);
   const counts = await getReferenceDataCounts();
   return { counts };
 }

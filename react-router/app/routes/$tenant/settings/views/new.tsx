@@ -2,7 +2,8 @@ import { data, redirect, useActionData, Form, Link, useSearchParams } from "reac
 
 export const handle = { breadcrumb: "New View" };
 
-import { requireFeature } from "~/lib/auth/require-auth.server";
+import { requireRoleAndFeature } from "~/lib/auth/require-auth.server";
+import { ADMIN_OR_TENANT_ADMIN } from "~/lib/auth/roles";
 import { FEATURE_FLAG_KEYS } from "~/lib/config/feature-flags.server";
 import { createView } from "~/services/saved-views.server";
 import { handleServiceError } from "~/lib/errors/handle-service-error.server";
@@ -16,12 +17,12 @@ import { useBasePrefix } from "~/hooks/use-base-prefix";
 import type { Route } from "./+types/new";
 
 export async function loader({ request }: Route.LoaderArgs) {
-  await requireFeature(request, FEATURE_FLAG_KEYS.SAVED_VIEWS);
+  await requireRoleAndFeature(request, [...ADMIN_OR_TENANT_ADMIN], FEATURE_FLAG_KEYS.SAVED_VIEWS);
   return {};
 }
 
 export async function action({ request, params }: Route.ActionArgs) {
-  const { user, tenantId } = await requireFeature(request, FEATURE_FLAG_KEYS.SAVED_VIEWS);
+  const { user, tenantId } = await requireRoleAndFeature(request, [...ADMIN_OR_TENANT_ADMIN], FEATURE_FLAG_KEYS.SAVED_VIEWS);
 
   const formData = await request.formData();
   const name = formData.get("name") as string;

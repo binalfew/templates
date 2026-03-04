@@ -1,6 +1,7 @@
 import { data, Link, useLoaderData, useFetcher } from "react-router";
 import { Send, XCircle, Plus, Pencil, Trash2 } from "lucide-react";
-import { requireFeature } from "~/lib/auth/require-auth.server";
+import { requireRoleAndFeature } from "~/lib/auth/require-auth.server";
+import { ADMIN_OR_TENANT_ADMIN } from "~/lib/auth/roles";
 import { FEATURE_FLAG_KEYS } from "~/lib/config/feature-flags.server";
 import { listBroadcastsPaginated, sendBroadcast, cancelBroadcast } from "~/services/broadcasts.server";
 import { handleServiceError } from "~/lib/errors/handle-service-error.server";
@@ -24,7 +25,7 @@ const BROADCAST_FIELD_MAP: Record<string, string> = {
 };
 
 export async function loader({ request }: Route.LoaderArgs) {
-  const { user, tenantId } = await requireFeature(request, FEATURE_FLAG_KEYS.BROADCASTS);
+  const { user, tenantId } = await requireRoleAndFeature(request, [...ADMIN_OR_TENANT_ADMIN], FEATURE_FLAG_KEYS.BROADCASTS);
 
   const { savedViewsEnabled, activeViewId, activeViewType, availableViews, viewWhere, viewOrderBy } =
     await resolveViewContext(request, tenantId, user.id, "Broadcast", BROADCAST_FIELD_MAP);
@@ -60,7 +61,7 @@ export async function loader({ request }: Route.LoaderArgs) {
 }
 
 export async function action({ request }: Route.ActionArgs) {
-  const { user, tenantId } = await requireFeature(request, FEATURE_FLAG_KEYS.BROADCASTS);
+  const { user, tenantId } = await requireRoleAndFeature(request, [...ADMIN_OR_TENANT_ADMIN], FEATURE_FLAG_KEYS.BROADCASTS);
 
   const formData = await request.formData();
   const _action = formData.get("_action") as string;

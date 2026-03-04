@@ -4,7 +4,8 @@ import { parseWithZod } from "@conform-to/zod/v4";
 
 export const handle = { breadcrumb: "New Object" };
 
-import { requireFeature } from "~/lib/auth/require-auth.server";
+import { requireRoleAndFeature } from "~/lib/auth/require-auth.server";
+import { ADMIN_ONLY } from "~/lib/auth/roles";
 import { FEATURE_FLAG_KEYS } from "~/lib/config/feature-flags.server";
 import { createDefinition } from "~/services/custom-objects.server";
 import { handleServiceError } from "~/lib/errors/handle-service-error.server";
@@ -18,7 +19,7 @@ import { useBasePrefix } from "~/hooks/use-base-prefix";
 import type { Route } from "./+types/new";
 
 export async function action({ request, params }: Route.ActionArgs) {
-  const { user, tenantId } = await requireFeature(request, FEATURE_FLAG_KEYS.CUSTOM_OBJECTS);
+  const { user, tenantId } = await requireRoleAndFeature(request, [...ADMIN_ONLY], FEATURE_FLAG_KEYS.CUSTOM_OBJECTS);
 
   const formData = await request.formData();
   const submission = parseWithZod(formData, { schema: createCustomObjectSchema });

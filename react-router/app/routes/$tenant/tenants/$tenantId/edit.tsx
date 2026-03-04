@@ -5,6 +5,7 @@ import { parseWithZod } from "@conform-to/zod/v4";
 export const handle = { breadcrumb: "Edit Tenant" };
 
 import { requireAnyRole } from "~/lib/auth/require-auth.server";
+import { ADMIN_ONLY } from "~/lib/auth/roles";
 import { getTenant, updateTenant } from "~/services/tenants.server";
 import { handleServiceError } from "~/lib/errors/handle-service-error.server";
 import { updateTenantSchema } from "~/lib/schemas/tenant";
@@ -20,14 +21,14 @@ import { buildServiceContext } from "~/lib/request-context.server";
 import type { Route } from "./+types/edit";
 
 export async function loader({ request, params }: Route.LoaderArgs) {
-  await requireAnyRole(request, ["ADMIN"]);
+  await requireAnyRole(request, [...ADMIN_ONLY]);
 
   const tenant = await getTenant(params.tenantId);
   return { tenant };
 }
 
 export async function action({ request, params }: Route.ActionArgs) {
-  const { user } = await requireAnyRole(request, ["ADMIN"]);
+  const { user } = await requireAnyRole(request, [...ADMIN_ONLY]);
 
   const formData = await request.formData();
   const submission = parseWithZod(formData, { schema: updateTenantSchema });

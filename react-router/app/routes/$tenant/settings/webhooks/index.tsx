@@ -2,7 +2,8 @@ import { data, Link, useLoaderData, useFetcher } from "react-router";
 
 export const handle = { breadcrumb: "Webhooks" };
 
-import { requireFeature } from "~/lib/auth/require-auth.server";
+import { requireRoleAndFeature } from "~/lib/auth/require-auth.server";
+import { ADMIN_OR_TENANT_ADMIN } from "~/lib/auth/roles";
 import { FEATURE_FLAG_KEYS } from "~/lib/config/feature-flags.server";
 import {
   listWebhookSubscriptions,
@@ -26,7 +27,7 @@ import type { Route } from "./+types/index";
 // --- Loader ---
 
 export async function loader({ request }: Route.LoaderArgs) {
-  const { tenantId } = await requireFeature(request, FEATURE_FLAG_KEYS.WEBHOOKS);
+  const { tenantId } = await requireRoleAndFeature(request, [...ADMIN_OR_TENANT_ADMIN], FEATURE_FLAG_KEYS.WEBHOOKS);
 
   const url = new URL(request.url);
   const page = Math.max(1, Number(url.searchParams.get("page")) || 1);
@@ -53,7 +54,7 @@ export async function loader({ request }: Route.LoaderArgs) {
 // --- Action (fetcher-based status transitions) ---
 
 export async function action({ request }: Route.ActionArgs) {
-  const { user, tenantId } = await requireFeature(request, FEATURE_FLAG_KEYS.WEBHOOKS);
+  const { user, tenantId } = await requireRoleAndFeature(request, [...ADMIN_OR_TENANT_ADMIN], FEATURE_FLAG_KEYS.WEBHOOKS);
 
   const formData = await request.formData();
   const _action = formData.get("_action") as string;

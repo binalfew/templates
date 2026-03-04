@@ -3,7 +3,8 @@ import { FileText, Plus, Pencil, Trash2 } from "lucide-react";
 
 export const handle = { breadcrumb: "Document Types" };
 
-import { requireUser } from "~/lib/auth/session.server";
+import { requireAnyRole } from "~/lib/auth/require-auth.server";
+import { ADMIN_ONLY } from "~/lib/auth/roles";
 import { listDocumentTypesPaginated } from "~/services/reference-data.server";
 import { useBasePrefix } from "~/hooks/use-base-prefix";
 import { DataTable } from "~/components/data-table/data-table";
@@ -12,7 +13,7 @@ import type { ColumnDef, PaginationMeta } from "~/components/data-table/data-tab
 import type { Route } from "./+types/index";
 
 export async function loader({ request }: Route.LoaderArgs) {
-  await requireUser(request);
+  await requireAnyRole(request, [...ADMIN_ONLY]);
   const url = new URL(request.url);
   const page = Math.max(1, Number(url.searchParams.get("page")) || 1);
   const pageSize = Math.max(1, Number(url.searchParams.get("pageSize")) || 10);

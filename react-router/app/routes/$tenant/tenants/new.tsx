@@ -6,6 +6,7 @@ import { useState, useEffect, useRef } from "react";
 export const handle = { breadcrumb: "New Tenant" };
 
 import { requireAnyRole } from "~/lib/auth/require-auth.server";
+import { ADMIN_ONLY } from "~/lib/auth/roles";
 import { createTenant } from "~/services/tenants.server";
 import { handleServiceError } from "~/lib/errors/handle-service-error.server";
 import { createTenantSchema } from "~/lib/schemas/tenant";
@@ -21,12 +22,12 @@ import { buildServiceContext } from "~/lib/request-context.server";
 import type { Route } from "./+types/new";
 
 export async function loader({ request }: Route.LoaderArgs) {
-  await requireAnyRole(request, ["ADMIN"]);
+  await requireAnyRole(request, [...ADMIN_ONLY]);
   return {};
 }
 
 export async function action({ request, params }: Route.ActionArgs) {
-  const { user } = await requireAnyRole(request, ["ADMIN"]);
+  const { user } = await requireAnyRole(request, [...ADMIN_ONLY]);
 
   const formData = await request.formData();
   const submission = parseWithZod(formData, { schema: createTenantSchema });

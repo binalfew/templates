@@ -10,7 +10,8 @@ import {
   Image,
   Eye,
 } from "lucide-react";
-import { requireFeature } from "~/lib/auth/require-auth.server";
+import { requireRoleAndFeature } from "~/lib/auth/require-auth.server";
+import { ADMIN_OR_TENANT_ADMIN } from "~/lib/auth/roles";
 import { FEATURE_FLAG_KEYS } from "~/lib/config/feature-flags.server";
 import { listViews } from "~/services/saved-views.server";
 import { Badge } from "~/components/ui/badge";
@@ -38,7 +39,7 @@ const VIEW_TYPE_LABELS: Record<string, string> = {
 const ENTITY_TYPES = ["User", "Role", "Permission", "AuditLog"];
 
 export async function loader({ request }: Route.LoaderArgs) {
-  const { user, tenantId } = await requireFeature(request, FEATURE_FLAG_KEYS.SAVED_VIEWS);
+  const { user, tenantId } = await requireRoleAndFeature(request, [...ADMIN_OR_TENANT_ADMIN], FEATURE_FLAG_KEYS.SAVED_VIEWS);
 
   const allViews: Array<
     Awaited<ReturnType<typeof listViews>>[number] & { entityType: string }

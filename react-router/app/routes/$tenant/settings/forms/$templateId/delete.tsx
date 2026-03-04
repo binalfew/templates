@@ -2,7 +2,8 @@ import { redirect, useLoaderData, useActionData, Form, Link, useSearchParams } f
 
 export const handle = { breadcrumb: "Delete Form" };
 
-import { requireFeature } from "~/lib/auth/require-auth.server";
+import { requireRoleAndFeature } from "~/lib/auth/require-auth.server";
+import { ADMIN_ONLY } from "~/lib/auth/roles";
 import { FEATURE_FLAG_KEYS } from "~/lib/config/feature-flags.server";
 import { getSectionTemplate, deleteSectionTemplate } from "~/services/section-templates.server";
 import { handleServiceError } from "~/lib/errors/handle-service-error.server";
@@ -13,13 +14,13 @@ import { buildServiceContext } from "~/lib/request-context.server";
 import type { Route } from "./+types/delete";
 
 export async function loader({ request, params }: Route.LoaderArgs) {
-  const { tenantId } = await requireFeature(request, FEATURE_FLAG_KEYS.FORM_DESIGNER);
+  const { tenantId } = await requireRoleAndFeature(request, [...ADMIN_ONLY], FEATURE_FLAG_KEYS.FORM_DESIGNER);
   const template = await getSectionTemplate(params.templateId, tenantId);
   return { template };
 }
 
 export async function action({ request, params }: Route.ActionArgs) {
-  const { user, tenantId } = await requireFeature(request, FEATURE_FLAG_KEYS.FORM_DESIGNER);
+  const { user, tenantId } = await requireRoleAndFeature(request, [...ADMIN_ONLY], FEATURE_FLAG_KEYS.FORM_DESIGNER);
 
   const ctx = buildServiceContext(request, user, tenantId);
 

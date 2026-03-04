@@ -1,9 +1,9 @@
 import { data, redirect, useLoaderData, useActionData, Form, Link, useSearchParams } from "react-router";
-import { invariantResponse } from "@epic-web/invariant";
-
 export const handle = { breadcrumb: "Delete View" };
 
-import { requireAuth } from "~/lib/auth/require-auth.server";
+import { requireRoleAndFeature } from "~/lib/auth/require-auth.server";
+import { ADMIN_OR_TENANT_ADMIN } from "~/lib/auth/roles";
+import { FEATURE_FLAG_KEYS } from "~/lib/config/feature-flags.server";
 import { getView, deleteView } from "~/services/saved-views.server";
 import { handleServiceError } from "~/lib/errors/handle-service-error.server";
 import { Button } from "~/components/ui/button";
@@ -20,8 +20,7 @@ const VIEW_TYPE_LABELS: Record<string, string> = {
 };
 
 export async function loader({ request, params }: Route.LoaderArgs) {
-  const { user } = await requireAuth(request);
-  invariantResponse(user.tenantId, "No tenant", { status: 403 });
+  const { user } = await requireRoleAndFeature(request, [...ADMIN_OR_TENANT_ADMIN], FEATURE_FLAG_KEYS.SAVED_VIEWS);
 
   const view = await getView(params.viewId);
   if (view.userId !== user.id) {
@@ -32,8 +31,7 @@ export async function loader({ request, params }: Route.LoaderArgs) {
 }
 
 export async function action({ request, params }: Route.ActionArgs) {
-  const { user } = await requireAuth(request);
-  invariantResponse(user.tenantId, "No tenant", { status: 403 });
+  const { user } = await requireRoleAndFeature(request, [...ADMIN_OR_TENANT_ADMIN], FEATURE_FLAG_KEYS.SAVED_VIEWS);
 
   try {
     await deleteView(params.viewId, user.id);

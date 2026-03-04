@@ -6,6 +6,7 @@ import {
   Bell,
   Database,
 } from "lucide-react";
+import { ADMIN_ONLY, ADMIN_OR_TENANT_ADMIN } from "~/lib/auth/roles";
 
 export type NavChild = {
   title: string;
@@ -75,14 +76,14 @@ export function buildNavigationGroups(basePrefix: string): NavGroup[] {
           tKey: "tenants",
           url: `${basePrefix}/tenants`,
           icon: Building2,
-          roles: ["ADMIN"],
+          roles: [...ADMIN_ONLY],
         },
         {
           title: "Data",
           tKey: "data",
           url: `${basePrefix}/data`,
           icon: Database,
-          roles: ["ADMIN", "TENANT_ADMIN"],
+          roles: [...ADMIN_ONLY],
           featureFlag: "FF_DATA_IMPORT_EXPORT",
         },
         {
@@ -90,7 +91,7 @@ export function buildNavigationGroups(basePrefix: string): NavGroup[] {
           tKey: "auditLogs",
           url: `${basePrefix}/logs`,
           icon: ClipboardList,
-          roles: ["ADMIN"],
+          roles: [...ADMIN_ONLY],
         },
       ],
     },
@@ -99,75 +100,86 @@ export function buildNavigationGroups(basePrefix: string): NavGroup[] {
 
 export function buildSettingsChildren(basePrefix: string): NavChild[] {
   return [
-    { title: "General", tKey: "general", url: `${basePrefix}/settings`, end: true },
+    {
+      title: "General",
+      tKey: "general",
+      url: `${basePrefix}/settings`,
+      end: true,
+      roles: [...ADMIN_OR_TENANT_ADMIN],
+    },
     {
       title: "Organization",
       tKey: "organization",
       url: `${basePrefix}/settings/organization`,
-      roles: ["ADMIN", "TENANT_ADMIN"],
+      roles: [...ADMIN_OR_TENANT_ADMIN],
     },
     {
       title: "Features",
       tKey: "featureFlags",
       url: `${basePrefix}/settings/features`,
-      roles: ["ADMIN"],
+      roles: [...ADMIN_ONLY],
     },
     {
       title: "API Keys",
       tKey: "apiKeys",
       url: `${basePrefix}/settings/api-keys`,
-      roles: ["ADMIN", "TENANT_ADMIN"],
+      roles: [...ADMIN_OR_TENANT_ADMIN],
       featureFlag: "FF_REST_API",
     },
     {
       title: "Webhooks",
       tKey: "webhooks",
       url: `${basePrefix}/settings/webhooks`,
-      roles: ["ADMIN", "TENANT_ADMIN"],
+      roles: [...ADMIN_OR_TENANT_ADMIN],
       featureFlag: "FF_WEBHOOKS",
     },
     {
       title: "Fields",
       tKey: "customFields",
       url: `${basePrefix}/settings/fields`,
-      roles: ["ADMIN", "TENANT_ADMIN"],
+      roles: [...ADMIN_ONLY],
       featureFlag: "FF_CUSTOM_FIELDS",
     },
     {
       title: "Security",
       tKey: "security",
       url: `${basePrefix}/settings/security`,
-      roles: ["ADMIN", "TENANT_ADMIN"],
+      roles: [...ADMIN_OR_TENANT_ADMIN],
       featureFlag: "FF_TWO_FACTOR",
     },
     {
       title: "Views",
       tKey: "savedViews",
       url: `${basePrefix}/settings/views`,
+      roles: [...ADMIN_OR_TENANT_ADMIN],
       featureFlag: "FF_SAVED_VIEWS",
     },
     {
       title: "Objects",
       tKey: "customObjects",
       url: `${basePrefix}/settings/objects`,
+      roles: [...ADMIN_ONLY],
       featureFlag: "FF_CUSTOM_OBJECTS",
     },
     {
       title: "Templates",
       tKey: "messageTemplates",
       url: `${basePrefix}/settings/templates`,
+      roles: [...ADMIN_OR_TENANT_ADMIN],
       featureFlag: "FF_BROADCASTS",
     },
     {
       title: "Broadcasts",
       tKey: "broadcasts",
       url: `${basePrefix}/settings/broadcasts`,
+      roles: [...ADMIN_OR_TENANT_ADMIN],
       featureFlag: "FF_BROADCASTS",
     },
     {
       title: "Forms",
       tKey: "formDesigner",
       url: `${basePrefix}/settings/forms`,
+      roles: [...ADMIN_ONLY],
       featureFlag: "FF_FORM_DESIGNER",
     },
   ];
@@ -190,19 +202,19 @@ export function buildSecurityChildren(basePrefix: string): NavChild[] {
       tKey: "users",
       url: `${basePrefix}/security/users`,
       end: true,
-      roles: ["ADMIN", "TENANT_ADMIN"],
+      roles: [...ADMIN_OR_TENANT_ADMIN],
     },
     {
       title: "Roles",
       tKey: "roles",
       url: `${basePrefix}/security/roles`,
-      roles: ["ADMIN"],
+      roles: [...ADMIN_OR_TENANT_ADMIN],
     },
     {
       title: "Permissions",
       tKey: "permissions",
       url: `${basePrefix}/security/permissions`,
-      roles: ["ADMIN"],
+      roles: [...ADMIN_OR_TENANT_ADMIN],
     },
   ];
 }
@@ -224,17 +236,19 @@ export function buildDataChildren(basePrefix: string): NavChild[] {
       tKey: "import",
       url: `${basePrefix}/data/import`,
       end: true,
+      roles: [...ADMIN_ONLY],
     },
     {
       title: "Export",
       tKey: "export",
       url: `${basePrefix}/data/export`,
+      roles: [...ADMIN_ONLY],
     },
     {
       title: "References",
       tKey: "referenceData",
       url: `${basePrefix}/data/references`,
-      roles: ["ADMIN"],
+      roles: [...ADMIN_ONLY],
     },
   ];
 }

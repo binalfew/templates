@@ -16,6 +16,7 @@ import {
 export const handle = { breadcrumb: "Details" };
 
 import { requireAnyRole } from "~/lib/auth/require-auth.server";
+import { ADMIN_ONLY } from "~/lib/auth/roles";
 import { getTenantDetail } from "~/services/tenants.server";
 import { BRAND_THEMES } from "~/lib/schemas/tenant";
 import { Button } from "~/components/ui/button";
@@ -25,7 +26,7 @@ import { useBasePrefix } from "~/hooks/use-base-prefix";
 import type { Route } from "./+types/index";
 
 export async function loader({ request, params }: Route.LoaderArgs) {
-  await requireAnyRole(request, ["ADMIN"]);
+  await requireAnyRole(request, [...ADMIN_ONLY]);
 
   const { tenant } = await getTenantDetail(params.tenantId);
   return { tenant };

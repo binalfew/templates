@@ -3,7 +3,8 @@ import { useState } from "react";
 
 export const handle = { breadcrumb: "Webhook Details" };
 
-import { requireFeature } from "~/lib/auth/require-auth.server";
+import { requireRoleAndFeature } from "~/lib/auth/require-auth.server";
+import { ADMIN_OR_TENANT_ADMIN } from "~/lib/auth/roles";
 import { FEATURE_FLAG_KEYS } from "~/lib/config/feature-flags.server";
 import {
   getWebhookSubscriptionWithCounts,
@@ -17,7 +18,7 @@ import { Webhook, ArrowLeft, Pencil, Trash2 } from "lucide-react";
 import type { Route } from "./+types/index";
 
 export async function loader({ request, params }: Route.LoaderArgs) {
-  const { tenantId } = await requireFeature(request, FEATURE_FLAG_KEYS.WEBHOOKS);
+  const { tenantId } = await requireRoleAndFeature(request, [...ADMIN_OR_TENANT_ADMIN], FEATURE_FLAG_KEYS.WEBHOOKS);
 
   const url = new URL(request.url);
   const secret = url.searchParams.get("secret") || null;

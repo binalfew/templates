@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Download, FileDown } from "lucide-react";
-import { requirePermission } from "~/lib/auth/require-auth.server";
+import { requireAnyRole } from "~/lib/auth/require-auth.server";
+import { ADMIN_ONLY } from "~/lib/auth/roles";
 import { Button } from "~/components/ui/button";
 import {
   Card,
@@ -27,7 +28,7 @@ const ENTITIES = [
 ] as const;
 
 export async function loader({ request }: Route.LoaderArgs) {
-  await requirePermission(request, "settings", "manage");
+  await requireAnyRole(request, [...ADMIN_ONLY]);
   return {};
 }
 

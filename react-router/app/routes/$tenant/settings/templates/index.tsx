@@ -3,7 +3,8 @@ import { Mail, Plus, Pencil, Trash2 } from "lucide-react";
 
 export const handle = { breadcrumb: "Templates" };
 
-import { requireFeature } from "~/lib/auth/require-auth.server";
+import { requireRoleAndFeature } from "~/lib/auth/require-auth.server";
+import { ADMIN_OR_TENANT_ADMIN } from "~/lib/auth/roles";
 import { FEATURE_FLAG_KEYS } from "~/lib/config/feature-flags.server";
 import { listTemplatesPaginated } from "~/services/message-templates.server";
 import { resolveViewContext } from "~/services/view-filters.server";
@@ -25,7 +26,7 @@ const TEMPLATE_FIELD_MAP: Record<string, string> = {
 };
 
 export async function loader({ request }: Route.LoaderArgs) {
-  const { user, tenantId } = await requireFeature(request, FEATURE_FLAG_KEYS.BROADCASTS);
+  const { user, tenantId } = await requireRoleAndFeature(request, [...ADMIN_OR_TENANT_ADMIN], FEATURE_FLAG_KEYS.BROADCASTS);
 
   const { savedViewsEnabled, activeViewId, activeViewType, availableViews, viewWhere, viewOrderBy } =
     await resolveViewContext(request, tenantId, user.id, "MessageTemplate", TEMPLATE_FIELD_MAP);

@@ -2,7 +2,8 @@ import { useRef } from "react";
 import { data, Form, useActionData, useNavigation } from "react-router";
 import { invariantResponse } from "@epic-web/invariant";
 import { AlertCircle, CheckCircle2, Eye, FileUp, Upload } from "lucide-react";
-import { requirePermission } from "~/lib/auth/require-auth.server";
+import { requireAnyRole } from "~/lib/auth/require-auth.server";
+import { ADMIN_ONLY } from "~/lib/auth/roles";
 import { parseCsv, parseJson, importData } from "~/services/data-import.server";
 import { Button } from "~/components/ui/button";
 import {
@@ -30,12 +31,12 @@ const ENTITIES = [
 ] as const;
 
 export async function loader({ request }: Route.LoaderArgs) {
-  await requirePermission(request, "settings", "manage");
+  await requireAnyRole(request, [...ADMIN_ONLY]);
   return {};
 }
 
 export async function action({ request }: Route.ActionArgs) {
-  const { user } = await requirePermission(request, "settings", "manage");
+  const { user } = await requireAnyRole(request, [...ADMIN_ONLY]);
   const tenantId = user.tenantId;
   invariantResponse(tenantId, "No tenant", { status: 403 });
 

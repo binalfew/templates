@@ -2,6 +2,7 @@ import { data, redirect, useActionData, useLoaderData, Form } from "react-router
 import { useForm, getFormProps, getInputProps } from "@conform-to/react";
 import { parseWithZod } from "@conform-to/zod/v4";
 import { requireAnyRole } from "~/lib/auth/require-auth.server";
+import { ADMIN_OR_TENANT_ADMIN } from "~/lib/auth/roles";
 import { resolveTenant } from "~/lib/tenant.server";
 import { updateTenant } from "~/services/tenants.server";
 import { handleServiceError } from "~/lib/errors/handle-service-error.server";
@@ -18,13 +19,13 @@ import type { Route } from "./+types/organization";
 export const handle = { breadcrumb: "Organization" };
 
 export async function loader({ request, params }: Route.LoaderArgs) {
-  await requireAnyRole(request, ["ADMIN", "TENANT_ADMIN"]);
+  await requireAnyRole(request, [...ADMIN_OR_TENANT_ADMIN]);
   const tenant = await resolveTenant(params.tenant);
   return { tenant };
 }
 
 export async function action({ request, params }: Route.ActionArgs) {
-  const { user } = await requireAnyRole(request, ["ADMIN", "TENANT_ADMIN"]);
+  const { user } = await requireAnyRole(request, [...ADMIN_OR_TENANT_ADMIN]);
   const tenant = await resolveTenant(params.tenant);
 
   const formData = await request.formData();

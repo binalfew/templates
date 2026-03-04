@@ -2,7 +2,8 @@ import { data, useActionData, Form, Link } from "react-router";
 
 export const handle = { breadcrumb: "Create API Key" };
 
-import { requireFeature } from "~/lib/auth/require-auth.server";
+import { requireRoleAndFeature } from "~/lib/auth/require-auth.server";
+import { ADMIN_OR_TENANT_ADMIN } from "~/lib/auth/roles";
 import { FEATURE_FLAG_KEYS } from "~/lib/config/feature-flags.server";
 import { createApiKey } from "~/services/api-keys.server";
 import { handleServiceError } from "~/lib/errors/handle-service-error.server";
@@ -48,14 +49,14 @@ const RATE_LIMIT_TIERS = [
 // --- Loader ---
 
 export async function loader({ request }: Route.LoaderArgs) {
-  await requireFeature(request, FEATURE_FLAG_KEYS.REST_API);
+  await requireRoleAndFeature(request, [...ADMIN_OR_TENANT_ADMIN], FEATURE_FLAG_KEYS.REST_API);
   return {};
 }
 
 // --- Action ---
 
 export async function action({ request, params }: Route.ActionArgs) {
-  const { user, tenantId } = await requireFeature(request, FEATURE_FLAG_KEYS.REST_API);
+  const { user, tenantId } = await requireRoleAndFeature(request, [...ADMIN_OR_TENANT_ADMIN], FEATURE_FLAG_KEYS.REST_API);
 
   const formData = await request.formData();
   const name = formData.get("name") as string;

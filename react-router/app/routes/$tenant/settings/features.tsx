@@ -2,6 +2,7 @@ import { useLoaderData, useFetcher } from "react-router";
 import { useTranslation } from "react-i18next";
 import { RouteErrorBoundary } from "~/components/route-error-boundary";
 import { requireAnyRole } from "~/lib/auth/require-auth.server";
+import { ADMIN_ONLY } from "~/lib/auth/roles";
 
 export function ErrorBoundary() {
   return <RouteErrorBoundary context="feature flags" />;
@@ -22,7 +23,7 @@ import type { Route } from "./+types/features";
 export const handle = { breadcrumb: "Features" };
 
 export async function loader({ request }: Route.LoaderArgs) {
-  await requireAnyRole(request, ["ADMIN"]);
+  await requireAnyRole(request, [...ADMIN_ONLY]);
 
   const flags = await prisma.featureFlag.findMany({
     orderBy: { key: "asc" },
@@ -32,7 +33,7 @@ export async function loader({ request }: Route.LoaderArgs) {
 }
 
 export async function action({ request }: Route.ActionArgs) {
-  await requireAnyRole(request, ["ADMIN"]);
+  await requireAnyRole(request, [...ADMIN_ONLY]);
 
   const formData = await request.formData();
   const flagId = formData.get("flagId") as string;

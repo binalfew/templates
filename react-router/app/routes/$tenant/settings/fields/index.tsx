@@ -3,7 +3,8 @@ import { Columns3, Pencil, Plus, Trash2 } from "lucide-react";
 
 export const handle = { breadcrumb: "Fields" };
 
-import { requireFeature } from "~/lib/auth/require-auth.server";
+import { requireRoleAndFeature } from "~/lib/auth/require-auth.server";
+import { ADMIN_ONLY } from "~/lib/auth/roles";
 import { FEATURE_FLAG_KEYS } from "~/lib/config/feature-flags.server";
 import {
   listFields,
@@ -22,7 +23,7 @@ import { buildServiceContext } from "~/lib/request-context.server";
 import type { Route } from "./+types/index";
 
 export async function loader({ request }: Route.LoaderArgs) {
-  const { tenantId } = await requireFeature(request, FEATURE_FLAG_KEYS.CUSTOM_FIELDS);
+  const { tenantId } = await requireRoleAndFeature(request, [...ADMIN_ONLY], FEATURE_FLAG_KEYS.CUSTOM_FIELDS);
 
   const url = new URL(request.url);
   const page = Math.max(1, Number(url.searchParams.get("page")) || 1);
@@ -46,7 +47,7 @@ export async function loader({ request }: Route.LoaderArgs) {
 }
 
 export async function action({ request, params }: Route.ActionArgs) {
-  const { user, tenantId } = await requireFeature(request, FEATURE_FLAG_KEYS.CUSTOM_FIELDS);
+  const { user, tenantId } = await requireRoleAndFeature(request, [...ADMIN_ONLY], FEATURE_FLAG_KEYS.CUSTOM_FIELDS);
 
   const formData = await request.formData();
   const _action = formData.get("_action");

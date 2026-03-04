@@ -3,7 +3,8 @@ import { FileText, ArrowLeft, Pencil, Trash2, PenTool } from "lucide-react";
 
 export const handle = { breadcrumb: "Details" };
 
-import { requireFeature } from "~/lib/auth/require-auth.server";
+import { requireRoleAndFeature } from "~/lib/auth/require-auth.server";
+import { ADMIN_ONLY } from "~/lib/auth/roles";
 import { FEATURE_FLAG_KEYS } from "~/lib/config/feature-flags.server";
 import { getSectionTemplate } from "~/services/section-templates.server";
 import { Button } from "~/components/ui/button";
@@ -13,7 +14,7 @@ import { useBasePrefix } from "~/hooks/use-base-prefix";
 import type { Route } from "./+types/index";
 
 export async function loader({ request, params }: Route.LoaderArgs) {
-  const { tenantId } = await requireFeature(request, FEATURE_FLAG_KEYS.FORM_DESIGNER);
+  const { tenantId } = await requireRoleAndFeature(request, [...ADMIN_ONLY], FEATURE_FLAG_KEYS.FORM_DESIGNER);
   const template = await getSectionTemplate(params.templateId, tenantId);
   return { template };
 }

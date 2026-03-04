@@ -3,6 +3,7 @@ import { invariantResponse } from "@epic-web/invariant";
 import { Info, Shield } from "lucide-react";
 import { isFeatureEnabled, FEATURE_FLAG_KEYS } from "~/lib/config/feature-flags.server";
 import { requireAnyRole } from "~/lib/auth/require-auth.server";
+import { ADMIN_OR_TENANT_ADMIN } from "~/lib/auth/roles";
 import { listRoles } from "~/services/roles.server";
 import { getTwoFAPolicy } from "~/services/2fa-enforcement.server";
 import { setSetting } from "~/lib/config/settings.server";
@@ -18,7 +19,7 @@ import type { Route } from "./+types/security";
 export const handle = { breadcrumb: "Security" };
 
 export async function loader({ request }: Route.LoaderArgs) {
-  const { user, roles } = await requireAnyRole(request, ["ADMIN", "TENANT_ADMIN"]);
+  const { user, roles } = await requireAnyRole(request, [...ADMIN_OR_TENANT_ADMIN]);
   const tenantId = user.tenantId;
   invariantResponse(tenantId, "User is not associated with a tenant", { status: 403 });
 
@@ -35,7 +36,7 @@ export async function loader({ request }: Route.LoaderArgs) {
 }
 
 export async function action({ request }: Route.ActionArgs) {
-  const { user } = await requireAnyRole(request, ["ADMIN", "TENANT_ADMIN"]);
+  const { user } = await requireAnyRole(request, [...ADMIN_OR_TENANT_ADMIN]);
   const tenantId = user.tenantId;
   invariantResponse(tenantId, "User is not associated with a tenant", { status: 403 });
 

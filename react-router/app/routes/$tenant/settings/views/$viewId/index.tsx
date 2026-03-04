@@ -9,11 +9,11 @@ import {
   Trash2,
   Copy,
 } from "lucide-react";
-import { invariantResponse } from "@epic-web/invariant";
-
 export const handle = { breadcrumb: "Details" };
 
-import { requireAuth } from "~/lib/auth/require-auth.server";
+import { requireRoleAndFeature } from "~/lib/auth/require-auth.server";
+import { ADMIN_OR_TENANT_ADMIN } from "~/lib/auth/roles";
+import { FEATURE_FLAG_KEYS } from "~/lib/config/feature-flags.server";
 import { getView } from "~/services/saved-views.server";
 import { Button } from "~/components/ui/button";
 import { Badge } from "~/components/ui/badge";
@@ -36,8 +36,7 @@ const VIEW_TYPE_LABELS: Record<string, string> = {
 };
 
 export async function loader({ request, params }: Route.LoaderArgs) {
-  const { user } = await requireAuth(request);
-  invariantResponse(user.tenantId, "No tenant", { status: 403 });
+  const { user } = await requireRoleAndFeature(request, [...ADMIN_OR_TENANT_ADMIN], FEATURE_FLAG_KEYS.SAVED_VIEWS);
 
   const view = await getView(params.viewId);
   return { view, isOwner: view.userId === user.id };

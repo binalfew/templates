@@ -4,7 +4,8 @@ import { parseWithZod } from "@conform-to/zod/v4";
 
 export const handle = { breadcrumb: "Edit Object" };
 
-import { requireFeature } from "~/lib/auth/require-auth.server";
+import { requireRoleAndFeature } from "~/lib/auth/require-auth.server";
+import { ADMIN_ONLY } from "~/lib/auth/roles";
 import { FEATURE_FLAG_KEYS } from "~/lib/config/feature-flags.server";
 import { getDefinition, updateDefinition } from "~/services/custom-objects.server";
 import { handleServiceError } from "~/lib/errors/handle-service-error.server";
@@ -18,14 +19,14 @@ import { useBasePrefix } from "~/hooks/use-base-prefix";
 import type { Route } from "./+types/edit";
 
 export async function loader({ request, params }: Route.LoaderArgs) {
-  await requireFeature(request, FEATURE_FLAG_KEYS.CUSTOM_OBJECTS);
+  await requireRoleAndFeature(request, [...ADMIN_ONLY], FEATURE_FLAG_KEYS.CUSTOM_OBJECTS);
 
   const definition = await getDefinition(params.definitionId);
   return { definition };
 }
 
 export async function action({ request, params }: Route.ActionArgs) {
-  await requireFeature(request, FEATURE_FLAG_KEYS.CUSTOM_OBJECTS);
+  await requireRoleAndFeature(request, [...ADMIN_ONLY], FEATURE_FLAG_KEYS.CUSTOM_OBJECTS);
 
   const formData = await request.formData();
   const submission = parseWithZod(formData, { schema: updateCustomObjectSchema });

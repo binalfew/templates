@@ -3,7 +3,8 @@ import { Box, Plus, Pencil, Trash2, Database } from "lucide-react";
 
 export const handle = { breadcrumb: "Objects" };
 
-import { requireFeature } from "~/lib/auth/require-auth.server";
+import { requireRoleAndFeature } from "~/lib/auth/require-auth.server";
+import { ADMIN_ONLY } from "~/lib/auth/roles";
 import { FEATURE_FLAG_KEYS } from "~/lib/config/feature-flags.server";
 import { listDefinitionsPaginated } from "~/services/custom-objects.server";
 import type { CustomFieldDefinition } from "~/services/custom-objects.server";
@@ -24,7 +25,7 @@ const OBJECT_FIELD_MAP: Record<string, string> = {
 };
 
 export async function loader({ request }: Route.LoaderArgs) {
-  const { user, tenantId } = await requireFeature(request, FEATURE_FLAG_KEYS.CUSTOM_OBJECTS);
+  const { user, tenantId } = await requireRoleAndFeature(request, [...ADMIN_ONLY], FEATURE_FLAG_KEYS.CUSTOM_OBJECTS);
 
   const { savedViewsEnabled, activeViewId, activeViewType, availableViews, viewWhere, viewOrderBy } =
     await resolveViewContext(request, tenantId, user.id, "CustomObject", OBJECT_FIELD_MAP);

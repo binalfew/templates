@@ -2,7 +2,8 @@ import { redirect, useActionData, useLoaderData } from "react-router";
 
 export const handle = { breadcrumb: "Edit Field" };
 
-import { requireFeature } from "~/lib/auth/require-auth.server";
+import { requireRoleAndFeature } from "~/lib/auth/require-auth.server";
+import { ADMIN_ONLY } from "~/lib/auth/roles";
 import { FEATURE_FLAG_KEYS } from "~/lib/config/feature-flags.server";
 import { getField, updateField } from "~/services/fields.server";
 import { handleServiceError } from "~/lib/errors/handle-service-error.server";
@@ -11,7 +12,7 @@ import { buildServiceContext } from "~/lib/request-context.server";
 import type { Route } from "./+types/edit";
 
 export async function loader({ request, params }: Route.LoaderArgs) {
-  const { tenantId } = await requireFeature(request, FEATURE_FLAG_KEYS.CUSTOM_FIELDS);
+  const { tenantId } = await requireRoleAndFeature(request, [...ADMIN_ONLY], FEATURE_FLAG_KEYS.CUSTOM_FIELDS);
 
   const field = await getField(params.fieldId, tenantId);
 
@@ -19,7 +20,7 @@ export async function loader({ request, params }: Route.LoaderArgs) {
 }
 
 export async function action({ request, params }: Route.ActionArgs) {
-  const { user, tenantId } = await requireFeature(request, FEATURE_FLAG_KEYS.CUSTOM_FIELDS);
+  const { user, tenantId } = await requireRoleAndFeature(request, [...ADMIN_ONLY], FEATURE_FLAG_KEYS.CUSTOM_FIELDS);
 
   const { fieldId } = params;
   const formData = await request.formData();

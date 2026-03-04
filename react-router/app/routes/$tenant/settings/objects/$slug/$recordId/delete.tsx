@@ -1,6 +1,6 @@
 import { redirect, useLoaderData, useActionData, Form, Link } from "react-router";
-import { invariantResponse } from "@epic-web/invariant";
-import { requireAuth, requireFeature } from "~/lib/auth/require-auth.server";
+import { requireRoleAndFeature } from "~/lib/auth/require-auth.server";
+import { ADMIN_ONLY } from "~/lib/auth/roles";
 import { FEATURE_FLAG_KEYS } from "~/lib/config/feature-flags.server";
 import {
   getRecord,
@@ -16,15 +16,14 @@ import type { Route } from "./+types/delete";
 export const handle = { breadcrumb: "Delete Record" };
 
 export async function loader({ request, params }: Route.LoaderArgs) {
-  await requireFeature(request, FEATURE_FLAG_KEYS.CUSTOM_OBJECTS);
+  await requireRoleAndFeature(request, [...ADMIN_ONLY], FEATURE_FLAG_KEYS.CUSTOM_OBJECTS);
   const record = await getRecord(params.recordId!);
   const fields = (record.definition.fields as unknown as CustomFieldDefinition[]) ?? [];
   return { record, fields, slug: params.slug! };
 }
 
 export async function action({ request, params }: Route.ActionArgs) {
-  const { user } = await requireAuth(request);
-  invariantResponse(user.tenantId, "No tenant", { status: 403 });
+  await requireRoleAndFeature(request, [...ADMIN_ONLY], FEATURE_FLAG_KEYS.CUSTOM_OBJECTS);
 
   try {
     await deleteRecord(params.recordId!);

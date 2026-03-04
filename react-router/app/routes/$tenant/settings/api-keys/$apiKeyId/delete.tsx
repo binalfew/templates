@@ -2,7 +2,8 @@ import { data, redirect, useLoaderData, useActionData, Form, Link } from "react-
 
 export const handle = { breadcrumb: "Revoke API Key" };
 
-import { requireFeature } from "~/lib/auth/require-auth.server";
+import { requireRoleAndFeature } from "~/lib/auth/require-auth.server";
+import { ADMIN_OR_TENANT_ADMIN } from "~/lib/auth/roles";
 import { FEATURE_FLAG_KEYS } from "~/lib/config/feature-flags.server";
 import { getApiKey, revokeApiKey } from "~/services/api-keys.server";
 import { handleServiceError } from "~/lib/errors/handle-service-error.server";
@@ -17,7 +18,7 @@ import type { Route } from "./+types/delete";
 // --- Loader ---
 
 export async function loader({ request, params }: Route.LoaderArgs) {
-  const { tenantId } = await requireFeature(request, FEATURE_FLAG_KEYS.REST_API);
+  const { tenantId } = await requireRoleAndFeature(request, [...ADMIN_OR_TENANT_ADMIN], FEATURE_FLAG_KEYS.REST_API);
 
   const apiKey = await getApiKey(params.apiKeyId, tenantId);
   if (!apiKey) {
@@ -30,7 +31,7 @@ export async function loader({ request, params }: Route.LoaderArgs) {
 // --- Action ---
 
 export async function action({ request, params }: Route.ActionArgs) {
-  const { user, tenantId } = await requireFeature(request, FEATURE_FLAG_KEYS.REST_API);
+  const { user, tenantId } = await requireRoleAndFeature(request, [...ADMIN_OR_TENANT_ADMIN], FEATURE_FLAG_KEYS.REST_API);
 
   const ctx = buildServiceContext(request, user, tenantId);
 

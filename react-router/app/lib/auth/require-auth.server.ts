@@ -195,6 +195,22 @@ export function toClientUser(user: AuthUser) {
   };
 }
 
+export async function requireRoleAndFeature(
+  request: Request,
+  roleNames: string[],
+  flagKey: string,
+) {
+  const { user, roles, isSuperAdmin } = await requireAuth(request);
+  if (!roleNames.some((name) => roles.includes(name))) {
+    throw data({ error: "Forbidden" }, { status: 403 });
+  }
+  const tenantId = user.tenantId;
+  if (!tenantId) throw data({ error: "No tenant" }, { status: 403 });
+  const enabled = await isFeatureEnabled(flagKey, { tenantId, roles, userId: user.id });
+  if (!enabled) throw data({ error: "Feature not enabled" }, { status: 404 });
+  return { user, roles, isSuperAdmin, tenantId };
+}
+
 export async function requireFeature(request: Request, flagKey: string) {
   const { user, roles, isSuperAdmin } = await requireAuth(request);
   const tenantId = user.tenantId;

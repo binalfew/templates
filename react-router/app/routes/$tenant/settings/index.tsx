@@ -5,6 +5,7 @@ import { Pencil, X, Check } from "lucide-react";
 export const handle = { breadcrumb: "General" };
 
 import { requireAnyRole } from "~/lib/auth/require-auth.server";
+import { ADMIN_OR_TENANT_ADMIN } from "~/lib/auth/roles";
 import { getAllSettings, setSetting, deleteSetting } from "~/lib/config/settings.server";
 import type { ResolvedSetting } from "~/lib/config/settings.server";
 import { upsertSettingSchema, SETTING_CATEGORIES } from "~/lib/schemas/settings";
@@ -19,7 +20,7 @@ import { Field } from "~/components/ui/field";
 import type { Route } from "./+types/index";
 
 export async function loader({ request }: Route.LoaderArgs) {
-  const { user } = await requireAnyRole(request, ["ADMIN", "TENANT_ADMIN"]);
+  const { user } = await requireAnyRole(request, [...ADMIN_OR_TENANT_ADMIN]);
   const tenantId = user.tenantId;
 
   const settingsByCategory = await getAllSettings(tenantId ? { tenantId } : undefined);
@@ -28,7 +29,7 @@ export async function loader({ request }: Route.LoaderArgs) {
 }
 
 export async function action({ request }: Route.ActionArgs) {
-  const { user } = await requireAnyRole(request, ["ADMIN", "TENANT_ADMIN"]);
+  const { user } = await requireAnyRole(request, [...ADMIN_OR_TENANT_ADMIN]);
 
   const formData = await request.formData();
   const _action = formData.get("_action") as string;

@@ -3,7 +3,8 @@ import { FileText, ArrowLeft, Pencil, Trash2 } from "lucide-react";
 
 export const handle = { breadcrumb: "Details" };
 
-import { requireFeature } from "~/lib/auth/require-auth.server";
+import { requireRoleAndFeature } from "~/lib/auth/require-auth.server";
+import { ADMIN_OR_TENANT_ADMIN } from "~/lib/auth/roles";
 import { FEATURE_FLAG_KEYS } from "~/lib/config/feature-flags.server";
 import { getTemplate } from "~/services/message-templates.server";
 import { CHANNEL_COLORS } from "~/lib/email/messaging-constants";
@@ -14,7 +15,7 @@ import { useBasePrefix } from "~/hooks/use-base-prefix";
 import type { Route } from "./+types/index";
 
 export async function loader({ request, params }: Route.LoaderArgs) {
-  const { tenantId } = await requireFeature(request, FEATURE_FLAG_KEYS.BROADCASTS);
+  const { tenantId } = await requireRoleAndFeature(request, [...ADMIN_OR_TENANT_ADMIN], FEATURE_FLAG_KEYS.BROADCASTS);
   const template = await getTemplate(params.templateId, tenantId);
   return { template };
 }

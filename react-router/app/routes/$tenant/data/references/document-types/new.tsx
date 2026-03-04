@@ -5,7 +5,8 @@ import { invariantResponse } from "@epic-web/invariant";
 
 export const handle = { breadcrumb: "New Document Type" };
 
-import { requireUser } from "~/lib/auth/session.server";
+import { requireAnyRole } from "~/lib/auth/require-auth.server";
+import { ADMIN_ONLY } from "~/lib/auth/roles";
 import { createDocumentType } from "~/services/reference-data.server";
 import { handleServiceError } from "~/lib/errors/handle-service-error.server";
 import { createDocumentTypeSchema } from "~/lib/schemas/reference-data";
@@ -18,7 +19,7 @@ import { buildServiceContext } from "~/lib/request-context.server";
 import type { Route } from "./+types/new";
 
 export async function action({ request, params }: Route.ActionArgs) {
-  const user = await requireUser(request);
+  const { user } = await requireAnyRole(request, [...ADMIN_ONLY]);
   const tenantId = user.tenantId;
   invariantResponse(tenantId, "User is not associated with a tenant", { status: 403 });
 

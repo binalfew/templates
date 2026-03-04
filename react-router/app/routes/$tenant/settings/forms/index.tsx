@@ -1,7 +1,8 @@
 import { Link, useLoaderData } from "react-router";
 import { FileText, Plus, Pencil, Trash2, PenTool } from "lucide-react";
 import { Badge } from "~/components/ui/badge";
-import { requireFeature } from "~/lib/auth/require-auth.server";
+import { requireRoleAndFeature } from "~/lib/auth/require-auth.server";
+import { ADMIN_ONLY } from "~/lib/auth/roles";
 import { FEATURE_FLAG_KEYS } from "~/lib/config/feature-flags.server";
 import { listSectionTemplatesPaginated } from "~/services/section-templates.server";
 import { resolveViewContext } from "~/services/view-filters.server";
@@ -22,7 +23,7 @@ const FIELD_MAP: Record<string, string> = {
 };
 
 export async function loader({ request }: Route.LoaderArgs) {
-  const { user, tenantId } = await requireFeature(request, FEATURE_FLAG_KEYS.FORM_DESIGNER);
+  const { user, tenantId } = await requireRoleAndFeature(request, [...ADMIN_ONLY], FEATURE_FLAG_KEYS.FORM_DESIGNER);
 
   const { savedViewsEnabled, activeViewId, activeViewType, availableViews, viewWhere, viewOrderBy } =
     await resolveViewContext(request, tenantId, user.id, "SectionTemplate", FIELD_MAP);

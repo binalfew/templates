@@ -3,7 +3,8 @@ import { Columns3, ArrowLeft, Pencil, Trash2 } from "lucide-react";
 
 export const handle = { breadcrumb: "Details" };
 
-import { requireFeature } from "~/lib/auth/require-auth.server";
+import { requireRoleAndFeature } from "~/lib/auth/require-auth.server";
+import { ADMIN_ONLY } from "~/lib/auth/roles";
 import { FEATURE_FLAG_KEYS } from "~/lib/config/feature-flags.server";
 import { getField, getFieldDataCount } from "~/services/fields.server";
 import { formatDataType } from "~/components/fields/+utils";
@@ -14,7 +15,7 @@ import { useBasePrefix } from "~/hooks/use-base-prefix";
 import type { Route } from "./+types/index";
 
 export async function loader({ request, params }: Route.LoaderArgs) {
-  const { tenantId } = await requireFeature(request, FEATURE_FLAG_KEYS.CUSTOM_FIELDS);
+  const { tenantId } = await requireRoleAndFeature(request, [...ADMIN_ONLY], FEATURE_FLAG_KEYS.CUSTOM_FIELDS);
 
   const field = await getField(params.fieldId, tenantId);
   const dataCount = await getFieldDataCount(field.name, tenantId);

@@ -3,7 +3,8 @@ import { FileText, ArrowLeft, Pencil, Trash2 } from "lucide-react";
 
 export const handle = { breadcrumb: "Details" };
 
-import { requireUser } from "~/lib/auth/session.server";
+import { requireAnyRole } from "~/lib/auth/require-auth.server";
+import { ADMIN_ONLY } from "~/lib/auth/roles";
 import { getDocumentType } from "~/services/reference-data.server";
 import { Button } from "~/components/ui/button";
 import { Badge } from "~/components/ui/badge";
@@ -12,7 +13,7 @@ import { useBasePrefix } from "~/hooks/use-base-prefix";
 import type { Route } from "./+types/index";
 
 export async function loader({ request, params }: Route.LoaderArgs) {
-  await requireUser(request);
+  await requireAnyRole(request, [...ADMIN_ONLY]);
   const documentType = await getDocumentType(params.documentTypeId);
   return { documentType };
 }
