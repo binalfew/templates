@@ -5,7 +5,7 @@ const SUBSCRIPTION_PLANS = ["free", "starter", "professional", "enterprise"] as 
 const RESERVED_SLUGS = ["auth", "api", "kiosk", "delegation", "resources", "up"];
 
 const slugField = z
-  .string()
+  .string({ error: "Slug is required" })
   .min(1, "Slug is required")
   .max(50, "Slug must be at most 50 characters")
   .regex(
@@ -37,10 +37,16 @@ export const BRAND_THEMES = [
 
 export const createTenantSchema = z
   .object({
-    name: z.string().min(1, "Name is required").max(200, "Name must be at most 200 characters"),
+    name: z
+      .string({ error: "Name is required" })
+      .min(1, "Name is required")
+      .max(200, "Name must be at most 200 characters"),
     slug: slugField,
-    email: z.string().min(1, "Email is required").email("Invalid email address"),
-    phone: z.string().min(1, "Phone is required"),
+    email: z
+      .string({ error: "Email is required" })
+      .min(1, "Email is required")
+      .email("Invalid email address"),
+    phone: z.string({ error: "Phone is required" }).min(1, "Phone is required"),
     website: z.string().url("Invalid URL").optional().or(z.literal("")),
     address: z.string().optional().default(""),
     city: z.string().optional().default(""),
@@ -77,10 +83,16 @@ export const createTenantSchema = z
 export type CreateTenantInput = z.infer<typeof createTenantSchema>;
 
 export const updateTenantSchema = z.object({
-  name: z.string().min(1, "Name is required").max(200, "Name must be at most 200 characters"),
+  name: z
+    .string({ error: "Name is required" })
+    .min(1, "Name is required")
+    .max(200, "Name must be at most 200 characters"),
   slug: slugField,
-  email: z.string().min(1, "Email is required").email("Invalid email address"),
-  phone: z.string().min(1, "Phone is required"),
+  email: z
+    .string({ error: "Email is required" })
+    .min(1, "Email is required")
+    .email("Invalid email address"),
+  phone: z.string({ error: "Phone is required" }).min(1, "Phone is required"),
   website: z.string().url("Invalid URL").optional().or(z.literal("")),
   address: z.string().optional().default(""),
   city: z.string().optional().default(""),

@@ -2,8 +2,6 @@ import type { LucideIcon } from "lucide-react";
 import {
   LayoutDashboard,
   Building2,
-  Shield,
-  Settings,
   ClipboardList,
   Bell,
   Database,
@@ -78,20 +76,6 @@ export function buildNavigationGroups(basePrefix: string): NavGroup[] {
           url: `${basePrefix}/tenants`,
           icon: Building2,
           roles: ["ADMIN"],
-        },
-        {
-          title: "Settings",
-          tKey: "settings",
-          url: `${basePrefix}/settings`,
-          icon: Settings,
-          roles: ["ADMIN", "TENANT_ADMIN"],
-        },
-        {
-          title: "Security",
-          tKey: "security",
-          url: `${basePrefix}/security`,
-          icon: Shield,
-          roles: ["ADMIN", "TENANT_ADMIN"],
         },
         {
           title: "Data",

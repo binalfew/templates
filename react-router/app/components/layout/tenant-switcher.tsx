@@ -1,4 +1,5 @@
-import { ChevronsUpDown, ShieldCheck } from "lucide-react";
+import { ChevronsUpDown, Settings, Shield, ShieldCheck } from "lucide-react";
+import { Link } from "react-router";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -97,14 +98,19 @@ export function TenantSwitcher({
               </div>
               {activeTenant.name}
             </DropdownMenuItem>
-            {!isAdmin && (
-              <>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem className="gap-2 p-2" asChild>
-                  <a href={`/${activeTenant.slug}`}>Go to tenant home</a>
-                </DropdownMenuItem>
-              </>
-            )}
+            <DropdownMenuSeparator />
+            <DropdownMenuItem className="gap-2 p-2" asChild>
+              <Link to={`${basePrefix}/settings`}>
+                <Settings className="size-4 shrink-0" />
+                Settings
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem className="gap-2 p-2" asChild>
+              <Link to={`${basePrefix}/security/users`}>
+                <Shield className="size-4 shrink-0" />
+                Security
+              </Link>
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </SidebarMenuItem>

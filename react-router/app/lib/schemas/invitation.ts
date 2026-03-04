@@ -6,15 +6,15 @@ export const inviteUserSchema = z.object({
 });
 
 export const acceptInviteSchema = z.object({
-  token: z.string().min(1),
-  name: z.string().min(1, "Name is required").max(100),
+  token: z.string({ error: "Token is required" }).min(1, "Token is required"),
+  name: z.string({ error: "Name is required" }).min(1, "Name is required").max(100),
   username: z
-    .string()
+    .string({ error: "Username is required" })
     .min(3, "Username must be at least 3 characters")
     .max(30)
     .regex(/^[a-zA-Z0-9_-]+$/, "Only letters, numbers, hyphens, and underscores"),
   password: z
-    .string()
+    .string({ error: "Password is required" })
     .min(8, "Password must be at least 8 characters")
     .max(100)
     .regex(/[A-Z]/, "Must contain an uppercase letter")

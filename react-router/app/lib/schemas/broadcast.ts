@@ -11,7 +11,7 @@ export type AudienceFilter = z.infer<typeof audienceFilterSchema>;
 
 export const createBroadcastSchema = z.object({
   subject: z.string().max(200).optional(),
-  body: z.string().min(1).max(50000),
+  body: z.string({ error: "Body is required" }).min(1, "Body is required").max(50000),
   channel: z.enum(MESSAGE_CHANNELS),
   filters: audienceFilterSchema.optional(),
   templateId: z.string().optional(),

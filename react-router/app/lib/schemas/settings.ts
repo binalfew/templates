@@ -10,14 +10,14 @@ export const SETTING_CATEGORIES = ["general", "auth", "email", "upload", "workfl
 
 export const upsertSettingSchema = z.object({
   key: z
-    .string()
+    .string({ error: "Key is required" })
     .min(1, "Key is required")
     .max(100, "Key must be at most 100 characters")
     .regex(
       /^[a-z][a-z0-9_.]*$/,
       "Key must start with a lowercase letter and contain only lowercase letters, digits, underscores, and dots",
     ),
-  value: z.string(),
+  value: z.string({ error: "Value is required" }),
   type: z.enum(SETTING_TYPES).default("string"),
   category: z.enum(SETTING_CATEGORIES),
   scope: z.enum(SETTING_SCOPES).default("global"),

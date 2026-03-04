@@ -3,9 +3,12 @@ import { z } from "zod/v4";
 export const SLUG_REGEX = /^[a-z][a-z0-9_-]*$/;
 
 export const createCustomObjectSchema = z.object({
-  name: z.string().min(1, "Name is required").max(100, "Name must be at most 100 characters"),
+  name: z
+    .string({ error: "Name is required" })
+    .min(1, "Name is required")
+    .max(100, "Name must be at most 100 characters"),
   slug: z
-    .string()
+    .string({ error: "Slug is required" })
     .min(1, "Slug is required")
     .max(100, "Slug must be at most 100 characters")
     .regex(
@@ -22,7 +25,10 @@ export const createCustomObjectSchema = z.object({
 export type CreateCustomObjectInput = z.infer<typeof createCustomObjectSchema>;
 
 export const updateCustomObjectSchema = z.object({
-  name: z.string().min(1, "Name is required").max(100, "Name must be at most 100 characters"),
+  name: z
+    .string({ error: "Name is required" })
+    .min(1, "Name is required")
+    .max(100, "Name must be at most 100 characters"),
   description: z
     .string()
     .max(500, "Description must be at most 500 characters")
