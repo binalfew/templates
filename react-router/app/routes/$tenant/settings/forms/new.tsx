@@ -83,13 +83,29 @@ export default function NewFormPage() {
               </div>
             )}
 
-            <Field fieldId={fields.name.id} label="Name" required errors={fields.name.errors}>
-              <Input
-                {...getInputProps(fields.name, { type: "text" })}
-                key={fields.name.key}
-                placeholder="Form template name"
-              />
-            </Field>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <Field fieldId={fields.name.id} label="Name" required errors={fields.name.errors}>
+                <Input
+                  {...getInputProps(fields.name, { type: "text" })}
+                  key={fields.name.key}
+                  placeholder="Form template name"
+                />
+              </Field>
+
+              <Field
+                fieldId={fields.entityType.id}
+                label="Entity Type"
+                errors={fields.entityType.errors}
+              >
+                <NativeSelect {...getSelectProps(fields.entityType)} key={fields.entityType.key}>
+                  {ENTITY_TYPES_LIST.map((t) => (
+                    <NativeSelectOption key={t} value={t}>
+                      {t}
+                    </NativeSelectOption>
+                  ))}
+                </NativeSelect>
+              </Field>
+            </div>
 
             <Field
               fieldId={fields.description.id}
@@ -102,25 +118,6 @@ export default function NewFormPage() {
                 rows={3}
                 placeholder="Optional description"
               />
-            </Field>
-
-            <Field
-              fieldId={fields.entityType.id}
-              label="Entity Type"
-              errors={fields.entityType.errors}
-              description="Which entity will this form add extra fields to?"
-            >
-              <NativeSelect
-                {...getSelectProps(fields.entityType)}
-                key={fields.entityType.key}
-                className="w-full sm:w-auto sm:min-w-[160px]"
-              >
-                {ENTITY_TYPES_LIST.map((t) => (
-                  <NativeSelectOption key={t} value={t}>
-                    {t}
-                  </NativeSelectOption>
-                ))}
-              </NativeSelect>
             </Field>
 
             <div className="flex flex-col gap-3 pt-4 sm:flex-row">

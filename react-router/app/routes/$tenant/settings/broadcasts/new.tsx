@@ -87,11 +87,39 @@ export default function NewBroadcastPage() {
               </div>
             )}
 
-            <Field
-              fieldId={fields.subject.id}
-              label="Subject"
-              errors={fields.subject.errors}
-            >
+            <div className="grid gap-4 sm:grid-cols-2">
+              <Field
+                fieldId={fields.channel.id}
+                label="Channel"
+                required
+                errors={fields.channel.errors}
+              >
+                <NativeSelect {...getSelectProps(fields.channel)} key={fields.channel.key}>
+                  {MESSAGE_CHANNELS.map((c) => (
+                    <NativeSelectOption key={c} value={c}>
+                      {c.replace(/_/g, " ")}
+                    </NativeSelectOption>
+                  ))}
+                </NativeSelect>
+              </Field>
+
+              <Field
+                fieldId={fields.templateId.id}
+                label="Template"
+                errors={fields.templateId.errors}
+              >
+                <NativeSelect {...getSelectProps(fields.templateId)} key={fields.templateId.key}>
+                  <NativeSelectOption value="">None</NativeSelectOption>
+                  {templates.map((t: { id: string; name: string }) => (
+                    <NativeSelectOption key={t.id} value={t.id}>
+                      {t.name}
+                    </NativeSelectOption>
+                  ))}
+                </NativeSelect>
+              </Field>
+            </div>
+
+            <Field fieldId={fields.subject.id} label="Subject" errors={fields.subject.errors}>
               <Input
                 {...getInputProps(fields.subject, { type: "text" })}
                 key={fields.subject.key}
@@ -99,44 +127,11 @@ export default function NewBroadcastPage() {
               />
             </Field>
 
-            <Field fieldId={fields.channel.id} label="Channel" required errors={fields.channel.errors}>
-              <NativeSelect
-                {...getSelectProps(fields.channel)}
-                key={fields.channel.key}
-                className="w-full sm:w-auto sm:min-w-[160px]"
-              >
-                {MESSAGE_CHANNELS.map((c) => (
-                  <NativeSelectOption key={c} value={c}>
-                    {c.replace(/_/g, " ")}
-                  </NativeSelectOption>
-                ))}
-              </NativeSelect>
-            </Field>
-
-            <Field
-              fieldId={fields.templateId.id}
-              label="Template"
-              errors={fields.templateId.errors}
-            >
-              <NativeSelect
-                {...getSelectProps(fields.templateId)}
-                key={fields.templateId.key}
-                className="w-full sm:w-auto sm:min-w-[160px]"
-              >
-                <NativeSelectOption value="">None</NativeSelectOption>
-                {templates.map((t: { id: string; name: string }) => (
-                  <NativeSelectOption key={t.id} value={t.id}>
-                    {t.name}
-                  </NativeSelectOption>
-                ))}
-              </NativeSelect>
-            </Field>
-
             <Field fieldId={fields.body.id} label="Body" required errors={fields.body.errors}>
               <Textarea
                 {...getTextareaProps(fields.body)}
                 key={fields.body.key}
-                rows={6}
+                rows={8}
                 placeholder="Message body content"
               />
             </Field>
