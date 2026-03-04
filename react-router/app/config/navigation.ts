@@ -4,10 +4,8 @@ import {
   Building2,
   Shield,
   Settings,
-  BarChart3,
   ClipboardList,
   Bell,
-  Upload,
   Database,
 } from "lucide-react";
 
@@ -71,8 +69,8 @@ export function buildNavigationGroups(basePrefix: string): NavGroup[] {
       ],
     },
     {
-      label: "Management",
-      tKey: "management",
+      label: "Administration",
+      tKey: "administration",
       items: [
         {
           title: "Tenants",
@@ -81,39 +79,6 @@ export function buildNavigationGroups(basePrefix: string): NavGroup[] {
           icon: Building2,
           roles: ["ADMIN"],
         },
-      ],
-    },
-    {
-      label: "Content",
-      tKey: "content",
-      items: [
-        {
-          title: "File Uploads",
-          tKey: "fileUploads",
-          url: `${basePrefix}/uploads`,
-          icon: Upload,
-          featureFlag: "FF_FILE_UPLOADS",
-        },
-      ],
-    },
-    {
-      label: "Insights",
-      tKey: "insights",
-      items: [
-        {
-          title: "Analytics",
-          tKey: "analytics",
-          url: `${basePrefix}/analytics`,
-          icon: BarChart3,
-          roles: ["ADMIN", "TENANT_ADMIN"],
-          featureFlag: "FF_ANALYTICS",
-        },
-      ],
-    },
-    {
-      label: "Administration",
-      tKey: "administration",
-      items: [
         {
           title: "Settings",
           tKey: "settings",

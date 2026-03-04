@@ -38,7 +38,6 @@ export async function loader({ request, params }: Route.LoaderArgs) {
   const savedViewsEnabled = await isFeatureEnabled(FEATURE_FLAG_KEYS.SAVED_VIEWS, flagContext);
   const customFieldsEnabled = await isFeatureEnabled(FEATURE_FLAG_KEYS.CUSTOM_FIELDS, flagContext);
   const broadcastsEnabled = await isFeatureEnabled(FEATURE_FLAG_KEYS.BROADCASTS, flagContext);
-  const fileUploadsEnabled = await isFeatureEnabled(FEATURE_FLAG_KEYS.FILE_UPLOADS, flagContext);
   const globalSearchEnabled = await isFeatureEnabled(FEATURE_FLAG_KEYS.GLOBAL_SEARCH, flagContext);
   const customObjectsEnabled = await isFeatureEnabled(FEATURE_FLAG_KEYS.CUSTOM_OBJECTS, flagContext);
   const formDesignerEnabled = await isFeatureEnabled(FEATURE_FLAG_KEYS.FORM_DESIGNER, flagContext);
@@ -57,7 +56,6 @@ export async function loader({ request, params }: Route.LoaderArgs) {
     FF_SAVED_VIEWS: savedViewsEnabled,
     FF_CUSTOM_FIELDS: customFieldsEnabled,
     FF_BROADCASTS: broadcastsEnabled,
-    FF_FILE_UPLOADS: fileUploadsEnabled,
     FF_GLOBAL_SEARCH: globalSearchEnabled,
     FF_CUSTOM_OBJECTS: customObjectsEnabled,
     FF_FORM_DESIGNER: formDesignerEnabled,
