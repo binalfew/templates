@@ -182,7 +182,7 @@ export function DataTable<TData>({
                   )}
                 </TableHead>
               ))}
-              {hasRowActions && <TableHead className="w-10" />}
+              {hasRowActions && <TableHead className="w-10">Actions</TableHead>}
             </TableRow>
           </TableHeader>
           <TableBody>
