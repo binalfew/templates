@@ -56,6 +56,95 @@ export async function exportData(options: ExportOptions): Promise<{ content: str
       }));
       break;
     }
+    case "countries": {
+      const countries = await prisma.country.findMany({
+        select: {
+          id: true,
+          code: true,
+          name: true,
+          alpha3: true,
+          numericCode: true,
+          phoneCode: true,
+          flag: true,
+          sortOrder: true,
+          isActive: true,
+        },
+        orderBy: { sortOrder: "asc" },
+      });
+      rows = countries.map((c) => ({
+        id: c.id,
+        code: c.code,
+        name: c.name,
+        alpha3: c.alpha3 ?? "",
+        numericCode: c.numericCode ?? "",
+        phoneCode: c.phoneCode ?? "",
+        flag: c.flag ?? "",
+        sortOrder: c.sortOrder,
+        isActive: c.isActive,
+      }));
+      break;
+    }
+    case "titles": {
+      const titles = await prisma.title.findMany({
+        select: { id: true, code: true, name: true, sortOrder: true, isActive: true },
+        orderBy: { sortOrder: "asc" },
+      });
+      rows = titles.map((t) => ({
+        id: t.id,
+        code: t.code,
+        name: t.name,
+        sortOrder: t.sortOrder,
+        isActive: t.isActive,
+      }));
+      break;
+    }
+    case "languages": {
+      const languages = await prisma.language.findMany({
+        select: { id: true, code: true, name: true, nativeName: true, sortOrder: true, isActive: true },
+        orderBy: { sortOrder: "asc" },
+      });
+      rows = languages.map((l) => ({
+        id: l.id,
+        code: l.code,
+        name: l.name,
+        nativeName: l.nativeName ?? "",
+        sortOrder: l.sortOrder,
+        isActive: l.isActive,
+      }));
+      break;
+    }
+    case "currencies": {
+      const currencies = await prisma.currency.findMany({
+        select: { id: true, code: true, name: true, symbol: true, decimalDigits: true, sortOrder: true, isActive: true },
+        orderBy: { sortOrder: "asc" },
+      });
+      rows = currencies.map((c) => ({
+        id: c.id,
+        code: c.code,
+        name: c.name,
+        symbol: c.symbol ?? "",
+        decimalDigits: c.decimalDigits,
+        sortOrder: c.sortOrder,
+        isActive: c.isActive,
+      }));
+      break;
+    }
+    case "document-types": {
+      const docTypes = await prisma.documentType.findMany({
+        select: { id: true, code: true, name: true, description: true, category: true, sortOrder: true, isActive: true },
+        orderBy: { sortOrder: "asc" },
+      });
+      rows = docTypes.map((d) => ({
+        id: d.id,
+        code: d.code,
+        name: d.name,
+        description: d.description ?? "",
+        category: d.category ?? "",
+        sortOrder: d.sortOrder,
+        isActive: d.isActive,
+      }));
+      break;
+    }
     case "custom-object-records": {
       if (!objectId) throw new Error("objectId is required for custom object records");
       const records = await prisma.customObjectRecord.findMany({

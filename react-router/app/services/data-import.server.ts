@@ -170,6 +170,225 @@ export async function importData(options: {
       break;
     }
 
+    case "countries": {
+      for (let i = 0; i < rows.length; i++) {
+        const row = rows[i];
+        if (!row.code || !row.name) {
+          result.errors.push({ row: i + 1, message: "code and name are required" });
+          result.errorRows++;
+          continue;
+        }
+        const existing = await prisma.country.findUnique({ where: { code: row.code } });
+        if (existing) {
+          result.errors.push({ row: i + 1, message: `code ${row.code} already exists` });
+          result.errorRows++;
+          continue;
+        }
+        result.validRows++;
+      }
+
+      if (!dryRun) {
+        for (let i = 0; i < rows.length; i += BATCH_SIZE) {
+          const batch = rows.slice(i, i + BATCH_SIZE);
+          for (const row of batch) {
+            if (!row.code || !row.name) continue;
+            const existing = await prisma.country.findUnique({ where: { code: row.code } });
+            if (existing) continue;
+            try {
+              await prisma.country.create({
+                data: {
+                  code: row.code,
+                  name: row.name,
+                  alpha3: row.alpha3 || null,
+                  numericCode: row.numericCode || null,
+                  phoneCode: row.phoneCode || null,
+                  flag: row.flag || null,
+                  sortOrder: row.sortOrder ? parseInt(row.sortOrder, 10) : 0,
+                },
+              });
+              result.imported++;
+            } catch (err) {
+              logger.error({ code: row.code, err }, "Import: failed to create country");
+            }
+          }
+        }
+      }
+      break;
+    }
+
+    case "titles": {
+      for (let i = 0; i < rows.length; i++) {
+        const row = rows[i];
+        if (!row.code || !row.name) {
+          result.errors.push({ row: i + 1, message: "code and name are required" });
+          result.errorRows++;
+          continue;
+        }
+        const existing = await prisma.title.findUnique({ where: { code: row.code } });
+        if (existing) {
+          result.errors.push({ row: i + 1, message: `code ${row.code} already exists` });
+          result.errorRows++;
+          continue;
+        }
+        result.validRows++;
+      }
+
+      if (!dryRun) {
+        for (let i = 0; i < rows.length; i += BATCH_SIZE) {
+          const batch = rows.slice(i, i + BATCH_SIZE);
+          for (const row of batch) {
+            if (!row.code || !row.name) continue;
+            const existing = await prisma.title.findUnique({ where: { code: row.code } });
+            if (existing) continue;
+            try {
+              await prisma.title.create({
+                data: {
+                  code: row.code,
+                  name: row.name,
+                  sortOrder: row.sortOrder ? parseInt(row.sortOrder, 10) : 0,
+                },
+              });
+              result.imported++;
+            } catch (err) {
+              logger.error({ code: row.code, err }, "Import: failed to create title");
+            }
+          }
+        }
+      }
+      break;
+    }
+
+    case "languages": {
+      for (let i = 0; i < rows.length; i++) {
+        const row = rows[i];
+        if (!row.code || !row.name) {
+          result.errors.push({ row: i + 1, message: "code and name are required" });
+          result.errorRows++;
+          continue;
+        }
+        const existing = await prisma.language.findUnique({ where: { code: row.code } });
+        if (existing) {
+          result.errors.push({ row: i + 1, message: `code ${row.code} already exists` });
+          result.errorRows++;
+          continue;
+        }
+        result.validRows++;
+      }
+
+      if (!dryRun) {
+        for (let i = 0; i < rows.length; i += BATCH_SIZE) {
+          const batch = rows.slice(i, i + BATCH_SIZE);
+          for (const row of batch) {
+            if (!row.code || !row.name) continue;
+            const existing = await prisma.language.findUnique({ where: { code: row.code } });
+            if (existing) continue;
+            try {
+              await prisma.language.create({
+                data: {
+                  code: row.code,
+                  name: row.name,
+                  nativeName: row.nativeName || null,
+                  sortOrder: row.sortOrder ? parseInt(row.sortOrder, 10) : 0,
+                },
+              });
+              result.imported++;
+            } catch (err) {
+              logger.error({ code: row.code, err }, "Import: failed to create language");
+            }
+          }
+        }
+      }
+      break;
+    }
+
+    case "currencies": {
+      for (let i = 0; i < rows.length; i++) {
+        const row = rows[i];
+        if (!row.code || !row.name) {
+          result.errors.push({ row: i + 1, message: "code and name are required" });
+          result.errorRows++;
+          continue;
+        }
+        const existing = await prisma.currency.findUnique({ where: { code: row.code } });
+        if (existing) {
+          result.errors.push({ row: i + 1, message: `code ${row.code} already exists` });
+          result.errorRows++;
+          continue;
+        }
+        result.validRows++;
+      }
+
+      if (!dryRun) {
+        for (let i = 0; i < rows.length; i += BATCH_SIZE) {
+          const batch = rows.slice(i, i + BATCH_SIZE);
+          for (const row of batch) {
+            if (!row.code || !row.name) continue;
+            const existing = await prisma.currency.findUnique({ where: { code: row.code } });
+            if (existing) continue;
+            try {
+              await prisma.currency.create({
+                data: {
+                  code: row.code,
+                  name: row.name,
+                  symbol: row.symbol || null,
+                  decimalDigits: row.decimalDigits ? parseInt(row.decimalDigits, 10) : 2,
+                  sortOrder: row.sortOrder ? parseInt(row.sortOrder, 10) : 0,
+                },
+              });
+              result.imported++;
+            } catch (err) {
+              logger.error({ code: row.code, err }, "Import: failed to create currency");
+            }
+          }
+        }
+      }
+      break;
+    }
+
+    case "document-types": {
+      for (let i = 0; i < rows.length; i++) {
+        const row = rows[i];
+        if (!row.code || !row.name) {
+          result.errors.push({ row: i + 1, message: "code and name are required" });
+          result.errorRows++;
+          continue;
+        }
+        const existing = await prisma.documentType.findUnique({ where: { code: row.code } });
+        if (existing) {
+          result.errors.push({ row: i + 1, message: `code ${row.code} already exists` });
+          result.errorRows++;
+          continue;
+        }
+        result.validRows++;
+      }
+
+      if (!dryRun) {
+        for (let i = 0; i < rows.length; i += BATCH_SIZE) {
+          const batch = rows.slice(i, i + BATCH_SIZE);
+          for (const row of batch) {
+            if (!row.code || !row.name) continue;
+            const existing = await prisma.documentType.findUnique({ where: { code: row.code } });
+            if (existing) continue;
+            try {
+              await prisma.documentType.create({
+                data: {
+                  code: row.code,
+                  name: row.name,
+                  description: row.description || null,
+                  category: row.category || null,
+                  sortOrder: row.sortOrder ? parseInt(row.sortOrder, 10) : 0,
+                },
+              });
+              result.imported++;
+            } catch (err) {
+              logger.error({ code: row.code, err }, "Import: failed to create document type");
+            }
+          }
+        }
+      }
+      break;
+    }
+
     case "custom-object-records": {
       if (!objectId) throw new Error("objectId required");
       for (let i = 0; i < rows.length; i++) {

@@ -3,7 +3,11 @@ import { SidebarInset, SidebarProvider } from "~/components/ui/sidebar";
 import { AppSidebar } from "~/components/layout/app-sidebar";
 import { TopNavbar } from "~/components/layout/top-navbar";
 import { Toaster } from "~/components/ui/toaster";
-import { getVisibleSettingsChildren, getVisibleSecurityChildren } from "~/config/navigation";
+import {
+  getVisibleSettingsChildren,
+  getVisibleSecurityChildren,
+  getVisibleDataChildren,
+} from "~/config/navigation";
 import { InstallPrompt } from "~/components/pwa/install-prompt";
 import { SwUpdatePrompt } from "~/components/pwa/sw-update-prompt";
 import { LogoutTimer } from "~/components/logout-timer";
@@ -69,6 +73,7 @@ export function DashboardLayout({
   const isNavigating = navigation.state === "loading";
   const settingsChildren = getVisibleSettingsChildren(roles, basePrefix, enabledFeatures);
   const securityChildren = getVisibleSecurityChildren(roles, basePrefix, enabledFeatures);
+  const dataChildren = getVisibleDataChildren(roles, basePrefix, enabledFeatures);
 
   return (
     <SidebarProvider defaultOpen={sidebarOpen}>
@@ -98,6 +103,7 @@ export function DashboardLayout({
           notifications={recentNotifications}
           settingsChildren={settingsChildren}
           securityChildren={securityChildren}
+          dataChildren={dataChildren}
         />
         <div className="flex-1 p-4 md:p-6">
           <Outlet />

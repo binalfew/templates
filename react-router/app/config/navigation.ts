@@ -9,7 +9,7 @@ import {
   Bell,
   Search,
   Upload,
-  Download,
+  Database,
 } from "lucide-react";
 
 export type NavChild = {
@@ -102,20 +102,6 @@ export function buildNavigationGroups(basePrefix: string): NavGroup[] {
           icon: Upload,
           featureFlag: "FF_FILE_UPLOADS",
         },
-        {
-          title: "Import",
-          tKey: "import",
-          url: `${basePrefix}/import`,
-          icon: Upload,
-          featureFlag: "FF_DATA_IMPORT_EXPORT",
-        },
-        {
-          title: "Export",
-          tKey: "export",
-          url: `${basePrefix}/export`,
-          icon: Download,
-          featureFlag: "FF_DATA_IMPORT_EXPORT",
-        },
       ],
     },
     {
@@ -149,6 +135,14 @@ export function buildNavigationGroups(basePrefix: string): NavGroup[] {
           url: `${basePrefix}/security`,
           icon: Shield,
           roles: ["ADMIN", "TENANT_ADMIN"],
+        },
+        {
+          title: "Data",
+          tKey: "data",
+          url: `${basePrefix}/data`,
+          icon: Database,
+          roles: ["ADMIN", "TENANT_ADMIN"],
+          featureFlag: "FF_DATA_IMPORT_EXPORT",
         },
         {
           title: "Logs",
@@ -197,12 +191,6 @@ export function buildSettingsChildren(basePrefix: string): NavChild[] {
       url: `${basePrefix}/settings/fields`,
       roles: ["ADMIN", "TENANT_ADMIN"],
       featureFlag: "FF_CUSTOM_FIELDS",
-    },
-    {
-      title: "References",
-      tKey: "referenceData",
-      url: `${basePrefix}/settings/references`,
-      roles: ["ADMIN"],
     },
     {
       title: "Security",
@@ -284,6 +272,38 @@ export function getVisibleSecurityChildren(
   enabledFeatures?: Record<string, boolean>,
 ): NavChild[] {
   return buildSecurityChildren(basePrefix).filter((child) =>
+    isVisibleEntry(child, roles, enabledFeatures),
+  );
+}
+
+export function buildDataChildren(basePrefix: string): NavChild[] {
+  return [
+    {
+      title: "Import",
+      tKey: "import",
+      url: `${basePrefix}/data/import`,
+      end: true,
+    },
+    {
+      title: "Export",
+      tKey: "export",
+      url: `${basePrefix}/data/export`,
+    },
+    {
+      title: "References",
+      tKey: "referenceData",
+      url: `${basePrefix}/data/references`,
+      roles: ["ADMIN"],
+    },
+  ];
+}
+
+export function getVisibleDataChildren(
+  roles: string[],
+  basePrefix = "/admin",
+  enabledFeatures?: Record<string, boolean>,
+): NavChild[] {
+  return buildDataChildren(basePrefix).filter((child) =>
     isVisibleEntry(child, roles, enabledFeatures),
   );
 }

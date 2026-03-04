@@ -59,6 +59,7 @@ type TopNavbarProps = {
   offlineEnabled?: boolean;
   settingsChildren?: NavChild[];
   securityChildren?: NavChild[];
+  dataChildren?: NavChild[];
 };
 
 type BreadcrumbEntry = {
@@ -81,7 +82,7 @@ function useBreadcrumbs(): BreadcrumbEntry[] {
   }
 
   // Merge section + child into a single "Section | Child" breadcrumb
-  const mergeLabels = ["Settings", "Security"];
+  const mergeLabels = ["Settings", "Security", "Data"];
   for (let i = 0; i < crumbs.length - 1; i++) {
     if (mergeLabels.includes(crumbs[i].label)) {
       crumbs[i] = {
@@ -121,6 +122,7 @@ export function TopNavbar({
   offlineEnabled = false,
   settingsChildren = [],
   securityChildren = [],
+  dataChildren = [],
 }: TopNavbarProps) {
   const breadcrumbs = useBreadcrumbs();
   const navigate = useNavigate();
@@ -198,8 +200,11 @@ export function TopNavbar({
     if (securityChildren.length > 0 && location.pathname.startsWith(`${basePrefix}/security`)) {
       return securityChildren;
     }
+    if (dataChildren.length > 0 && location.pathname.startsWith(`${basePrefix}/data`)) {
+      return dataChildren;
+    }
     return [];
-  }, [settingsChildren, securityChildren, location.pathname, basePrefix]);
+  }, [settingsChildren, securityChildren, dataChildren, location.pathname, basePrefix]);
 
   return (
     <>

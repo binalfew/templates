@@ -1,0 +1,184 @@
+code,name,nativeName
+ab,Abkhaz,аҧсуа
+aa,Afar,Afaraf
+af,Afrikaans,Afrikaans
+ak,Akan,Akan
+sq,Albanian,Shqip
+am,Amharic,አማርኛ
+ar,Arabic,العربية
+an,Aragonese,Aragonés
+hy,Armenian,Հայերեն
+as,Assamese,অসমীয়া
+av,Avaric,авар мацӀ
+ae,Avestan,avesta
+ay,Aymara,aymar aru
+az,Azerbaijani,azərbaycan dili
+bm,Bambara,bamanankan
+ba,Bashkir,башҡорт теле
+eu,Basque,euskara
+be,Belarusian,Беларуская
+bn,Bengali,বাংলা
+bh,Bihari,भोजपुरी
+bi,Bislama,Bislama
+bs,Bosnian,bosanski jezik
+br,Breton,brezhoneg
+bg,Bulgarian,български език
+my,Burmese,ဗမာစာ
+ca,Catalan,Català
+ch,Chamorro,Chamoru
+ce,Chechen,нохчийн мотт
+ny,Chichewa,chiCheŵa
+zh,Chinese,中文
+cv,Chuvash,чӑваш чӗлхи
+kw,Cornish,Kernewek
+co,Corsican,corsu
+cr,Cree,ᓀᐦᐃᔭᐍᐏᐣ
+hr,Croatian,hrvatski
+cs,Czech,čeština
+da,Danish,dansk
+dv,Divehi,ދިވެހި
+nl,Dutch,Nederlands
+en,English,English
+eo,Esperanto,Esperanto
+et,Estonian,eesti
+ee,Ewe,Eʋegbe
+fo,Faroese,føroyskt
+fj,Fijian,vosa Vakaviti
+fi,Finnish,suomi
+fr,French,français
+ff,Fula,Fulfulde
+gl,Galician,Galego
+ka,Georgian,ქართული
+de,German,Deutsch
+el,Greek,Ελληνικά
+gn,Guaraní,Avañeẽ
+gu,Gujarati,ગુજરાતી
+ht,Haitian Creole,Kreyòl ayisyen
+ha,Hausa,Hausa
+he,Hebrew,עברית
+hz,Herero,Otjiherero
+hi,Hindi,हिन्दी
+ho,Hiri Motu,Hiri Motu
+hu,Hungarian,Magyar
+ia,Interlingua,Interlingua
+id,Indonesian,Bahasa Indonesia
+ie,Interlingue,Interlingue
+ga,Irish,Gaeilge
+ig,Igbo,Asụsụ Igbo
+ik,Inupiaq,Iñupiaq
+io,Ido,Ido
+is,Icelandic,Íslenska
+it,Italian,Italiano
+iu,Inuktitut,ᐃᓄᒃᑎᑐᑦ
+ja,Japanese,日本語
+jv,Javanese,basa Jawa
+kl,Kalaallisut,kalaallisut
+kn,Kannada,ಕನ್ನಡ
+kr,Kanuri,Kanuri
+ks,Kashmiri,कश्मीरी
+kk,Kazakh,Қазақ тілі
+km,Khmer,ភាសាខ្មែរ
+ki,Kikuyu,Gĩkũyũ
+rw,Kinyarwanda,Ikinyarwanda
+ky,Kyrgyz,кыргыз тили
+kv,Komi,коми кыв
+kg,Kongo,KiKongo
+ko,Korean,한국어
+ku,Kurdish,Kurdî
+kj,Kuanyama,Kuanyama
+la,Latin,latine
+lb,Luxembourgish,Lëtzebuergesch
+lg,Luganda,Luganda
+li,Limburgish,Limburgs
+ln,Lingala,Lingála
+lo,Lao,ພາສາລາວ
+lt,Lithuanian,lietuvių kalba
+lu,Luba-Katanga,Tshiluba
+lv,Latvian,latviešu valoda
+gv,Manx,Gaelg
+mk,Macedonian,македонски јазик
+mg,Malagasy,Malagasy fiteny
+ms,Malay,bahasa Melayu
+ml,Malayalam,മലയാളം
+mt,Maltese,Malti
+mi,Māori,te reo Māori
+mr,Marathi,मराठी
+mh,Marshallese,Kajin M̧ajeļ
+mn,Mongolian,монгол
+na,Nauru,Ekakairũ Naoero
+nv,Navajo,Diné bizaad
+nb,Norwegian Bokmål,Norsk bokmål
+nd,North Ndebele,isiNdebele
+ne,Nepali,नेपाली
+ng,Ndonga,Owambo
+nn,Norwegian Nynorsk,Norsk nynorsk
+no,Norwegian,Norsk
+ii,Nuosu,ꆈꌠ꒿ Nuosuhxop
+nr,South Ndebele,isiNdebele
+oc,Occitan,Occitan
+oj,Ojibwe,ᐊᓂᔑᓈᐯᒧᐎᓐ
+cu,Old Church Slavonic,ѩзыкъ словѣньскъ
+om,Oromo,Afaan Oromoo
+or,Oriya,ଓଡ଼ିଆ
+os,Ossetian,ирон æвзаг
+pa,Panjabi,ਪੰਜਾਬੀ
+pi,Pāli,पाऴि
+fa,Persian,فارسی
+pl,Polish,polski
+ps,Pashto,پښتو
+pt,Portuguese,Português
+qu,Quechua,Runa Simi
+rm,Romansh,rumantsch grischun
+rn,Kirundi,kiRundi
+ro,Romanian,română
+ru,Russian,русский язык
+sa,Sanskrit,संस्कृतम्
+sc,Sardinian,sardu
+sd,Sindhi,سنڌي
+se,Northern Sami,Davvisámegiella
+sm,Samoan,gagana faa Samoa
+sg,Sango,yângâ tî sängö
+sr,Serbian,српски језик
+gd,Scottish Gaelic,Gàidhlig
+sn,Shona,chiShona
+si,Sinhala,සිංහල
+sk,Slovak,slovenčina
+sl,Slovene,slovenščina
+so,Somali,Soomaaliga
+st,Southern Sotho,Sesotho
+es,Spanish,español
+su,Sundanese,Basa Sunda
+sw,Swahili,Kiswahili
+ss,Swati,SiSwati
+sv,Swedish,svenska
+ta,Tamil,தமிழ்
+te,Telugu,తెలుగు
+tg,Tajik,тоҷикӣ
+th,Thai,ไทย
+ti,Tigrinya,ትግርኛ
+bo,Tibetan,བོད་ཡིག
+tk,Turkmen,Türkmen
+tl,Tagalog,Wikang Tagalog
+tn,Tswana,Setswana
+to,Tonga,faka Tonga
+tr,Turkish,Türkçe
+ts,Tsonga,Xitsonga
+tt,Tatar,татарча
+tw,Twi,Twi
+ty,Tahitian,Reo Tahiti
+ug,Uyghur,ئۇيغۇرچە
+uk,Ukrainian,українська
+ur,Urdu,اردو
+uz,Uzbek,Oʻzbek
+ve,Venda,Tshivenḓa
+vi,Vietnamese,Tiếng Việt
+vo,Volapük,Volapük
+wa,Walloon,Walon
+cy,Welsh,Cymraeg
+wo,Wolof,Wollof
+fy,Western Frisian,Frysk
+xh,Xhosa,isiXhosa
+yi,Yiddish,ייִדיש
+yo,Yoruba,Yorùbá
+za,Zhuang,Saɯ cueŋƅ
+zu,Zulu,isiZulu

@@ -12,7 +12,7 @@ import type {
   UpdateDocumentTypeInput,
 } from "~/lib/schemas/reference-data";
 
-import type { TenantServiceContext } from "~/lib/types.server";
+import type { TenantServiceContext, PaginatedQueryOptions } from "~/lib/types.server";
 import { ServiceError } from "~/lib/errors/service-error.server";
 
 export class ReferenceDataError extends ServiceError {
@@ -66,6 +66,21 @@ export async function listCountries(filter?: { isActive?: boolean; search?: stri
     },
     orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
   });
+}
+
+export async function listCountriesPaginated(options: PaginatedQueryOptions) {
+  const where = { ...(options.where ?? {}) } as any;
+  const orderBy = options.orderBy?.length ? (options.orderBy as any) : [{ sortOrder: "asc" }, { name: "asc" }];
+  const [items, totalCount] = await Promise.all([
+    prisma.country.findMany({
+      where,
+      orderBy,
+      skip: (options.page - 1) * options.pageSize,
+      take: options.pageSize,
+    }),
+    prisma.country.count({ where }),
+  ]);
+  return { items, totalCount };
 }
 
 export async function getCountry(id: string) {
@@ -167,6 +182,21 @@ export async function listTitles(filter?: { isActive?: boolean; search?: string 
   });
 }
 
+export async function listTitlesPaginated(options: PaginatedQueryOptions) {
+  const where = { ...(options.where ?? {}) } as any;
+  const orderBy = options.orderBy?.length ? (options.orderBy as any) : [{ sortOrder: "asc" }, { name: "asc" }];
+  const [items, totalCount] = await Promise.all([
+    prisma.title.findMany({
+      where,
+      orderBy,
+      skip: (options.page - 1) * options.pageSize,
+      take: options.pageSize,
+    }),
+    prisma.title.count({ where }),
+  ]);
+  return { items, totalCount };
+}
+
 export async function getTitle(id: string) {
   const title = await prisma.title.findFirst({ where: { id } });
   if (!title) throw new ReferenceDataError("Title not found", 404);
@@ -245,6 +275,21 @@ export async function listLanguages(filter?: { isActive?: boolean; search?: stri
     },
     orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
   });
+}
+
+export async function listLanguagesPaginated(options: PaginatedQueryOptions) {
+  const where = { ...(options.where ?? {}) } as any;
+  const orderBy = options.orderBy?.length ? (options.orderBy as any) : [{ sortOrder: "asc" }, { name: "asc" }];
+  const [items, totalCount] = await Promise.all([
+    prisma.language.findMany({
+      where,
+      orderBy,
+      skip: (options.page - 1) * options.pageSize,
+      take: options.pageSize,
+    }),
+    prisma.language.count({ where }),
+  ]);
+  return { items, totalCount };
 }
 
 export async function getLanguage(id: string) {
@@ -347,6 +392,21 @@ export async function listCurrencies(filter?: { isActive?: boolean; search?: str
   });
 }
 
+export async function listCurrenciesPaginated(options: PaginatedQueryOptions) {
+  const where = { ...(options.where ?? {}) } as any;
+  const orderBy = options.orderBy?.length ? (options.orderBy as any) : [{ sortOrder: "asc" }, { name: "asc" }];
+  const [items, totalCount] = await Promise.all([
+    prisma.currency.findMany({
+      where,
+      orderBy,
+      skip: (options.page - 1) * options.pageSize,
+      take: options.pageSize,
+    }),
+    prisma.currency.count({ where }),
+  ]);
+  return { items, totalCount };
+}
+
 export async function getCurrency(id: string) {
   const currency = await prisma.currency.findFirst({ where: { id } });
   if (!currency) throw new ReferenceDataError("Currency not found", 404);
@@ -447,6 +507,21 @@ export async function listDocumentTypes(filter?: { isActive?: boolean; search?: 
     },
     orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
   });
+}
+
+export async function listDocumentTypesPaginated(options: PaginatedQueryOptions) {
+  const where = { ...(options.where ?? {}) } as any;
+  const orderBy = options.orderBy?.length ? (options.orderBy as any) : [{ sortOrder: "asc" }, { name: "asc" }];
+  const [items, totalCount] = await Promise.all([
+    prisma.documentType.findMany({
+      where,
+      orderBy,
+      skip: (options.page - 1) * options.pageSize,
+      take: options.pageSize,
+    }),
+    prisma.documentType.count({ where }),
+  ]);
+  return { items, totalCount };
 }
 
 export async function getDocumentType(id: string) {

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useFetcher, useNavigate } from "react-router";
 import {
   Loader2,
@@ -8,8 +8,13 @@ import {
   Clock,
   ArrowRight,
   LayoutDashboard,
+  Shield,
+  KeyRound,
+  Box,
+  ClipboardList,
 } from "lucide-react";
 import { Dialog, DialogContent, DialogTitle } from "~/components/ui/dialog";
+import { Badge } from "~/components/ui/badge";
 
 // ─── Types ───────────────────────────────────────────────
 
@@ -21,11 +26,12 @@ interface CommandPaletteProps {
 
 interface SearchResultItem {
   id: string;
-  type: "action" | "recent";
+  category: "action" | "recent" | "result";
   label: string;
   description?: string;
   href: string;
   icon: React.ReactNode;
+  entityType?: string;
 }
 
 // ─── Constants ───────────────────────────────────────────
@@ -33,25 +39,48 @@ interface SearchResultItem {
 const RECENT_SEARCHES_KEY = "global-search-recent";
 const MAX_RECENT = 5;
 
+const ENTITY_CONFIG: Record<
+  string,
+  { icon: typeof Users; label: string; colorClass: string }
+> = {
+  User: { icon: Users, label: "User", colorClass: "bg-blue-100 text-blue-800" },
+  Role: { icon: Shield, label: "Role", colorClass: "bg-purple-100 text-purple-800" },
+  Permission: {
+    icon: KeyRound,
+    label: "Permission",
+    colorClass: "bg-amber-100 text-amber-800",
+  },
+  CustomObject: {
+    icon: Box,
+    label: "Object",
+    colorClass: "bg-green-100 text-green-800",
+  },
+  AuditLog: {
+    icon: ClipboardList,
+    label: "Log",
+    colorClass: "bg-slate-100 text-slate-800",
+  },
+};
+
 function buildQuickActions(basePrefix: string): SearchResultItem[] {
   return [
     {
       id: "action-dashboard",
-      type: "action",
+      category: "action",
       label: "Go to Dashboard",
       href: basePrefix,
       icon: <LayoutDashboard className="size-4" />,
     },
     {
       id: "action-users",
-      type: "action",
+      category: "action",
       label: "Go to Users",
-      href: `${basePrefix}/users`,
+      href: `${basePrefix}/security/users`,
       icon: <Users className="size-4" />,
     },
     {
       id: "action-settings",
-      type: "action",
+      category: "action",
       label: "Go to Settings",
       href: `${basePrefix}/settings`,
       icon: <Settings className="size-4" />,
@@ -80,6 +109,13 @@ function addRecentSearch(query: string) {
   }
 }
 
+function getEntityIcon(type: string) {
+  const config = ENTITY_CONFIG[type];
+  if (!config) return <Search className="size-4" />;
+  const Icon = config.icon;
+  return <Icon className="size-4" />;
+}
+
 // ─── Component ───────────────────────────────────────────
 
 export function CommandPalette({ open, onOpenChange, basePrefix = "/admin" }: CommandPaletteProps) {
@@ -95,15 +131,34 @@ export function CommandPalette({ open, onOpenChange, basePrefix = "/admin" }: Co
 
   const loading = fetcher.state === "loading";
   const searchData = fetcher.data;
+
+  // Map API results to display items with entity-specific icons
   const results: SearchResultItem[] =
     searchData?.results?.results?.map((r: any) => ({
       id: r.id,
-      type: "action" as const,
+      category: "result" as const,
       label: r.title,
       description: r.subtitle,
       href: `${basePrefix}/${r.url}`,
-      icon: <Search className="size-4" />,
+      icon: getEntityIcon(r.type),
+      entityType: r.type,
     })) ?? [];
+
+  // Group results by entity type for display
+  const groupedResults: { type: string; items: SearchResultItem[] }[] = [];
+  const entityOrder = ["User", "Role", "Permission", "CustomObject", "AuditLog"];
+  for (const type of entityOrder) {
+    const items = results.filter((r) => r.entityType === type);
+    if (items.length > 0) {
+      groupedResults.push({ type, items });
+    }
+  }
+
+  // Flat list of all selectable items for keyboard navigation
+  const flatResults = groupedResults.flatMap((g) => g.items);
+  const quickActions = buildQuickActions(basePrefix);
+  const showResults = query.length >= 2;
+  const displayItems = showResults ? flatResults : quickActions;
 
   // Load recent searches when dialog opens
   useEffect(() => {
@@ -118,7 +173,6 @@ export function CommandPalette({ open, onOpenChange, basePrefix = "/admin" }: Co
   const handleInputChange = (value: string) => {
     setQuery(value);
     setSelectedIndex(0);
-    // Debounced search
     if (debounceRef.current) clearTimeout(debounceRef.current);
     if (value.trim().length >= 2) {
       debounceRef.current = setTimeout(() => {
@@ -137,12 +191,8 @@ export function CommandPalette({ open, onOpenChange, basePrefix = "/admin" }: Co
 
   const handleRecentClick = (recent: string) => {
     setQuery(recent);
-    setSelectedIndex(0);
+    handleInputChange(recent);
   };
-
-  const showResults = query.length >= 2;
-  const quickActions = buildQuickActions(basePrefix);
-  const displayItems = showResults ? results : quickActions;
 
   useEffect(() => {
     if (!listRef.current) return;
@@ -170,6 +220,9 @@ export function CommandPalette({ open, onOpenChange, basePrefix = "/admin" }: Co
       }
     }
   };
+
+  // Track running index for grouped results (keyboard selection)
+  let runningIndex = 0;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -240,34 +293,57 @@ export function CommandPalette({ open, onOpenChange, basePrefix = "/admin" }: Co
             </div>
           )}
 
-          {/* Search results */}
-          {showResults && results.length > 0 && (
-            <div>
-              <div className="px-2 py-1.5 text-xs font-medium text-muted-foreground">
-                Results
-              </div>
-              {results.map((item, index) => (
-                <button
-                  key={item.id}
-                  type="button"
-                  data-result-item
-                  onClick={() => selectItem(item)}
-                  className={`flex w-full items-center gap-2 rounded-sm px-2 py-1.5 text-sm ${
-                    selectedIndex === index ? "bg-accent text-accent-foreground" : "hover:bg-accent"
-                  }`}
-                >
-                  <span className="text-muted-foreground">{item.icon}</span>
-                  <span className="flex-1 text-left">
-                    <span className="font-medium">{item.label}</span>
-                    {item.description && (
-                      <span className="ml-2 text-xs text-muted-foreground">{item.description}</span>
-                    )}
-                  </span>
-                  <ArrowRight className="size-3 text-muted-foreground" />
-                </button>
-              ))}
-            </div>
-          )}
+          {/* Grouped search results */}
+          {showResults &&
+            groupedResults.length > 0 &&
+            groupedResults.map((group) => {
+              const config = ENTITY_CONFIG[group.type];
+              const GroupIcon = config?.icon ?? Search;
+              const items = group.items;
+
+              return (
+                <div key={group.type} className="mb-1">
+                  <div className="flex items-center gap-2 px-2 py-1.5 text-xs font-medium text-muted-foreground">
+                    <GroupIcon className="size-3" />
+                    {config?.label ?? group.type}s
+                    <Badge variant="outline" className="ml-auto h-4 px-1 text-[10px]">
+                      {items.length}
+                    </Badge>
+                  </div>
+                  {items.map((item) => {
+                    const idx = runningIndex++;
+                    return (
+                      <button
+                        key={item.id}
+                        type="button"
+                        data-result-item
+                        onClick={() => selectItem(item)}
+                        className={`flex w-full items-center gap-2 rounded-sm px-2 py-1.5 text-sm ${
+                          selectedIndex === idx
+                            ? "bg-accent text-accent-foreground"
+                            : "hover:bg-accent"
+                        }`}
+                      >
+                        <span className="text-muted-foreground">{item.icon}</span>
+                        <span className="flex-1 min-w-0 text-left">
+                          <span className="font-medium truncate">{item.label}</span>
+                          {item.description && (
+                            <span className="ml-2 text-xs text-muted-foreground truncate">
+                              {item.description}
+                            </span>
+                          )}
+                        </span>
+                        <Badge
+                          className={`shrink-0 text-[10px] ${config?.colorClass ?? ""}`}
+                        >
+                          {config?.label ?? item.entityType}
+                        </Badge>
+                      </button>
+                    );
+                  })}
+                </div>
+              );
+            })}
 
           {/* Empty state */}
           {showResults && !loading && results.length === 0 && (

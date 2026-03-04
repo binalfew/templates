@@ -82,7 +82,7 @@ export async function globalSearch(
       type: "User",
       title: u.name ?? u.email,
       subtitle: u.email,
-      url: `users/${u.id}/edit`,
+      url: `security/users/${u.id}`,
       score: scoreMatch(term, [u.name, u.email, u.username]),
     })),
     ...roles.map((r) => ({
@@ -90,7 +90,7 @@ export async function globalSearch(
       type: "Role",
       title: r.name,
       subtitle: r.description ?? undefined,
-      url: `roles/${r.id}/edit`,
+      url: `security/roles/${r.id}`,
       score: scoreMatch(term, [r.name, r.description]),
     })),
     ...permissions.map((p) => ({
@@ -98,7 +98,7 @@ export async function globalSearch(
       type: "Permission",
       title: `${p.resource}:${p.action}`,
       subtitle: p.description ?? undefined,
-      url: `roles`,
+      url: `security/permissions/${p.id}`,
       score: scoreMatch(term, [p.resource, p.action, p.description]),
     })),
     ...customObjects.map((co) => ({
@@ -106,7 +106,7 @@ export async function globalSearch(
       type: "CustomObject",
       title: co.name,
       subtitle: co.description ?? co.slug,
-      url: `custom-objects/${co.slug}`,
+      url: `objects/${co.slug}`,
       score: scoreMatch(term, [co.name, co.slug, co.description]),
     })),
     ...auditLogs.map((al) => ({
