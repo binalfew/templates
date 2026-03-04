@@ -137,6 +137,13 @@ export function buildNavigationGroups(basePrefix: string): NavGroup[] {
       tKey: "administration",
       items: [
         {
+          title: "Settings",
+          tKey: "settings",
+          url: `${basePrefix}/settings`,
+          icon: Settings,
+          roles: ["ADMIN", "TENANT_ADMIN"],
+        },
+        {
           title: "Security",
           tKey: "security",
           url: `${basePrefix}/security`,
@@ -149,13 +156,6 @@ export function buildNavigationGroups(basePrefix: string): NavGroup[] {
           url: `${basePrefix}/logs`,
           icon: ClipboardList,
           roles: ["ADMIN"],
-        },
-        {
-          title: "Settings",
-          tKey: "settings",
-          url: `${basePrefix}/settings`,
-          icon: Settings,
-          roles: ["ADMIN", "TENANT_ADMIN"],
         },
       ],
     },
