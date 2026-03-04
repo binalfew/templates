@@ -36,19 +36,11 @@ export default function UserDetailPage() {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-start justify-between">
-        <div className="flex items-start gap-3">
-          <User className="size-5 text-muted-foreground shrink-0 mt-1" />
-          <div>
-            <h2 className="text-2xl font-bold text-foreground">
-              {targetUser.name || targetUser.email}
-            </h2>
-            <p className="text-sm text-muted-foreground">@{targetUser.username}</p>
-            <span
-              className={`mt-1 inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${statusColors[targetUser.status] ?? "bg-gray-100 text-gray-800"}`}
-            >
-              {targetUser.status}
-            </span>
-          </div>
+        <div className="flex items-center gap-3">
+          <User className="size-5 text-muted-foreground shrink-0" />
+          <h2 className="text-2xl font-bold text-foreground">
+            {targetUser.name || targetUser.email}
+          </h2>
         </div>
         <div className="flex gap-2">
           <Button variant="outline" size="sm" asChild>

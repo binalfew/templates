@@ -33,23 +33,9 @@ export default function FormDetailPage() {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-start justify-between">
-        <div className="flex items-start gap-3">
-          <FileText className="size-5 text-muted-foreground shrink-0 mt-1" />
-          <div>
-            <h2 className="text-2xl font-bold text-foreground">{template.name}</h2>
-            <div className="mt-1 flex flex-wrap gap-2">
-              <Badge
-                variant={template.status === "PUBLISHED" ? "outline" : "secondary"}
-                className={statusClassName}
-              >
-                {template.status}
-              </Badge>
-              <Badge variant="secondary">{template.entityType}</Badge>
-            </div>
-            {template.description && (
-              <p className="mt-2 text-sm text-muted-foreground">{template.description}</p>
-            )}
-          </div>
+        <div className="flex items-center gap-3">
+          <FileText className="size-5 text-muted-foreground shrink-0" />
+          <h2 className="text-2xl font-bold text-foreground">{template.name}</h2>
         </div>
         <div className="flex gap-2">
           <Button variant="outline" size="sm" asChild>

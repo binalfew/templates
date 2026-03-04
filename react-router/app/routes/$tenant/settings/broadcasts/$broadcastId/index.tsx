@@ -27,21 +27,11 @@ export default function BroadcastDetailPage() {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-start justify-between">
-        <div className="flex items-start gap-3">
-          <Send className="size-5 text-muted-foreground shrink-0 mt-1" />
-          <div>
-            <h2 className="text-2xl font-bold text-foreground">
-              {broadcast.subject || "(no subject)"}
-            </h2>
-            <div className="mt-1 flex flex-wrap gap-2">
-              <Badge variant="secondary" className={CHANNEL_COLORS[broadcast.channel]}>
-                {broadcast.channel}
-              </Badge>
-              <Badge variant={BROADCAST_STATUS_COLORS[broadcast.status] ?? "secondary"}>
-                {broadcast.status}
-              </Badge>
-            </div>
-          </div>
+        <div className="flex items-center gap-3">
+          <Send className="size-5 text-muted-foreground shrink-0" />
+          <h2 className="text-2xl font-bold text-foreground">
+            {broadcast.subject || "(no subject)"}
+          </h2>
         </div>
         <div className="flex gap-2">
           <Button variant="outline" size="sm" asChild>

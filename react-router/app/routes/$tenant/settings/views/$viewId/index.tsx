@@ -53,19 +53,9 @@ export default function ViewDetailPage() {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-start justify-between">
-        <div className="flex items-start gap-3">
-          <Icon className="size-5 text-muted-foreground shrink-0 mt-1" />
-          <div>
-            <h2 className="text-2xl font-bold text-foreground">{view.name}</h2>
-            <div className="mt-1 flex flex-wrap gap-2">
-              <Badge variant="secondary">{view.entityType}</Badge>
-              <Badge variant="outline">
-                {VIEW_TYPE_LABELS[view.viewType] ?? view.viewType}
-              </Badge>
-              {view.isDefault && <Badge variant="secondary">Default</Badge>}
-              {view.isShared && <Badge variant="outline">Shared</Badge>}
-            </div>
-          </div>
+        <div className="flex items-center gap-3">
+          <Icon className="size-5 text-muted-foreground shrink-0" />
+          <h2 className="text-2xl font-bold text-foreground">{view.name}</h2>
         </div>
         <div className="flex gap-2">
           <Button variant="outline" size="sm" asChild>

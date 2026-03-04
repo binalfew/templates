@@ -25,17 +25,9 @@ export default function PermissionDetailPage() {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-start justify-between">
-        <div className="flex items-start gap-3">
-          <KeyRound className="size-5 text-muted-foreground shrink-0 mt-1" />
-          <div>
-            <h2 className="text-2xl font-bold text-foreground">{permission.resource}</h2>
-            <Badge variant="default" className="mt-1">
-              {permission.action}
-            </Badge>
-            {permission.description && (
-              <p className="mt-2 text-sm text-muted-foreground">{permission.description}</p>
-            )}
-          </div>
+        <div className="flex items-center gap-3">
+          <KeyRound className="size-5 text-muted-foreground shrink-0" />
+          <h2 className="text-2xl font-bold text-foreground">{permission.resource}</h2>
         </div>
         <div className="flex gap-2">
           <Button variant="outline" size="sm" asChild>

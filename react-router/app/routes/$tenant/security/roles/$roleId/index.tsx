@@ -29,17 +29,9 @@ export default function RoleDetailPage() {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-start justify-between">
-        <div className="flex items-start gap-3">
-          <Shield className="size-5 text-muted-foreground shrink-0 mt-1" />
-          <div>
-            <h2 className="text-2xl font-bold text-foreground">{role.name}</h2>
-            {role.description && (
-              <p className="mt-1 text-sm text-muted-foreground">{role.description}</p>
-            )}
-            <Badge variant="secondary" className="mt-1">
-              {role.scope}
-            </Badge>
-          </div>
+        <div className="flex items-center gap-3">
+          <Shield className="size-5 text-muted-foreground shrink-0" />
+          <h2 className="text-2xl font-bold text-foreground">{role.name}</h2>
         </div>
         <div className="flex gap-2">
           <Button variant="outline" size="sm" asChild>
