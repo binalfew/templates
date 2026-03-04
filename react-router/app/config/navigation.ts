@@ -7,7 +7,6 @@ import {
   BarChart3,
   ClipboardList,
   Bell,
-  Search,
   Upload,
   Database,
 } from "lucide-react";
@@ -68,13 +67,6 @@ export function buildNavigationGroups(basePrefix: string): NavGroup[] {
           url: `${basePrefix}/notifications`,
           icon: Bell,
           featureFlag: "FF_NOTIFICATIONS",
-        },
-        {
-          title: "Search",
-          tKey: "search",
-          url: `${basePrefix}/search`,
-          icon: Search,
-          featureFlag: "FF_GLOBAL_SEARCH",
         },
       ],
     },
