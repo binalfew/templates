@@ -31,6 +31,7 @@ interface UpdateWebhookInput {
 
 interface ListWebhookFilters {
   status?: "ACTIVE" | "PAUSED" | "DISABLED" | "SUSPENDED";
+  search?: string;
   page?: number;
   pageSize?: number;
 }
@@ -82,14 +83,51 @@ export async function createWebhookSubscription(input: CreateWebhookInput, ctx: 
   return { subscription, secret };
 }
 
+export async function getWebhookSubscriptionWithCounts(id: string, tenantId: string) {
+  const subscription = await prisma.webhookSubscription.findFirst({
+    where: { id, tenantId },
+    select: {
+      id: true,
+      url: true,
+      description: true,
+      events: true,
+      secret: true,
+      status: true,
+      version: true,
+      maxRetries: true,
+      retryBackoffMs: true,
+      timeoutMs: true,
+      consecutiveFailures: true,
+      circuitBreakerOpen: true,
+      circuitBreakerResetAt: true,
+      headers: true,
+      metadata: true,
+      createdBy: true,
+      createdAt: true,
+      updatedAt: true,
+      _count: { select: { deliveries: true } },
+    },
+  });
+  if (!subscription) {
+    throw new WebhookError("Webhook subscription not found", 404);
+  }
+  return subscription;
+}
+
 export async function listWebhookSubscriptions(tenantId: string, filters?: ListWebhookFilters) {
   const page = filters?.page ?? 1;
   const pageSize = Math.min(filters?.pageSize ?? 20, 100);
   const skip = (page - 1) * pageSize;
 
-  const where = {
+  const where: any = {
     tenantId,
     ...(filters?.status && { status: filters.status }),
+    ...(filters?.search && {
+      OR: [
+        { url: { contains: filters.search, mode: "insensitive" } },
+        { description: { contains: filters.search, mode: "insensitive" } },
+      ],
+    }),
   };
 
   const [items, total] = await Promise.all([
