@@ -1,7 +1,6 @@
 import { useForm, getFormProps, getInputProps } from "@conform-to/react";
 import { parseWithZod } from "@conform-to/zod/v4";
 import { data, Form, redirect } from "react-router";
-import { z } from "zod/v4";
 import { sendEmail } from "~/lib/email/email.server";
 import { otpEmail } from "~/lib/email/email-templates.server";
 import { logger } from "~/lib/monitoring/logger.server";
@@ -11,16 +10,12 @@ import {
   isCodeValid,
   prepareVerification,
 } from "~/lib/auth/verification.server";
+import { verifyEmailSchema as verifySchema } from "~/lib/schemas/auth";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import type { Route } from "./+types/verify";
-
-const verifySchema = z.object({
-  code: z.string({ error: "Code is required" }).min(6, "Code must be 6 characters").max(6, "Code must be 6 characters"),
-  intent: z.enum(["verify", "resend"]),
-});
 
 export async function loader({ request }: Route.LoaderArgs) {
   const url = new URL(request.url);

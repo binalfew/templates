@@ -2,27 +2,22 @@ import { useForm, getFormProps, getInputProps } from "@conform-to/react";
 import { parseWithZod } from "@conform-to/zod/v4";
 import { data, Form, Link, redirect } from "react-router";
 import { useTranslation } from "react-i18next";
-import { z } from "zod/v4";
 import { prisma } from "~/lib/db/db.server";
 import { sendEmail } from "~/lib/email/email.server";
 import { otpEmail } from "~/lib/email/email-templates.server";
 import { logger } from "~/lib/monitoring/logger.server";
 import { requireAnonymous } from "~/lib/auth/session.server";
-import { SignupEmailSchema } from "~/lib/schemas/user";
 import {
   prepareVerification,
   getVerifySession,
   commitVerifySession,
 } from "~/lib/auth/verification.server";
+import { signupSchema } from "~/lib/schemas/auth";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import type { Route } from "./+types/signup";
-
-const signupSchema = z.object({
-  email: SignupEmailSchema,
-});
 
 export async function loader({ request }: Route.LoaderArgs) {
   await requireAnonymous(request);

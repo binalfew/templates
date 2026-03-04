@@ -1,7 +1,6 @@
 import { data, redirect, useActionData, useLoaderData, Form, Link } from "react-router";
 import { useForm, getFormProps, getInputProps } from "@conform-to/react";
 import { parseWithZod } from "@conform-to/zod/v4";
-import { z } from "zod/v4";
 import { invariantResponse } from "@epic-web/invariant";
 import { requireAuth, requireFeature } from "~/lib/auth/require-auth.server";
 import { FEATURE_FLAG_KEYS } from "~/lib/config/feature-flags.server";
@@ -11,6 +10,7 @@ import {
   type CustomFieldDefinition,
 } from "~/services/custom-objects.server";
 import { handleServiceError } from "~/lib/errors/handle-service-error.server";
+import { addFieldSchema, ADD_FIELD_DATA_TYPES as DATA_TYPES } from "~/lib/schemas/custom-object";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Checkbox } from "~/components/ui/checkbox";
@@ -22,22 +22,6 @@ import { useBasePrefix } from "~/hooks/use-base-prefix";
 import type { Route } from "./+types/add-field";
 
 export const handle = { breadcrumb: "Add Field" };
-
-const DATA_TYPES = ["TEXT", "NUMBER", "BOOLEAN", "DATE", "EMAIL", "URL", "PHONE"] as const;
-
-const addFieldSchema = z.object({
-  fieldName: z
-    .string()
-    .min(1, "Name is required")
-    .max(50, "Name must be at most 50 characters")
-    .regex(/^[a-z][a-z0-9_]*$/, "Must start with a letter and contain only lowercase letters, numbers, and underscores"),
-  fieldLabel: z
-    .string()
-    .min(1, "Label is required")
-    .max(100, "Label must be at most 100 characters"),
-  fieldType: z.enum(DATA_TYPES),
-  fieldRequired: z.string().optional(),
-});
 
 export async function loader({ request, params }: Route.LoaderArgs) {
   const { tenantId } = await requireFeature(request, FEATURE_FLAG_KEYS.CUSTOM_OBJECTS);

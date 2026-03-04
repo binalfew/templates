@@ -1,11 +1,11 @@
 import { useForm, getFormProps, getInputProps } from "@conform-to/react";
 import { parseWithZod } from "@conform-to/zod/v4";
 import { data, Form, Link, redirect, useParams } from "react-router";
-import { z } from "zod/v4";
 import { KeyRound, ArrowLeft } from "lucide-react";
 import { prisma } from "~/lib/db/db.server";
 import { requireUserId } from "~/lib/auth/session.server";
 import { verifyPassword, hashPassword } from "~/lib/auth/auth.server";
+import { changePasswordSchema } from "~/lib/schemas/profile";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
@@ -13,23 +13,6 @@ import { Field } from "~/components/ui/field";
 import type { Route } from "./+types/change-password";
 
 export const handle = { breadcrumb: "Change Password" };
-
-const changePasswordSchema = z
-  .object({
-    currentPassword: z.string({ error: "Current password is required" }).min(1, "Current password is required"),
-    newPassword: z
-      .string({ error: "New password is required" })
-      .min(8, "Password must be at least 8 characters")
-      .regex(/[A-Z]/, "Must contain an uppercase letter")
-      .regex(/[a-z]/, "Must contain a lowercase letter")
-      .regex(/[0-9]/, "Must contain a number")
-      .regex(/[^A-Za-z0-9]/, "Must contain a special character"),
-    confirmPassword: z.string({ error: "Please confirm your password" }).min(1, "Please confirm your password"),
-  })
-  .refine((val) => val.newPassword === val.confirmPassword, {
-    message: "Passwords do not match",
-    path: ["confirmPassword"],
-  });
 
 export async function action({ request, params }: Route.ActionArgs) {
   const userId = await requireUserId(request);

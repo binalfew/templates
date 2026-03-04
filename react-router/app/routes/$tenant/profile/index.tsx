@@ -1,12 +1,12 @@
 import { useForm, getFormProps, getInputProps } from "@conform-to/react";
 import { parseWithZod } from "@conform-to/zod/v4";
 import { data, Form, Link, redirect, useLoaderData } from "react-router";
-import { z } from "zod/v4";
 import { Shield, KeyRound, Monitor, ShieldCheck, ShieldAlert } from "lucide-react";
 import { twoFAVerificationType } from "~/lib/auth/2fa-constants";
 import { prisma } from "~/lib/db/db.server";
 import { isFeatureEnabled, FEATURE_FLAG_KEYS } from "~/lib/config/feature-flags.server";
 import { requireUserId } from "~/lib/auth/session.server";
+import { profileSchema } from "~/lib/schemas/profile";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
@@ -16,16 +16,6 @@ import { PhotoUpload } from "~/components/photo-upload";
 import type { Route } from "./+types/index";
 
 export const handle = { breadcrumb: "Profile" };
-
-const profileSchema = z.object({
-  name: z.string({ error: "Name is required" }).min(1, "Name is required").max(200),
-  username: z
-    .string({ error: "Username is required" })
-    .min(3, "Username must be at least 3 characters")
-    .max(50)
-    .regex(/^[a-zA-Z0-9_-]+$/, "Only letters, numbers, hyphens, and underscores"),
-  photoUrl: z.string().optional(),
-});
 
 export async function loader({ request }: Route.LoaderArgs) {
   const userId = await requireUserId(request);

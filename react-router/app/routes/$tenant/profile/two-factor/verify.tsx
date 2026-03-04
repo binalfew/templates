@@ -5,13 +5,13 @@ import { data, Form, Link, redirect, useActionData, useLoaderData, useParams } f
 import { Check, Copy, KeyRound, Shield } from "lucide-react";
 import * as QRCode from "qrcode";
 import { useState } from "react";
-import { z } from "zod/v4";
 import { twoFAVerificationType, twoFAVerifyVerificationType } from "~/lib/auth/2fa-constants";
 import { prisma } from "~/lib/db/db.server";
 import { env } from "~/lib/config/env.server";
 import { isFeatureEnabled, FEATURE_FLAG_KEYS } from "~/lib/config/feature-flags.server";
 import { requireUserId } from "~/lib/auth/session.server";
 import { isCodeValid } from "~/lib/auth/verification.server";
+import { profileTwoFAVerifySchema as verifySchema } from "~/lib/schemas/profile";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
 import { Input } from "~/components/ui/input";
@@ -20,11 +20,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import type { Route } from "./+types/verify";
 
 export const handle = { breadcrumb: "Verify Setup" };
-
-const verifySchema = z.object({
-  code: z.string({ error: "Code is required" }).min(6, "Code must be 6 digits").max(6, "Code must be 6 digits"),
-  intent: z.enum(["verify", "cancel"]),
-});
 
 export async function loader({ request, params }: Route.LoaderArgs) {
   const twoFAFlagEnabled = await isFeatureEnabled(FEATURE_FLAG_KEYS.TWO_FACTOR);

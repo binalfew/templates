@@ -1,7 +1,6 @@
 import { useForm, getFormProps, getInputProps } from "@conform-to/react";
 import { parseWithZod } from "@conform-to/zod/v4";
 import { data, Form, Link, redirect, useLoaderData, useParams } from "react-router";
-import { z } from "zod/v4";
 import { Mail, ArrowLeft } from "lucide-react";
 import { prisma } from "~/lib/db/db.server";
 import { requireUserId } from "~/lib/auth/session.server";
@@ -11,6 +10,7 @@ import {
   getVerifySession,
   commitVerifySession,
 } from "~/lib/auth/verification.server";
+import { changeEmailSchema } from "~/lib/schemas/profile";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
@@ -18,10 +18,6 @@ import { Field } from "~/components/ui/field";
 import type { Route } from "./+types/change-email";
 
 export const handle = { breadcrumb: "Change Email" };
-
-const changeEmailSchema = z.object({
-  newEmail: z.email("Please enter a valid email address"),
-});
 
 export async function loader({ request }: Route.LoaderArgs) {
   const userId = await requireUserId(request);

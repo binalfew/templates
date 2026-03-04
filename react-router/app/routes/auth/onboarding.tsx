@@ -1,35 +1,18 @@
 import { useForm, getFormProps, getInputProps } from "@conform-to/react";
 import { parseWithZod } from "@conform-to/zod/v4";
 import { data, Form, redirect } from "react-router";
-import { z } from "zod/v4";
 import { hashPassword } from "~/lib/auth/auth.server";
 import { prisma } from "~/lib/db/db.server";
 import { logger } from "~/lib/monitoring/logger.server";
 import { requireAnonymous, getDefaultRedirect, createUserSession } from "~/lib/auth/session.server";
-import { SignupUsernameSchema, SignupNameSchema, SignupPasswordSchema } from "~/lib/schemas/user";
 import { requireOnboardingEmail, getVerifySession } from "~/lib/auth/verification.server";
+import { onboardingSchema } from "~/lib/schemas/auth";
 import { Button } from "~/components/ui/button";
 import { Checkbox } from "~/components/ui/checkbox";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import type { Route } from "./+types/onboarding";
-
-const onboardingSchema = z
-  .object({
-    username: SignupUsernameSchema,
-    name: SignupNameSchema,
-    password: SignupPasswordSchema,
-    confirmPassword: z.string({ error: "Please confirm your password" }).min(1, "Please confirm your password"),
-    agreeToTerms: z.preprocess(
-      (v) => v === "on" || v === true,
-      z.boolean().refine((v) => v === true, "You must agree to the terms"),
-    ),
-  })
-  .refine((d) => d.password === d.confirmPassword, {
-    message: "Passwords don't match",
-    path: ["confirmPassword"],
-  });
 
 export async function loader({ request }: Route.LoaderArgs) {
   await requireAnonymous(request);

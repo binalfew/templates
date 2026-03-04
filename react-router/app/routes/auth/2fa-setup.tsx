@@ -5,7 +5,6 @@ import { data, Form, redirect, useActionData, useLoaderData } from "react-router
 import { Check, Copy, KeyRound, Shield, ShieldAlert } from "lucide-react";
 import * as QRCode from "qrcode";
 import { useState } from "react";
-import { z } from "zod/v4";
 import {
   twoFAVerificationType,
   twoFAVerifyVerificationType,
@@ -19,16 +18,13 @@ import {
   handleTwoFAVerification,
 } from "~/lib/auth/verification.server";
 import { generateRecoveryCodes } from "~/services/recovery-codes.server";
+import { twoFASetupSchema as verifySchema } from "~/lib/schemas/auth";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import type { Route } from "./+types/2fa-setup";
-
-const verifySchema = z.object({
-  code: z.string({ error: "Code is required" }).min(6, "Code must be 6 digits").max(6, "Code must be 6 digits"),
-});
 
 export async function loader({ request }: Route.LoaderArgs) {
   const verifySession = await getVerifySession(request);

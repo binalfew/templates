@@ -1,7 +1,6 @@
 import { useForm, getFormProps, getInputProps } from "@conform-to/react";
 import { parseWithZod } from "@conform-to/zod/v4";
 import { data, Form, Link, redirect, useParams } from "react-router";
-import { z } from "zod/v4";
 import { ShieldCheck, ArrowLeft } from "lucide-react";
 import { prisma } from "~/lib/db/db.server";
 import { logger } from "~/lib/monitoring/logger.server";
@@ -11,17 +10,13 @@ import {
   destroyVerifySession,
   prepareVerification,
 } from "~/lib/auth/verification.server";
+import { verifyProfileEmailSchema as verifySchema } from "~/lib/schemas/profile";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
 import type { Route } from "./+types/verify-email";
 
 export const handle = { breadcrumb: "Verify Email" };
-
-const verifySchema = z.object({
-  code: z.string({ error: "Code is required" }).min(6, "Code must be 6 characters").max(6, "Code must be 6 characters"),
-  intent: z.enum(["verify", "resend"]),
-});
 
 export async function loader({ request, params }: Route.LoaderArgs) {
   const verifySession = await getVerifySession(request);

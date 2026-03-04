@@ -2,20 +2,16 @@ import { useForm, getFormProps, getInputProps } from "@conform-to/react";
 import { parseWithZod } from "@conform-to/zod/v4";
 import { data, Form, Link, redirect } from "react-router";
 import { useTranslation } from "react-i18next";
-import { z } from "zod/v4";
 import { unverifiedSessionIdKey } from "~/lib/auth/2fa-constants";
 import { prisma } from "~/lib/db/db.server";
 import { getVerifySession, handleTwoFAVerification } from "~/lib/auth/verification.server";
 import { validateRecoveryCode } from "~/services/recovery-codes.server";
+import { twoFARecoverySchema as recoverySchema } from "~/lib/schemas/auth";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import type { Route } from "./+types/2fa-recovery";
-
-const recoverySchema = z.object({
-  code: z.string({ error: "Recovery code is required" }).min(1, "Recovery code is required"),
-});
 
 export async function loader({ request }: Route.LoaderArgs) {
   const verifySession = await getVerifySession(request);

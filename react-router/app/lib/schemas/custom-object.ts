@@ -37,3 +37,26 @@ export const updateCustomObjectSchema = z.object({
 });
 
 export type UpdateCustomObjectInput = z.infer<typeof updateCustomObjectSchema>;
+
+// ─── Add Field (inline on object detail page) ──────────
+
+const ADD_FIELD_DATA_TYPES = ["TEXT", "NUMBER", "BOOLEAN", "DATE", "EMAIL", "URL", "PHONE"] as const;
+
+export const addFieldSchema = z.object({
+  fieldName: z
+    .string({ error: "Name is required" })
+    .min(1, "Name is required")
+    .max(50, "Name must be at most 50 characters")
+    .regex(
+      /^[a-z][a-z0-9_]*$/,
+      "Must start with a letter and contain only lowercase letters, numbers, and underscores",
+    ),
+  fieldLabel: z
+    .string({ error: "Label is required" })
+    .min(1, "Label is required")
+    .max(100, "Label must be at most 100 characters"),
+  fieldType: z.enum(ADD_FIELD_DATA_TYPES),
+  fieldRequired: z.string().optional(),
+});
+
+export { ADD_FIELD_DATA_TYPES };

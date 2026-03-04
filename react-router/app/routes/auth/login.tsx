@@ -2,7 +2,6 @@ import { useForm, getFormProps, getInputProps } from "@conform-to/react";
 import { parseWithZod } from "@conform-to/zod/v4";
 import { data, Form, Link, redirect, useActionData } from "react-router";
 import { useTranslation } from "react-i18next";
-import { z } from "zod/v4";
 import { twoFAVerificationType, unverifiedSessionIdKey } from "~/lib/auth/2fa-constants";
 import { verifyPassword } from "~/lib/auth/auth.server";
 import { prisma } from "~/lib/db/db.server";
@@ -12,17 +11,12 @@ import { logger } from "~/lib/monitoring/logger.server";
 import { getUserId, getDefaultRedirect, createUserSession, generateFingerprint } from "~/lib/auth/session.server";
 import { verifySessionStorage } from "~/lib/auth/verification.server";
 import { isUserRequired2FA, hasUserSetUp2FA } from "~/services/2fa-enforcement.server";
+import { loginSchema } from "~/lib/schemas/auth";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import type { Route } from "./+types/login";
-
-const loginSchema = z.object({
-  email: z.email("Please enter a valid email address"),
-  password: z.string({ error: "Password is required" }).min(1, "Password is required"),
-  redirectTo: z.string().optional(),
-});
 
 export async function loader({ request }: Route.LoaderArgs) {
   const userId = await getUserId(request);

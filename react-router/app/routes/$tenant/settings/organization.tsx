@@ -1,12 +1,11 @@
 import { data, redirect, useActionData, useLoaderData, Form } from "react-router";
 import { useForm, getFormProps, getInputProps } from "@conform-to/react";
 import { parseWithZod } from "@conform-to/zod/v4";
-import { z } from "zod/v4";
-
 import { requireAnyRole } from "~/lib/auth/require-auth.server";
 import { resolveTenant } from "~/lib/tenant.server";
 import { updateTenant } from "~/services/tenants.server";
 import { handleServiceError } from "~/lib/errors/handle-service-error.server";
+import { organizationSchema } from "~/lib/schemas/organization";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
@@ -17,20 +16,6 @@ import { buildServiceContext } from "~/lib/request-context.server";
 import type { Route } from "./+types/organization";
 
 export const handle = { breadcrumb: "Organization" };
-
-const organizationSchema = z.object({
-  name: z.string({ error: "Name is required" }).min(1, "Name is required").max(200),
-  email: z.email("Valid email is required"),
-  phone: z.string({ error: "Phone is required" }).min(1, "Phone is required"),
-  website: z.string().optional(),
-  address: z.string().optional(),
-  city: z.string().optional(),
-  state: z.string().optional(),
-  zip: z.string().optional(),
-  country: z.string().optional(),
-  logoUrl: z.string().optional(),
-  brandTheme: z.string().optional(),
-});
 
 export async function loader({ request, params }: Route.LoaderArgs) {
   await requireAnyRole(request, ["ADMIN", "TENANT_ADMIN"]);
