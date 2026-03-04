@@ -39,6 +39,7 @@ interface UpdateApiKeyInput {
 
 interface ListApiKeysFilters {
   status?: "ACTIVE" | "ROTATED" | "REVOKED" | "EXPIRED";
+  search?: string;
   page?: number;
   pageSize?: number;
 }
@@ -50,6 +51,29 @@ export interface ValidatedApiKey {
   rateLimitTier: string;
   rateLimitCustom: number | null;
 }
+
+// ─── Shared Select ────────────────────────────────────────
+
+const API_KEY_SELECT = {
+  id: true,
+  name: true,
+  description: true,
+  keyPrefix: true,
+  permissions: true,
+  rateLimitTier: true,
+  rateLimitCustom: true,
+  status: true,
+  expiresAt: true,
+  lastUsedAt: true,
+  lastUsedIp: true,
+  usageCount: true,
+  allowedIps: true,
+  allowedOrigins: true,
+  createdBy: true,
+  createdAt: true,
+  updatedAt: true,
+  revokedAt: true,
+} as const;
 
 // ─── Key Generation ───────────────────────────────────────
 
@@ -114,31 +138,18 @@ export async function listApiKeys(tenantId: string, filters?: ListApiKeysFilters
   const where = {
     tenantId,
     ...(filters?.status && { status: filters.status }),
+    ...(filters?.search && {
+      OR: [
+        { name: { contains: filters.search, mode: "insensitive" as const } },
+        { description: { contains: filters.search, mode: "insensitive" as const } },
+      ],
+    }),
   };
 
   const [items, total] = await Promise.all([
     prisma.apiKey.findMany({
       where,
-      select: {
-        id: true,
-        name: true,
-        description: true,
-        keyPrefix: true,
-        permissions: true,
-        rateLimitTier: true,
-        rateLimitCustom: true,
-        status: true,
-        expiresAt: true,
-        lastUsedAt: true,
-        lastUsedIp: true,
-        usageCount: true,
-        allowedIps: true,
-        allowedOrigins: true,
-        createdBy: true,
-        createdAt: true,
-        updatedAt: true,
-        revokedAt: true,
-      },
+      select: API_KEY_SELECT,
       orderBy: { createdAt: "desc" },
       skip,
       take: pageSize,
@@ -155,26 +166,7 @@ export async function listApiKeys(tenantId: string, filters?: ListApiKeysFilters
 export async function getApiKey(id: string, tenantId: string) {
   return prisma.apiKey.findFirst({
     where: { id, tenantId },
-    select: {
-      id: true,
-      name: true,
-      description: true,
-      keyPrefix: true,
-      permissions: true,
-      rateLimitTier: true,
-      rateLimitCustom: true,
-      status: true,
-      expiresAt: true,
-      lastUsedAt: true,
-      lastUsedIp: true,
-      usageCount: true,
-      allowedIps: true,
-      allowedOrigins: true,
-      createdBy: true,
-      createdAt: true,
-      updatedAt: true,
-      revokedAt: true,
-    },
+    select: API_KEY_SELECT,
   });
 }
 
