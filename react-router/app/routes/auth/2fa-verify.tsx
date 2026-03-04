@@ -12,7 +12,7 @@ import { Label } from "~/components/ui/label";
 import type { Route } from "./+types/2fa-verify";
 
 const twoFASchema = z.object({
-  code: z.string().min(6, "Code must be 6 digits").max(6, "Code must be 6 digits"),
+  code: z.string({ error: "Code is required" }).min(6, "Code must be 6 digits").max(6, "Code must be 6 digits"),
 });
 
 export async function loader({ request }: Route.LoaderArgs) {

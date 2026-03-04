@@ -14,7 +14,7 @@ import { Label } from "~/components/ui/label";
 import type { Route } from "./+types/2fa-recovery";
 
 const recoverySchema = z.object({
-  code: z.string().min(1, "Recovery code is required"),
+  code: z.string({ error: "Recovery code is required" }).min(1, "Recovery code is required"),
 });
 
 export async function loader({ request }: Route.LoaderArgs) {

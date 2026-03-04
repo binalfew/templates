@@ -18,9 +18,9 @@ import type { Route } from "./+types/index";
 export const handle = { breadcrumb: "Profile" };
 
 const profileSchema = z.object({
-  name: z.string().min(1, "Name is required").max(200),
+  name: z.string({ error: "Name is required" }).min(1, "Name is required").max(200),
   username: z
-    .string()
+    .string({ error: "Username is required" })
     .min(3, "Username must be at least 3 characters")
     .max(50)
     .regex(/^[a-zA-Z0-9_-]+$/, "Only letters, numbers, hyphens, and underscores"),

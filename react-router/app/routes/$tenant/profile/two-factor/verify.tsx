@@ -22,7 +22,7 @@ import type { Route } from "./+types/verify";
 export const handle = { breadcrumb: "Verify Setup" };
 
 const verifySchema = z.object({
-  code: z.string().min(6, "Code must be 6 digits").max(6, "Code must be 6 digits"),
+  code: z.string({ error: "Code is required" }).min(6, "Code must be 6 digits").max(6, "Code must be 6 digits"),
   intent: z.enum(["verify", "cancel"]),
 });
 

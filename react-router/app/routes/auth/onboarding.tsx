@@ -20,7 +20,7 @@ const onboardingSchema = z
     username: SignupUsernameSchema,
     name: SignupNameSchema,
     password: SignupPasswordSchema,
-    confirmPassword: z.string(),
+    confirmPassword: z.string({ error: "Please confirm your password" }).min(1, "Please confirm your password"),
     agreeToTerms: z.preprocess(
       (v) => v === "on" || v === true,
       z.boolean().refine((v) => v === true, "You must agree to the terms"),

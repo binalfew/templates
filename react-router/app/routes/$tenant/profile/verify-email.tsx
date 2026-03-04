@@ -19,7 +19,7 @@ import type { Route } from "./+types/verify-email";
 export const handle = { breadcrumb: "Verify Email" };
 
 const verifySchema = z.object({
-  code: z.string().min(6, "Code must be 6 characters").max(6, "Code must be 6 characters"),
+  code: z.string({ error: "Code is required" }).min(6, "Code must be 6 characters").max(6, "Code must be 6 characters"),
   intent: z.enum(["verify", "resend"]),
 });
 

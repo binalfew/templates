@@ -19,9 +19,9 @@ import type { Route } from "./+types/organization";
 export const handle = { breadcrumb: "Organization" };
 
 const organizationSchema = z.object({
-  name: z.string().min(1, "Name is required").max(200),
+  name: z.string({ error: "Name is required" }).min(1, "Name is required").max(200),
   email: z.email("Valid email is required"),
-  phone: z.string().min(1, "Phone is required"),
+  phone: z.string({ error: "Phone is required" }).min(1, "Phone is required"),
   website: z.string().optional(),
   address: z.string().optional(),
   city: z.string().optional(),

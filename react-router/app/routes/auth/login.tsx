@@ -20,7 +20,7 @@ import type { Route } from "./+types/login";
 
 const loginSchema = z.object({
   email: z.email("Please enter a valid email address"),
-  password: z.string().min(1, "Password is required"),
+  password: z.string({ error: "Password is required" }).min(1, "Password is required"),
   redirectTo: z.string().optional(),
 });
 
