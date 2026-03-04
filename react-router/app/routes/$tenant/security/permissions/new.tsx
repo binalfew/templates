@@ -35,7 +35,7 @@ export async function action({ request, params }: Route.ActionArgs) {
   try {
     await createPermission(submission.value, ctx);
     const redirectTo = new URL(request.url).searchParams.get("redirectTo");
-    return redirect(redirectTo || `/${params.tenant}/permissions`);
+    return redirect(redirectTo || `/${params.tenant}/security/permissions`);
   } catch (error) {
     return handleServiceError(error, { submission });
   }
@@ -45,7 +45,7 @@ export default function NewPermissionPage() {
   const actionData = useActionData<typeof action>();
   const basePrefix = useBasePrefix();
   const [searchParams] = useSearchParams();
-  const cancelUrl = searchParams.get("redirectTo") || `${basePrefix}/permissions`;
+  const cancelUrl = searchParams.get("redirectTo") || `${basePrefix}/security/permissions`;
 
   const [form, fields] = useForm({
     lastResult: actionData?.result,

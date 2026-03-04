@@ -54,19 +54,19 @@ export default function UserDetailPage() {
         </div>
         <div className="flex gap-2">
           <Button variant="outline" size="sm" asChild>
-            <Link to={`${base}/users`}>
+            <Link to={`${base}/security/users`}>
               <ArrowLeft className="mr-1.5 size-3.5" />
               Back
             </Link>
           </Button>
           <Button variant="outline" size="sm" asChild>
-            <Link to={`${base}/users/${targetUser.id}/edit`}>
+            <Link to={`${base}/security/users/${targetUser.id}/edit`}>
               <Pencil className="mr-1.5 size-3.5" />
               Edit
             </Link>
           </Button>
           <Button variant="outline" size="sm" asChild>
-            <Link to={`${base}/users/${targetUser.id}/delete`} className="text-destructive">
+            <Link to={`${base}/security/users/${targetUser.id}/delete`} className="text-destructive">
               <Trash2 className="mr-1.5 size-3.5" />
               Delete
             </Link>

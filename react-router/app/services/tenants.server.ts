@@ -83,13 +83,7 @@ export async function getTenantDetail(id: string) {
     throw new TenantError("Tenant not found", 404);
   }
 
-  const recentAuditLogs = await prisma.auditLog.findMany({
-    where: { entityType: "Tenant", entityId: id },
-    orderBy: { createdAt: "desc" },
-    take: 5,
-  });
-
-  return { tenant, recentAuditLogs };
+  return { tenant };
 }
 
 interface CreateTenantInput {

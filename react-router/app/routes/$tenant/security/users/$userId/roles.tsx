@@ -50,7 +50,7 @@ export default function UserRolesPage() {
   const actionData = useActionData<typeof action>();
   const basePrefix = useBasePrefix();
   const [searchParams] = useSearchParams();
-  const cancelUrl = searchParams.get("redirectTo") || `${basePrefix}/users`;
+  const cancelUrl = searchParams.get("redirectTo") || `${basePrefix}/security/users`;
 
   return (
     <div className="space-y-6">

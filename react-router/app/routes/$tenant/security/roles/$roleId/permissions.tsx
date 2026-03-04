@@ -73,7 +73,7 @@ export default function RolePermissionsPage() {
   const actionData = useActionData<typeof action>();
   const basePrefix = useBasePrefix();
   const [searchParams] = useSearchParams();
-  const cancelUrl = searchParams.get("redirectTo") || `${basePrefix}/roles`;
+  const cancelUrl = searchParams.get("redirectTo") || `${basePrefix}/security/roles`;
 
   const [assignments, setAssignments] = useState<Map<string, string>>(
     () => new Map(Object.entries(currentAssignments)),

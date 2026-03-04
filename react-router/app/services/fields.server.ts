@@ -4,7 +4,7 @@ import { FIELD_LIMITS } from "~/config/fields";
 import { ConflictError, isPrismaNotFoundError } from "~/services/optimistic-lock.server";
 import type { CreateFieldInput, UpdateFieldInput, ReorderFieldsInput } from "~/lib/schemas/field";
 
-import type { TenantServiceContext } from "~/lib/types.server";
+import type { TenantServiceContext, PaginatedQueryOptions } from "~/lib/types.server";
 import { ServiceError } from "~/lib/errors/service-error.server";
 
 export async function listFields(
@@ -32,6 +32,33 @@ export async function listFields(
   });
 
   return fields;
+}
+
+export async function listFieldsPaginated(
+  tenantId: string,
+  options: PaginatedQueryOptions & { dataType?: string; search?: string },
+) {
+  const where: Record<string, unknown> = { tenantId, ...(options.where ?? {}) };
+
+  if (options.dataType) where.dataType = options.dataType;
+  if (options.search) {
+    where.OR = [
+      { name: { contains: options.search, mode: "insensitive" } },
+      { label: { contains: options.search, mode: "insensitive" } },
+    ];
+  }
+
+  const [items, totalCount] = await Promise.all([
+    prisma.fieldDefinition.findMany({
+      where,
+      orderBy: { sortOrder: "asc" },
+      skip: (options.page - 1) * options.pageSize,
+      take: options.pageSize,
+    }),
+    prisma.fieldDefinition.count({ where }),
+  ]);
+
+  return { items, totalCount };
 }
 
 export async function createField(input: CreateFieldInput, ctx: TenantServiceContext) {
@@ -218,7 +245,7 @@ export async function deleteField(
 
   // Check if any record has data for this field (unless force)
   if (!options.force) {
-    const dataCount = await getFieldDataCount(id, ctx.tenantId);
+    const dataCount = await getFieldDataCount(existing.name, ctx.tenantId);
     if (dataCount > 0) {
       throw new FieldError(
         `Cannot delete: ${dataCount} record(s) have data for this field. Use force=true to delete anyway.`,
@@ -288,19 +315,25 @@ export async function reorderFields(input: ReorderFieldsInput, ctx: TenantServic
   return { success: true };
 }
 
-export async function getFieldDataCount(fieldId: string, tenantId: string): Promise<number> {
+export async function getField(id: string, tenantId: string) {
   const field = await prisma.fieldDefinition.findFirst({
-    where: { id: fieldId, tenantId },
-    select: { name: true, entityType: true },
+    where: { id, tenantId },
   });
-  if (!field) return 0;
+  if (!field) {
+    throw new FieldError("Field not found", 404);
+  }
+  return field;
+}
 
-  // Generic query against User table extras column as a default
+export async function getFieldDataCount(
+  fieldName: string,
+  tenantId: string,
+): Promise<number> {
   try {
     const result = await prisma.$queryRawUnsafe<{ count: bigint }[]>(
       `SELECT COUNT(*) as count FROM "User" WHERE "tenantId" = $1 AND extras ? $2`,
       tenantId,
-      field.name,
+      fieldName,
     );
     return result[0] ? Number(result[0].count) : 0;
   } catch {

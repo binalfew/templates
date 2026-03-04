@@ -2,9 +2,7 @@ import type { LucideIcon } from "lucide-react";
 import {
   LayoutDashboard,
   Building2,
-  Users,
   Shield,
-  KeyRound,
   Settings,
   BarChart3,
   ClipboardList,
@@ -91,27 +89,6 @@ export function buildNavigationGroups(basePrefix: string): NavGroup[] {
           icon: Building2,
           roles: ["ADMIN"],
         },
-        {
-          title: "Users",
-          tKey: "users",
-          url: `${basePrefix}/users`,
-          icon: Users,
-          roles: ["ADMIN", "TENANT_ADMIN"],
-        },
-        {
-          title: "Roles",
-          tKey: "roles",
-          url: `${basePrefix}/roles`,
-          icon: Shield,
-          roles: ["ADMIN"],
-        },
-        {
-          title: "Permissions",
-          tKey: "permissions",
-          url: `${basePrefix}/permissions`,
-          icon: KeyRound,
-          roles: ["ADMIN"],
-        },
       ],
     },
     {
@@ -159,6 +136,13 @@ export function buildNavigationGroups(basePrefix: string): NavGroup[] {
       label: "Administration",
       tKey: "administration",
       items: [
+        {
+          title: "Security",
+          tKey: "security",
+          url: `${basePrefix}/security`,
+          icon: Shield,
+          roles: ["ADMIN", "TENANT_ADMIN"],
+        },
         {
           title: "Logs",
           tKey: "auditLogs",
@@ -266,6 +250,40 @@ export function getVisibleSettingsChildren(
   enabledFeatures?: Record<string, boolean>,
 ): NavChild[] {
   return buildSettingsChildren(basePrefix).filter((child) =>
+    isVisibleEntry(child, roles, enabledFeatures),
+  );
+}
+
+export function buildSecurityChildren(basePrefix: string): NavChild[] {
+  return [
+    {
+      title: "Users",
+      tKey: "users",
+      url: `${basePrefix}/security/users`,
+      end: true,
+      roles: ["ADMIN", "TENANT_ADMIN"],
+    },
+    {
+      title: "Roles",
+      tKey: "roles",
+      url: `${basePrefix}/security/roles`,
+      roles: ["ADMIN"],
+    },
+    {
+      title: "Permissions",
+      tKey: "permissions",
+      url: `${basePrefix}/security/permissions`,
+      roles: ["ADMIN"],
+    },
+  ];
+}
+
+export function getVisibleSecurityChildren(
+  roles: string[],
+  basePrefix = "/admin",
+  enabledFeatures?: Record<string, boolean>,
+): NavChild[] {
+  return buildSecurityChildren(basePrefix).filter((child) =>
     isVisibleEntry(child, roles, enabledFeatures),
   );
 }

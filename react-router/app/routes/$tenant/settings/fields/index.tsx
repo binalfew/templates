@@ -1,67 +1,52 @@
-import { data, Form, Link, redirect, useLoaderData, useSearchParams } from "react-router";
-import { invariantResponse } from "@epic-web/invariant";
+import { data, Link, redirect, useLoaderData } from "react-router";
+import { Columns3, Pencil, Plus, Trash2 } from "lucide-react";
 
 export const handle = { breadcrumb: "Fields" };
 
-import { requirePermission, requireFeature } from "~/lib/auth/require-auth.server";
+import { requireFeature } from "~/lib/auth/require-auth.server";
 import { FEATURE_FLAG_KEYS } from "~/lib/config/feature-flags.server";
 import {
   listFields,
+  listFieldsPaginated,
   deleteField,
   reorderFields,
-  getFieldDataCount,
 } from "~/services/fields.server";
 import { handleServiceError } from "~/lib/errors/handle-service-error.server";
-import { Button } from "~/components/ui/button";
-import { NativeSelect, NativeSelectOption } from "~/components/ui/native-select";
-import { Separator } from "~/components/ui/separator";
-import { FieldTable } from "~/components/fields/FieldTable";
+import { formatDataType } from "~/components/fields/+utils";
+import { FIELD_DATA_TYPES } from "~/lib/schemas/field";
+import { Badge } from "~/components/ui/badge";
+import { DataTable } from "~/components/data-table/data-table";
+import type { ColumnDef, FilterDef, PaginationMeta } from "~/components/data-table/data-table-types";
 import { useBasePrefix } from "~/hooks/use-base-prefix";
 import { buildServiceContext } from "~/lib/request-context.server";
 import type { Route } from "./+types/index";
 
-const FIELD_DATA_TYPES = [
-  "TEXT",
-  "LONG_TEXT",
-  "NUMBER",
-  "BOOLEAN",
-  "DATE",
-  "DATETIME",
-  "ENUM",
-  "MULTI_ENUM",
-  "EMAIL",
-  "URL",
-  "PHONE",
-  "FILE",
-  "IMAGE",
-  "REFERENCE",
-  "FORMULA",
-  "JSON",
-] as const;
-
 export async function loader({ request }: Route.LoaderArgs) {
-  await requirePermission(request, "custom-field", "manage");
   const { tenantId } = await requireFeature(request, FEATURE_FLAG_KEYS.CUSTOM_FIELDS);
 
   const url = new URL(request.url);
+  const page = Math.max(1, Number(url.searchParams.get("page")) || 1);
+  const pageSize = Math.max(1, Number(url.searchParams.get("pageSize")) || 10);
   const dataType = url.searchParams.get("dataType") || undefined;
+  const q = url.searchParams.get("q")?.trim() || "";
 
-  const fields = await listFields(tenantId, {
+  const { items: fields, totalCount } = await listFieldsPaginated(tenantId, {
     dataType,
+    search: q || undefined,
+    page,
+    pageSize,
   });
 
-  const dataCounts: Record<string, number> = {};
-  for (const field of fields) {
-    dataCounts[field.id] = await getFieldDataCount(field.id, tenantId);
-  }
+  const totalPages = Math.ceil(totalCount / pageSize);
 
-  return { fields, dataCounts };
+  return {
+    fields,
+    pagination: { page, pageSize, totalCount, totalPages } satisfies PaginationMeta,
+  };
 }
 
 export async function action({ request, params }: Route.ActionArgs) {
-  const { user } = await requirePermission(request, "custom-field", "manage");
-  const tenantId = user.tenantId;
-  invariantResponse(tenantId, "User is not associated with a tenant", { status: 403 });
+  const { user, tenantId } = await requireFeature(request, FEATURE_FLAG_KEYS.CUSTOM_FIELDS);
 
   const formData = await request.formData();
   const _action = formData.get("_action");
@@ -104,65 +89,118 @@ export async function action({ request, params }: Route.ActionArgs) {
   }
 }
 
+type FieldRow = Awaited<ReturnType<typeof loader>>["fields"][number];
+
 export default function FieldsListPage() {
-  const { fields, dataCounts } = useLoaderData<typeof loader>();
-  const [searchParams] = useSearchParams();
-  const basePrefix = useBasePrefix();
+  const { fields, pagination } = useLoaderData<typeof loader>();
+  const base = useBasePrefix();
+
+  const columns: ColumnDef<FieldRow>[] = [
+    {
+      id: "label",
+      header: "Label",
+      cell: (row) => (
+        <div className="flex items-center gap-2">
+          <Columns3 className="size-4 text-muted-foreground shrink-0" />
+          <Link to={`${base}/settings/fields/${row.id}`} className="hover:underline">
+            {row.label}
+          </Link>
+        </div>
+      ),
+      cellClassName: "font-medium text-foreground",
+    },
+    {
+      id: "name",
+      header: "Name",
+      cell: "name",
+      cellClassName: "text-muted-foreground",
+      hideOnMobile: true,
+    },
+    {
+      id: "dataType",
+      header: "Type",
+      cell: (row) => <Badge variant="secondary">{formatDataType(row.dataType)}</Badge>,
+    },
+    {
+      id: "entityType",
+      header: "Entity",
+      cell: (row) => <span className="text-xs text-muted-foreground">{row.entityType}</span>,
+      hideOnMobile: true,
+    },
+    {
+      id: "isRequired",
+      header: "Required",
+      align: "center",
+      cell: (row) =>
+        row.isRequired ? (
+          <span className="text-green-600">&#10003;</span>
+        ) : (
+          <span className="text-muted-foreground">&mdash;</span>
+        ),
+    },
+    {
+      id: "isSearchable",
+      header: "Searchable",
+      align: "center",
+      cell: (row) =>
+        row.isSearchable ? (
+          <span className="text-green-600">&#10003;</span>
+        ) : (
+          <span className="text-muted-foreground">&mdash;</span>
+        ),
+      hideOnMobile: true,
+    },
+  ];
+
+  const filters: FilterDef[] = [
+    {
+      paramKey: "dataType",
+      label: "Data Type",
+      placeholder: "All types",
+      options: FIELD_DATA_TYPES.map((dt) => ({
+        label: dt.replace(/_/g, " "),
+        value: dt,
+      })),
+    },
+  ];
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-2xl font-bold text-foreground">Fields</h2>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Define custom fields for your entities. {fields.length} field
-            {fields.length !== 1 ? "s" : ""} defined.
-          </p>
-        </div>
-        <Link to={`${basePrefix}/settings/fields/new`}>
-          <Button>Add Field</Button>
-        </Link>
+      <div>
+        <h2 className="text-2xl font-bold text-foreground">Fields</h2>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Define custom fields for your entities.
+        </p>
       </div>
 
-      <Separator />
-
-      <Form method="get" className="flex flex-wrap items-end gap-4">
-        <div>
-          <label
-            htmlFor="dataType"
-            className="mb-1 block text-xs font-medium text-muted-foreground"
-          >
-            Data Type
-          </label>
-          <NativeSelect
-            id="dataType"
-            name="dataType"
-            defaultValue={searchParams.get("dataType") ?? ""}
-          >
-            <NativeSelectOption value="">All types</NativeSelectOption>
-            {FIELD_DATA_TYPES.map((dt) => (
-              <NativeSelectOption key={dt} value={dt}>
-                {dt.replace(/_/g, " ")}
-              </NativeSelectOption>
-            ))}
-          </NativeSelect>
-        </div>
-        <Button type="submit" variant="secondary" size="sm">
-          Filter
-        </Button>
-        {searchParams.get("dataType") && (
-          <Link
-            to={`${basePrefix}/settings/fields`}
-            className="text-sm text-muted-foreground hover:text-foreground"
-          >
-            Clear filters
-          </Link>
-        )}
-      </Form>
-
-      <div className="rounded-lg border bg-card">
-        <FieldTable fields={fields} dataCounts={dataCounts} />
-      </div>
+      <DataTable
+        data={fields}
+        columns={columns}
+        searchConfig={{ placeholder: "Search fields..." }}
+        filters={filters}
+        toolbarActions={[
+          { label: "Add Field", icon: Plus, href: `${base}/settings/fields/new` },
+        ]}
+        rowActions={[
+          {
+            label: "Edit",
+            icon: Pencil,
+            href: (row) => `${base}/settings/fields/${row.id}/edit`,
+          },
+          {
+            label: "Delete",
+            icon: Trash2,
+            href: (row) => `${base}/settings/fields/${row.id}/delete`,
+            variant: "destructive",
+          },
+        ]}
+        pagination={pagination}
+        emptyState={{
+          icon: Columns3,
+          title: "No fields found",
+          description: "Custom fields will appear here once they are created.",
+        }}
+      />
     </div>
   );
 }

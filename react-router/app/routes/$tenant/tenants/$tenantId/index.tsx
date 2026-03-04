@@ -11,7 +11,6 @@ import {
   Users,
   Shield,
   ExternalLink,
-  Clock,
 } from "lucide-react";
 
 export const handle = { breadcrumb: "Details" };
@@ -28,8 +27,8 @@ import type { Route } from "./+types/index";
 export async function loader({ request, params }: Route.LoaderArgs) {
   await requireAnyRole(request, ["ADMIN"]);
 
-  const { tenant, recentAuditLogs } = await getTenantDetail(params.tenantId);
-  return { tenant, recentAuditLogs };
+  const { tenant } = await getTenantDetail(params.tenantId);
+  return { tenant };
 }
 
 const planVariant: Record<string, "default" | "secondary" | "outline"> = {
@@ -40,7 +39,7 @@ const planVariant: Record<string, "default" | "secondary" | "outline"> = {
 };
 
 export default function TenantDetailPage() {
-  const { tenant, recentAuditLogs } = useLoaderData<typeof loader>();
+  const { tenant } = useLoaderData<typeof loader>();
   const basePrefix = useBasePrefix();
 
   const brandLabel =
@@ -54,28 +53,9 @@ export default function TenantDetailPage() {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-start justify-between">
-        <div className="flex items-start gap-4">
-          <div className="flex size-14 shrink-0 items-center justify-center rounded-xl border bg-muted overflow-hidden">
-            {tenant.logoUrl ? (
-              <img
-                src={tenant.logoUrl}
-                alt={tenant.name}
-                className="size-full object-contain p-1"
-              />
-            ) : (
-              <Building2 className="size-7 text-muted-foreground" />
-            )}
-          </div>
-          <div>
-            <h2 className="text-2xl font-bold text-foreground">{tenant.name}</h2>
-            <p className="text-sm text-muted-foreground">/{tenant.slug}</p>
-            <Badge
-              variant={planVariant[tenant.subscriptionPlan] ?? "outline"}
-              className="mt-1 capitalize"
-            >
-              {tenant.subscriptionPlan}
-            </Badge>
-          </div>
+        <div className="flex items-center gap-3">
+          <Building2 className="size-5 text-muted-foreground shrink-0" />
+          <h2 className="text-2xl font-bold text-foreground">{tenant.name}</h2>
         </div>
         <div className="flex gap-2">
           <Button variant="outline" size="sm" asChild>
@@ -100,6 +80,28 @@ export default function TenantDetailPage() {
       </div>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+        {/* General Info */}
+        <Card>
+          <CardHeader>
+            <CardTitle>General Info</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3 text-sm">
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">Slug</span>
+              <span className="font-mono text-xs">/{tenant.slug}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">Subscription Plan</span>
+              <Badge
+                variant={planVariant[tenant.subscriptionPlan] ?? "outline"}
+                className="capitalize"
+              >
+                {tenant.subscriptionPlan}
+              </Badge>
+            </div>
+          </CardContent>
+        </Card>
+
         {/* Contact Information */}
         <Card>
           <CardHeader>
@@ -147,7 +149,7 @@ export default function TenantDetailPage() {
           <CardContent>
             <div className="grid grid-cols-2 gap-4">
               <Link
-                to={`${basePrefix}/users`}
+                to={`${basePrefix}/security/users`}
                 className="rounded-lg border p-4 text-center hover:bg-muted/50 transition-colors"
               >
                 <Users className="mx-auto size-5 text-muted-foreground" />
@@ -155,7 +157,7 @@ export default function TenantDetailPage() {
                 <p className="text-xs text-muted-foreground">Users</p>
               </Link>
               <Link
-                to={`${basePrefix}/roles`}
+                to={`${basePrefix}/security/roles`}
                 className="rounded-lg border p-4 text-center hover:bg-muted/50 transition-colors"
               >
                 <Shield className="mx-auto size-5 text-muted-foreground" />
@@ -171,48 +173,19 @@ export default function TenantDetailPage() {
           <CardHeader>
             <CardTitle>Branding</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-3">
-            <div className="flex items-center gap-3">
-              <span className="text-sm text-muted-foreground">Theme:</span>
-              <Badge variant="secondary">{brandLabel}</Badge>
-            </div>
+          <CardContent className="space-y-3 text-sm">
             {tenant.logoUrl && (
-              <div>
-                <span className="text-sm text-muted-foreground">Logo:</span>
-                <div className="mt-2 inline-flex size-16 items-center justify-center rounded-lg border bg-muted overflow-hidden">
-                  <img src={tenant.logoUrl} alt="Logo" className="size-full object-contain p-1" />
+              <div className="flex justify-between items-center">
+                <span className="text-muted-foreground">Logo</span>
+                <div className="size-10 rounded-md border bg-muted overflow-hidden">
+                  <img src={tenant.logoUrl} alt="Logo" className="size-full object-contain p-0.5" />
                 </div>
               </div>
             )}
-          </CardContent>
-        </Card>
-
-        {/* Recent Activity */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Recent Activity</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {recentAuditLogs.length === 0 ? (
-              <p className="text-sm text-muted-foreground">No activity recorded yet.</p>
-            ) : (
-              <div className="space-y-3">
-                {recentAuditLogs.map((log) => (
-                  <div key={log.id} className="flex items-start gap-3 text-sm">
-                    <Clock className="size-4 text-muted-foreground shrink-0 mt-0.5" />
-                    <div className="min-w-0 flex-1">
-                      <p className="text-foreground">{log.description}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {new Date(log.createdAt).toLocaleString()}
-                      </p>
-                    </div>
-                    <Badge variant="outline" className="shrink-0 text-xs">
-                      {log.action}
-                    </Badge>
-                  </div>
-                ))}
-              </div>
-            )}
+            <div className="flex justify-between items-center">
+              <span className="text-muted-foreground">Theme</span>
+              <Badge variant="secondary">{brandLabel}</Badge>
+            </div>
           </CardContent>
         </Card>
       </div>
@@ -231,13 +204,13 @@ export default function TenantDetailPage() {
               </Link>
             </Button>
             <Button variant="outline" size="sm" asChild>
-              <Link to={`${basePrefix}/users`}>
+              <Link to={`${basePrefix}/security/users`}>
                 <Users className="mr-1.5 size-3.5" />
                 Manage Users
               </Link>
             </Button>
             <Button variant="outline" size="sm" asChild>
-              <Link to={`${basePrefix}/roles`}>
+              <Link to={`${basePrefix}/security/roles`}>
                 <Shield className="mr-1.5 size-3.5" />
                 Manage Roles
               </Link>

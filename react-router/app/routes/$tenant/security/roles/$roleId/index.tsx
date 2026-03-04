@@ -45,19 +45,19 @@ export default function RoleDetailPage() {
         </div>
         <div className="flex gap-2">
           <Button variant="outline" size="sm" asChild>
-            <Link to={`${base}/roles`}>
+            <Link to={`${base}/security/roles`}>
               <ArrowLeft className="mr-1.5 size-3.5" />
               Back
             </Link>
           </Button>
           <Button variant="outline" size="sm" asChild>
-            <Link to={`${base}/roles/${role.id}/edit`}>
+            <Link to={`${base}/security/roles/${role.id}/edit`}>
               <Pencil className="mr-1.5 size-3.5" />
               Edit
             </Link>
           </Button>
           <Button variant="outline" size="sm" asChild>
-            <Link to={`${base}/roles/${role.id}/delete`} className="text-destructive">
+            <Link to={`${base}/security/roles/${role.id}/delete`} className="text-destructive">
               <Trash2 className="mr-1.5 size-3.5" />
               Delete
             </Link>
@@ -74,7 +74,7 @@ export default function RoleDetailPage() {
           <CardContent>
             <div className="grid grid-cols-2 gap-4">
               <Link
-                to={`${base}/roles/${role.id}/permissions`}
+                to={`${base}/security/roles/${role.id}/permissions`}
                 className="rounded-lg border p-4 text-center hover:bg-muted/50 transition-colors"
               >
                 <KeyRound className="mx-auto size-5 text-muted-foreground" />
@@ -120,13 +120,13 @@ export default function RoleDetailPage() {
         <CardContent>
           <div className="flex flex-wrap gap-3">
             <Button variant="outline" size="sm" asChild>
-              <Link to={`${base}/roles/${role.id}/permissions`}>
+              <Link to={`${base}/security/roles/${role.id}/permissions`}>
                 <KeyRound className="mr-1.5 size-3.5" />
                 Manage Permissions
               </Link>
             </Button>
             <Button variant="outline" size="sm" asChild>
-              <Link to={`${base}/roles/${role.id}/edit`}>
+              <Link to={`${base}/security/roles/${role.id}/edit`}>
                 <Pencil className="mr-1.5 size-3.5" />
                 Edit Role
               </Link>

@@ -69,14 +69,14 @@ export async function action({ request }: Route.ActionArgs) {
     throw redirect(redirectTo);
   }
   const base = `/${(await prisma.tenant.findUnique({ where: { id: tenantId }, select: { slug: true } }))?.slug}`;
-  throw redirect(`${base}/users`);
+  throw redirect(`${base}/security/users`);
 }
 
 export default function InviteUserPage({ actionData }: Route.ComponentProps) {
   const { roles } = useLoaderData<typeof loader>();
   const base = useBasePrefix();
   const [searchParams] = useSearchParams();
-  const cancelUrl = searchParams.get("redirectTo") || `${base}/users`;
+  const cancelUrl = searchParams.get("redirectTo") || `${base}/security/users`;
 
   const [form, fields] = useForm({
     lastResult: actionData,

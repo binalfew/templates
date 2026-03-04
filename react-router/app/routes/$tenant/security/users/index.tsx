@@ -104,7 +104,7 @@ export default function UsersListPage() {
       cell: (row) => (
         <div className="flex items-center gap-2">
           <User className="size-4 text-muted-foreground shrink-0" />
-          <Link to={`${base}/users/${row.id}`} className="hover:underline">
+          <Link to={`${base}/security/users/${row.id}`} className="hover:underline">
             {row.name || <span className="text-muted-foreground italic">No name</span>}
           </Link>
         </div>
@@ -223,16 +223,16 @@ export default function UsersListPage() {
         searchConfig={{ placeholder: "Search users..." }}
         toolbarExtra={toolbarExtraNode}
         toolbarActions={[
-          { label: t("inviteUser"), icon: Mail, href: `${base}/users/invite`, variant: "outline" },
-          { label: t("newUser"), icon: Plus, href: `${base}/users/new` },
+          { label: t("inviteUser"), icon: Mail, href: `${base}/security/users/invite`, variant: "outline" },
+          { label: t("newUser"), icon: Plus, href: `${base}/security/users/new` },
         ]}
         rowActions={[
-          { label: "Edit", icon: Pencil, href: (row) => `${base}/users/${row.id}/edit` },
-          { label: "Roles", icon: Shield, href: (row) => `${base}/users/${row.id}/roles` },
+          { label: "Edit", icon: Pencil, href: (row) => `${base}/security/users/${row.id}/edit` },
+          { label: "Roles", icon: Shield, href: (row) => `${base}/security/users/${row.id}/roles` },
           {
             label: "Delete",
             icon: Trash2,
-            href: (row) => `${base}/users/${row.id}/delete`,
+            href: (row) => `${base}/security/users/${row.id}/delete`,
             variant: "destructive",
           },
         ]}

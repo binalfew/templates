@@ -1,15 +1,16 @@
 import { data, redirect, useActionData, useLoaderData, Form, Link, useSearchParams } from "react-router";
-import { useForm, getFormProps, getTextareaProps } from "@conform-to/react";
+import { useForm, getFormProps, getInputProps, getTextareaProps } from "@conform-to/react";
 import { parseWithZod } from "@conform-to/zod/v4";
 import { invariantResponse } from "@epic-web/invariant";
 
-export const handle = { breadcrumb: "Edit Permission" };
+export const handle = { breadcrumb: "Edit Role" };
 
 import { requirePermission } from "~/lib/auth/require-auth.server";
-import { getPermission, updatePermission } from "~/services/permissions.server";
+import { getRole, updateRole } from "~/services/roles.server";
 import { handleServiceError } from "~/lib/errors/handle-service-error.server";
-import { updatePermissionSchema } from "~/lib/schemas/permission";
+import { updateRoleSchema } from "~/lib/schemas/role";
 import { Button } from "~/components/ui/button";
+import { Input } from "~/components/ui/input";
 import { Textarea } from "~/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { Field } from "~/components/ui/field";
@@ -18,9 +19,12 @@ import { buildServiceContext } from "~/lib/request-context.server";
 import type { Route } from "./+types/edit";
 
 export async function loader({ request, params }: Route.LoaderArgs) {
-  await requirePermission(request, "settings", "manage");
-  const permission = await getPermission(params.permissionId);
-  return { permission };
+  const { user } = await requirePermission(request, "settings", "manage");
+  const tenantId = user.tenantId;
+  invariantResponse(tenantId, "User is not associated with a tenant", { status: 403 });
+
+  const role = await getRole(params.roleId, tenantId);
+  return { role };
 }
 
 export async function action({ request, params }: Route.ActionArgs) {
@@ -29,7 +33,7 @@ export async function action({ request, params }: Route.ActionArgs) {
   invariantResponse(tenantId, "User is not associated with a tenant", { status: 403 });
 
   const formData = await request.formData();
-  const submission = parseWithZod(formData, { schema: updatePermissionSchema });
+  const submission = parseWithZod(formData, { schema: updateRoleSchema });
 
   if (submission.status !== "success") {
     return data({ result: submission.reply() }, { status: 400 });
@@ -38,28 +42,29 @@ export async function action({ request, params }: Route.ActionArgs) {
   const ctx = buildServiceContext(request, user, tenantId);
 
   try {
-    await updatePermission(params.permissionId, submission.value, ctx);
+    await updateRole(params.roleId, submission.value, ctx);
     const redirectTo = new URL(request.url).searchParams.get("redirectTo");
-    return redirect(redirectTo || `/${params.tenant}/permissions`);
+    return redirect(redirectTo || `/${params.tenant}/security/roles`);
   } catch (error) {
     return handleServiceError(error, { submission });
   }
 }
 
-export default function EditPermissionPage() {
-  const { permission } = useLoaderData<typeof loader>();
+export default function EditRolePage() {
+  const { role } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
   const basePrefix = useBasePrefix();
   const [searchParams] = useSearchParams();
-  const cancelUrl = searchParams.get("redirectTo") || `${basePrefix}/permissions`;
+  const cancelUrl = searchParams.get("redirectTo") || `${basePrefix}/security/roles`;
 
   const [form, fields] = useForm({
     lastResult: actionData?.result,
     defaultValue: {
-      description: permission.description ?? "",
+      name: role.name,
+      description: role.description ?? "",
     },
     onValidate({ formData }) {
-      return parseWithZod(formData, { schema: updatePermissionSchema });
+      return parseWithZod(formData, { schema: updateRoleSchema });
     },
     shouldValidate: "onBlur",
     shouldRevalidate: "onInput",
@@ -68,28 +73,17 @@ export default function EditPermissionPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold text-foreground">Edit Permission</h2>
+        <h2 className="text-2xl font-bold text-foreground">Edit Role</h2>
         <p className="mt-1 text-sm text-muted-foreground">
-          Update the description for this permission.
+          Update details for the {role.name} role.
         </p>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>Permission Details</CardTitle>
+          <CardTitle>Role Details</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="mb-4 grid grid-cols-2 gap-4 text-sm">
-            <div>
-              <span className="font-medium text-foreground">Resource</span>
-              <p className="text-muted-foreground">{permission.resource}</p>
-            </div>
-            <div>
-              <span className="font-medium text-foreground">Action</span>
-              <p className="text-muted-foreground">{permission.action}</p>
-            </div>
-          </div>
-
           <Form method="post" {...getFormProps(form)} className="space-y-4">
             {form.errors && form.errors.length > 0 && (
               <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
@@ -98,6 +92,10 @@ export default function EditPermissionPage() {
                 ))}
               </div>
             )}
+
+            <Field fieldId={fields.name.id} label="Name" required errors={fields.name.errors}>
+              <Input {...getInputProps(fields.name, { type: "text" })} key={fields.name.key} />
+            </Field>
 
             <Field
               fieldId={fields.description.id}

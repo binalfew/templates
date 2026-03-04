@@ -37,7 +37,7 @@ export async function action({ request, params }: Route.ActionArgs) {
   try {
     await deleteUser(params.userId, ctx);
     const redirectTo = new URL(request.url).searchParams.get("redirectTo");
-    return redirect(redirectTo || `/${params.tenant}/users`);
+    return redirect(redirectTo || `/${params.tenant}/security/users`);
   } catch (error) {
     return handleServiceError(error);
   }
@@ -48,7 +48,7 @@ export default function DeleteUserPage() {
   const actionData = useActionData<typeof action>();
   const basePrefix = useBasePrefix();
   const [searchParams] = useSearchParams();
-  const cancelUrl = searchParams.get("redirectTo") || `${basePrefix}/users`;
+  const cancelUrl = searchParams.get("redirectTo") || `${basePrefix}/security/users`;
 
   const isSelf = targetUser.id === currentUserId;
   const canDelete = !isSelf && !isSystemAdmin;

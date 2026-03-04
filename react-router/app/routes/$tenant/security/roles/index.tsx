@@ -74,7 +74,7 @@ export default function RolesListPage() {
       cell: (row) => (
         <div className="flex items-center gap-2">
           <Shield className="size-4 text-muted-foreground shrink-0" />
-          <Link to={`${base}/roles/${row.id}`} className="hover:underline">
+          <Link to={`${base}/security/roles/${row.id}`} className="hover:underline">
             {row.name}
           </Link>
         </div>
@@ -155,18 +155,18 @@ export default function RolesListPage() {
         columns={columns}
         searchConfig={{ placeholder: "Search roles..." }}
         toolbarExtra={toolbarExtraNode}
-        toolbarActions={[{ label: "New Role", icon: Plus, href: `${base}/roles/new` }]}
+        toolbarActions={[{ label: "New Role", icon: Plus, href: `${base}/security/roles/new` }]}
         rowActions={[
-          { label: "Edit", icon: Pencil, href: (row) => `${base}/roles/${row.id}/edit` },
+          { label: "Edit", icon: Pencil, href: (row) => `${base}/security/roles/${row.id}/edit` },
           {
             label: "Permissions",
             icon: KeyRound,
-            href: (row) => `${base}/roles/${row.id}/permissions`,
+            href: (row) => `${base}/security/roles/${row.id}/permissions`,
           },
           {
             label: "Delete",
             icon: Trash2,
-            href: (row) => `${base}/roles/${row.id}/delete`,
+            href: (row) => `${base}/security/roles/${row.id}/delete`,
             variant: "destructive",
           },
         ]}

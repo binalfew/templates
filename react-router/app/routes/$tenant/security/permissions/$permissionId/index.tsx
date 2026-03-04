@@ -41,19 +41,19 @@ export default function PermissionDetailPage() {
         </div>
         <div className="flex gap-2">
           <Button variant="outline" size="sm" asChild>
-            <Link to={`${base}/permissions`}>
+            <Link to={`${base}/security/permissions`}>
               <ArrowLeft className="mr-1.5 size-3.5" />
               Back
             </Link>
           </Button>
           <Button variant="outline" size="sm" asChild>
-            <Link to={`${base}/permissions/${permission.id}/edit`}>
+            <Link to={`${base}/security/permissions/${permission.id}/edit`}>
               <Pencil className="mr-1.5 size-3.5" />
               Edit
             </Link>
           </Button>
           <Button variant="outline" size="sm" asChild>
-            <Link to={`${base}/permissions/${permission.id}/delete`} className="text-destructive">
+            <Link to={`${base}/security/permissions/${permission.id}/delete`} className="text-destructive">
               <Trash2 className="mr-1.5 size-3.5" />
               Delete
             </Link>
@@ -102,7 +102,7 @@ export default function PermissionDetailPage() {
             ) : (
               <div className="flex flex-wrap gap-2">
                 {permission.rolePermissions.map((rp) => (
-                  <Link key={rp.role.id} to={`${base}/roles/${rp.role.id}`}>
+                  <Link key={rp.role.id} to={`${base}/security/roles/${rp.role.id}`}>
                     <Badge variant="secondary" className="cursor-pointer hover:bg-secondary/80">
                       <Shield className="mr-1 size-3" />
                       {rp.role.name}

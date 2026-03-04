@@ -58,6 +58,7 @@ type TopNavbarProps = {
   i18nEnabled?: boolean;
   offlineEnabled?: boolean;
   settingsChildren?: NavChild[];
+  securityChildren?: NavChild[];
 };
 
 type BreadcrumbEntry = {
@@ -79,11 +80,12 @@ function useBreadcrumbs(): BreadcrumbEntry[] {
     }
   }
 
-  // Merge "Settings" + child into a single "Settings | Child" breadcrumb
+  // Merge section + child into a single "Section | Child" breadcrumb
+  const mergeLabels = ["Settings", "Security"];
   for (let i = 0; i < crumbs.length - 1; i++) {
-    if (crumbs[i].label === "Settings") {
+    if (mergeLabels.includes(crumbs[i].label)) {
       crumbs[i] = {
-        label: `Settings | ${crumbs[i + 1].label}`,
+        label: `${crumbs[i].label} | ${crumbs[i + 1].label}`,
         to: crumbs[i + 1].to,
       };
       crumbs.splice(i + 1, 1);
@@ -118,6 +120,7 @@ export function TopNavbar({
   i18nEnabled = false,
   offlineEnabled = false,
   settingsChildren = [],
+  securityChildren = [],
 }: TopNavbarProps) {
   const breadcrumbs = useBreadcrumbs();
   const navigate = useNavigate();
@@ -167,7 +170,7 @@ export function TopNavbar({
         description: "Go to Users",
         group: "navigation",
         key: ["g", "u"],
-        handler: () => navigate(`${basePrefix}/users`),
+        handler: () => navigate(`${basePrefix}/security/users`),
       },
       {
         id: "nav-settings",
@@ -188,9 +191,15 @@ export function TopNavbar({
 
   const shortcutInfoList = useMemo(() => getShortcutInfo(shortcuts), [shortcuts]);
 
-  const settingsPrefix = `${basePrefix}/settings`;
-  const isSettingsPage =
-    settingsChildren.length > 0 && location.pathname.startsWith(settingsPrefix);
+  const subNavChildren = useMemo(() => {
+    if (settingsChildren.length > 0 && location.pathname.startsWith(`${basePrefix}/settings`)) {
+      return settingsChildren;
+    }
+    if (securityChildren.length > 0 && location.pathname.startsWith(`${basePrefix}/security`)) {
+      return securityChildren;
+    }
+    return [];
+  }, [settingsChildren, securityChildren, location.pathname, basePrefix]);
 
   return (
     <>
@@ -330,10 +339,10 @@ export function TopNavbar({
       />
     </header>
 
-    {isSettingsPage && (
+    {subNavChildren.length > 0 && (
       <nav className="flex shrink-0 overflow-x-auto border-b bg-background">
         <div className="flex items-center px-4">
-          {settingsChildren.map((child) => (
+          {subNavChildren.map((child) => (
             <NavLink
               key={child.url}
               to={child.url}

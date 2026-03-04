@@ -1,37 +1,25 @@
-import { data, redirect, useActionData, useLoaderData } from "react-router";
-import { invariantResponse } from "@epic-web/invariant";
+import { redirect, useActionData, useLoaderData } from "react-router";
 
 export const handle = { breadcrumb: "Edit Field" };
 
-import { requirePermission, requireFeature } from "~/lib/auth/require-auth.server";
+import { requireFeature } from "~/lib/auth/require-auth.server";
 import { FEATURE_FLAG_KEYS } from "~/lib/config/feature-flags.server";
-import { prisma } from "~/lib/db/db.server";
-import { updateField } from "~/services/fields.server";
+import { getField, updateField } from "~/services/fields.server";
 import { handleServiceError } from "~/lib/errors/handle-service-error.server";
 import { FieldForm } from "~/components/fields/FieldForm";
 import { buildServiceContext } from "~/lib/request-context.server";
-import type { Route } from "./+types/$fieldId";
+import type { Route } from "./+types/edit";
 
 export async function loader({ request, params }: Route.LoaderArgs) {
-  await requirePermission(request, "custom-field", "manage");
   const { tenantId } = await requireFeature(request, FEATURE_FLAG_KEYS.CUSTOM_FIELDS);
 
-  const { fieldId } = params;
-
-  const field = await prisma.fieldDefinition.findFirst({
-    where: { id: fieldId, tenantId },
-  });
-  if (!field) {
-    throw data({ error: "Field not found" }, { status: 404 });
-  }
+  const field = await getField(params.fieldId, tenantId);
 
   return { field };
 }
 
 export async function action({ request, params }: Route.ActionArgs) {
-  const { user } = await requirePermission(request, "custom-field", "manage");
-  const tenantId = user.tenantId;
-  invariantResponse(tenantId, "User is not associated with a tenant", { status: 403 });
+  const { user, tenantId } = await requireFeature(request, FEATURE_FLAG_KEYS.CUSTOM_FIELDS);
 
   const { fieldId } = params;
   const formData = await request.formData();

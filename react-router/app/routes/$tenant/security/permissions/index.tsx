@@ -86,7 +86,7 @@ export default function PermissionsListPage() {
       cell: (row) => (
         <div className="flex items-center gap-2">
           <KeyRound className="size-4 text-muted-foreground shrink-0" />
-          <Link to={`${base}/permissions/${row.id}`} className="hover:underline">
+          <Link to={`${base}/security/permissions/${row.id}`} className="hover:underline">
             {row.resource}
           </Link>
         </div>
@@ -172,14 +172,14 @@ export default function PermissionsListPage() {
         searchConfig={{ placeholder: "Search permissions..." }}
         toolbarExtra={toolbarExtraNode}
         toolbarActions={[
-          { label: "New Permission", icon: Plus, href: `${base}/permissions/new` },
+          { label: "New Permission", icon: Plus, href: `${base}/security/permissions/new` },
         ]}
         rowActions={[
-          { label: "Edit", icon: Pencil, href: (row) => `${base}/permissions/${row.id}/edit` },
+          { label: "Edit", icon: Pencil, href: (row) => `${base}/security/permissions/${row.id}/edit` },
           {
             label: "Delete",
             icon: Trash2,
-            href: (row) => `${base}/permissions/${row.id}/delete`,
+            href: (row) => `${base}/security/permissions/${row.id}/delete`,
             variant: "destructive",
           },
         ]}

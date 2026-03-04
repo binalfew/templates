@@ -104,7 +104,7 @@ export async function action({ request, params }: Route.ActionArgs) {
   try {
     await updateUser(params.userId, { ...submission.value, extras: extrasResult?.extras }, ctx);
     const redirectTo = new URL(request.url).searchParams.get("redirectTo");
-    return redirect(redirectTo || `/${params.tenant}/users`);
+    return redirect(redirectTo || `/${params.tenant}/security/users`);
   } catch (error) {
     return handleServiceError(error, { submission });
   }
@@ -116,7 +116,7 @@ export default function EditUserPage() {
   const actionData = useActionData<typeof action>();
   const basePrefix = useBasePrefix();
   const [searchParams] = useSearchParams();
-  const cancelUrl = searchParams.get("redirectTo") || `${basePrefix}/users`;
+  const cancelUrl = searchParams.get("redirectTo") || `${basePrefix}/security/users`;
 
   const [form, fields] = useForm({
     lastResult: actionData && "result" in actionData ? actionData.result : undefined,
