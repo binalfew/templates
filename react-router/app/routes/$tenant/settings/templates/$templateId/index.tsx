@@ -27,10 +27,8 @@ export default function TemplateDetailPage() {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-start justify-between">
-        <div className="flex items-start gap-4">
-          <div className="flex size-14 shrink-0 items-center justify-center rounded-xl border bg-muted">
-            <FileText className="size-7 text-muted-foreground" />
-          </div>
+        <div className="flex items-start gap-3">
+          <FileText className="size-5 text-muted-foreground shrink-0 mt-1" />
           <div>
             <h2 className="text-2xl font-bold text-foreground">{template.name}</h2>
             <Badge variant="secondary" className={CHANNEL_COLORS[template.channel]}>
