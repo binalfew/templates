@@ -65,8 +65,9 @@ export async function createView(input: CreateViewInput) {
   return view;
 }
 
-export async function updateView(viewId: string, userId: string, input: UpdateViewInput) {
-  const view = await prisma.savedView.findUniqueOrThrow({ where: { id: viewId } });
+export async function updateView(viewId: string, userId: string, tenantId: string, input: UpdateViewInput) {
+  const view = await prisma.savedView.findFirst({ where: { id: viewId, tenantId } });
+  if (!view) throw new SavedViewError("View not found", 404);
 
   if (view.userId !== userId) {
     throw new SavedViewError("You can only update your own views", 403);
@@ -97,8 +98,9 @@ export async function updateView(viewId: string, userId: string, input: UpdateVi
   return updated;
 }
 
-export async function deleteView(viewId: string, userId: string) {
-  const view = await prisma.savedView.findUniqueOrThrow({ where: { id: viewId } });
+export async function deleteView(viewId: string, userId: string, tenantId: string) {
+  const view = await prisma.savedView.findFirst({ where: { id: viewId, tenantId } });
+  if (!view) throw new SavedViewError("View not found", 404);
   if (view.userId !== userId) {
     throw new SavedViewError("You can only delete your own views", 403);
   }
@@ -106,11 +108,13 @@ export async function deleteView(viewId: string, userId: string) {
   logger.info({ viewId }, "Saved view deleted");
 }
 
-export async function getView(viewId: string) {
-  return prisma.savedView.findUniqueOrThrow({
-    where: { id: viewId },
+export async function getView(viewId: string, tenantId: string) {
+  const view = await prisma.savedView.findFirst({
+    where: { id: viewId, tenantId },
     include: { owner: { select: { id: true, name: true } } },
   });
+  if (!view) throw new SavedViewError("View not found", 404);
+  return view;
 }
 
 export async function listViews(tenantId: string, userId: string, entityType: string) {
@@ -132,7 +136,8 @@ export async function getDefaultView(tenantId: string, userId: string, entityTyp
 }
 
 export async function duplicateView(viewId: string, userId: string, tenantId: string) {
-  const source = await prisma.savedView.findUniqueOrThrow({ where: { id: viewId } });
+  const source = await prisma.savedView.findFirst({ where: { id: viewId, tenantId } });
+  if (!source) throw new SavedViewError("View not found", 404);
   const copy = await prisma.savedView.create({
     data: {
       tenantId,

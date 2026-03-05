@@ -73,7 +73,7 @@ export async function loader({ request }: Route.LoaderArgs) {
       ? prisma.user.count({ where: { ...tenantFilter, status: "SUSPENDED", deletedAt: null } })
       : Promise.resolve(0),
     analyticsEnabled
-      ? prisma.session.count({ where: { expirationDate: { gt: new Date() } } })
+      ? prisma.session.count({ where: { expirationDate: { gt: new Date() }, user: { tenantId } } })
       : Promise.resolve(0),
   ]);
 
@@ -88,10 +88,10 @@ export async function loader({ request }: Route.LoaderArgs) {
 
   const chartData = analyticsEnabled
     ? Promise.all([
-        getUserGrowth(tenantId, 30),
-        getLoginActivity(tenantId, 30),
-        getRoleDistribution(tenantId),
-        getSessionActivity(30),
+        getUserGrowth(tenantId!, 30),
+        getLoginActivity(tenantId!, 30),
+        getRoleDistribution(tenantId!),
+        getSessionActivity(tenantId!, 30),
       ]).then(([userGrowth, loginActivity, roleDistribution, sessionActivity]) => ({
         userGrowth,
         loginActivity,

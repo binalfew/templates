@@ -15,17 +15,17 @@ import { useBasePrefix } from "~/hooks/use-base-prefix";
 import type { Route } from "./+types/delete";
 
 export async function loader({ request, params }: Route.LoaderArgs) {
-  await requireRoleAndFeature(request, [...ADMIN_ONLY], FEATURE_FLAG_KEYS.CUSTOM_OBJECTS);
+  const { tenantId } = await requireRoleAndFeature(request, [...ADMIN_ONLY], FEATURE_FLAG_KEYS.CUSTOM_OBJECTS);
 
-  const definition = await getDefinition(params.definitionId);
+  const definition = await getDefinition(params.definitionId, tenantId);
   return { definition };
 }
 
 export async function action({ request, params }: Route.ActionArgs) {
-  await requireRoleAndFeature(request, [...ADMIN_ONLY], FEATURE_FLAG_KEYS.CUSTOM_OBJECTS);
+  const { tenantId } = await requireRoleAndFeature(request, [...ADMIN_ONLY], FEATURE_FLAG_KEYS.CUSTOM_OBJECTS);
 
   try {
-    await deleteDefinition(params.definitionId);
+    await deleteDefinition(params.definitionId, tenantId);
     const redirectTo = new URL(request.url).searchParams.get("redirectTo");
     return redirect(redirectTo || `/${params.tenant}/settings/objects`);
   } catch (error) {

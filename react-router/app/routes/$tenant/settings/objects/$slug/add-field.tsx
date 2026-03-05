@@ -61,7 +61,7 @@ export async function action({ request, params }: Route.ActionArgs) {
   });
 
   try {
-    await updateDefinition(definition.id, { fields });
+    await updateDefinition(definition.id, tenantId, { fields });
     return redirect(`/${params.tenant}/settings/objects/${params.slug}`);
   } catch (error) {
     return handleServiceError(error, { submission });

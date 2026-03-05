@@ -247,9 +247,10 @@ export async function storeFileLocally(
 /**
  * Retrieves file metadata by searching for the .meta.json sidecar file.
  */
-export async function getFileMetadata(fileId: string): Promise<FileMeta | null> {
+export async function getFileMetadata(fileId: string, tenantId: string): Promise<FileMeta | null> {
   const uploadDir = (env as any).FILE_UPLOAD_DIR ?? "./uploads";
-  const metaFile = await findMetaFile(uploadDir, fileId);
+  const tenantDir = path.join(uploadDir, tenantId);
+  const metaFile = await findMetaFile(tenantDir, fileId);
   if (!metaFile) return null;
 
   const content = await fs.readFile(metaFile, "utf8");

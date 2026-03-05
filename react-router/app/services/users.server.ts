@@ -281,8 +281,17 @@ export async function assignRoles(userId: string, roleIds: string[], ctx: Tenant
     throw new UserError("User not found", 404);
   }
 
+  if (roleIds.length > 0 && !ctx.isSuperAdmin) {
+    const validRoles = await prisma.role.count({
+      where: { id: { in: roleIds }, tenantId: ctx.tenantId },
+    });
+    if (validRoles !== roleIds.length) {
+      throw new UserError("One or more roles do not belong to this tenant", 403);
+    }
+  }
+
   await prisma.userRole.deleteMany({
-    where: { userId, eventId: null },
+    where: { userId, eventId: null, ...(ctx.isSuperAdmin ? {} : { role: { tenantId: ctx.tenantId } }) },
   });
 
   if (roleIds.length > 0) {

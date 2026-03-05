@@ -67,7 +67,7 @@ export async function action({ request, params }: Route.ActionArgs) {
 
   try {
     if (_action === "delete-record") {
-      await deleteRecord(formData.get("recordId") as string);
+      await deleteRecord(formData.get("recordId") as string, tenantId);
       return data({ success: true });
     }
     return data({ error: "Unknown action" }, { status: 400 });

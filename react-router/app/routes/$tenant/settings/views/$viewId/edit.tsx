@@ -16,9 +16,9 @@ import { useBasePrefix } from "~/hooks/use-base-prefix";
 import type { Route } from "./+types/edit";
 
 export async function loader({ request, params }: Route.LoaderArgs) {
-  const { user } = await requireRoleAndFeature(request, [...ADMIN_OR_TENANT_ADMIN], FEATURE_FLAG_KEYS.SAVED_VIEWS);
+  const { user, tenantId } = await requireRoleAndFeature(request, [...ADMIN_OR_TENANT_ADMIN], FEATURE_FLAG_KEYS.SAVED_VIEWS);
 
-  const view = await getView(params.viewId);
+  const view = await getView(params.viewId, tenantId);
   if (view.userId !== user.id) {
     throw data({ error: "You can only edit your own views" }, { status: 403 });
   }
@@ -27,7 +27,7 @@ export async function loader({ request, params }: Route.LoaderArgs) {
 }
 
 export async function action({ request, params }: Route.ActionArgs) {
-  const { user } = await requireRoleAndFeature(request, [...ADMIN_OR_TENANT_ADMIN], FEATURE_FLAG_KEYS.SAVED_VIEWS);
+  const { user, tenantId } = await requireRoleAndFeature(request, [...ADMIN_OR_TENANT_ADMIN], FEATURE_FLAG_KEYS.SAVED_VIEWS);
 
   const formData = await request.formData();
   const name = formData.get("name") as string;
@@ -40,7 +40,7 @@ export async function action({ request, params }: Route.ActionArgs) {
   }
 
   try {
-    await updateView(params.viewId, user.id, {
+    await updateView(params.viewId, user.id, tenantId, {
       name,
       viewType: viewType as "TABLE" | "KANBAN" | "CALENDAR" | "GALLERY",
       isShared,

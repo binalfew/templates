@@ -20,9 +20,9 @@ const VIEW_TYPE_LABELS: Record<string, string> = {
 };
 
 export async function loader({ request, params }: Route.LoaderArgs) {
-  const { user } = await requireRoleAndFeature(request, [...ADMIN_OR_TENANT_ADMIN], FEATURE_FLAG_KEYS.SAVED_VIEWS);
+  const { user, tenantId } = await requireRoleAndFeature(request, [...ADMIN_OR_TENANT_ADMIN], FEATURE_FLAG_KEYS.SAVED_VIEWS);
 
-  const view = await getView(params.viewId);
+  const view = await getView(params.viewId, tenantId);
   if (view.userId !== user.id) {
     throw data({ error: "You can only delete your own views" }, { status: 403 });
   }
@@ -31,10 +31,10 @@ export async function loader({ request, params }: Route.LoaderArgs) {
 }
 
 export async function action({ request, params }: Route.ActionArgs) {
-  const { user } = await requireRoleAndFeature(request, [...ADMIN_OR_TENANT_ADMIN], FEATURE_FLAG_KEYS.SAVED_VIEWS);
+  const { user, tenantId } = await requireRoleAndFeature(request, [...ADMIN_OR_TENANT_ADMIN], FEATURE_FLAG_KEYS.SAVED_VIEWS);
 
   try {
-    await deleteView(params.viewId, user.id);
+    await deleteView(params.viewId, user.id, tenantId);
     const redirectTo = new URL(request.url).searchParams.get("redirectTo");
     return redirect(redirectTo || `/${params.tenant}/settings/views`);
   } catch (error) {

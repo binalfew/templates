@@ -3,12 +3,13 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 const mockDefCreate = vi.fn();
 const mockDefUpdate = vi.fn();
 const mockDefDelete = vi.fn();
+const mockDefFindFirst = vi.fn();
 const mockDefFindUniqueOrThrow = vi.fn();
 const mockDefFindMany = vi.fn();
 const mockRecCreate = vi.fn();
 const mockRecUpdate = vi.fn();
 const mockRecDelete = vi.fn();
-const mockRecFindUniqueOrThrow = vi.fn();
+const mockRecFindFirst = vi.fn();
 const mockRecFindMany = vi.fn();
 
 vi.mock("~/lib/db/db.server", () => ({
@@ -17,6 +18,7 @@ vi.mock("~/lib/db/db.server", () => ({
       create: (...args: unknown[]) => mockDefCreate(...args),
       update: (...args: unknown[]) => mockDefUpdate(...args),
       delete: (...args: unknown[]) => mockDefDelete(...args),
+      findFirst: (...args: unknown[]) => mockDefFindFirst(...args),
       findUniqueOrThrow: (...args: unknown[]) => mockDefFindUniqueOrThrow(...args),
       findMany: (...args: unknown[]) => mockDefFindMany(...args),
     },
@@ -24,7 +26,7 @@ vi.mock("~/lib/db/db.server", () => ({
       create: (...args: unknown[]) => mockRecCreate(...args),
       update: (...args: unknown[]) => mockRecUpdate(...args),
       delete: (...args: unknown[]) => mockRecDelete(...args),
-      findUniqueOrThrow: (...args: unknown[]) => mockRecFindUniqueOrThrow(...args),
+      findFirst: (...args: unknown[]) => mockRecFindFirst(...args),
       findMany: (...args: unknown[]) => mockRecFindMany(...args),
     },
   },
@@ -95,13 +97,13 @@ describe("custom-objects.server", () => {
   describe("deleteDefinition", () => {
     it("deletes a definition with no records", async () => {
       const { deleteDefinition } = await import("../custom-objects.server");
-      mockDefFindUniqueOrThrow.mockResolvedValue({
+      mockDefFindFirst.mockResolvedValue({
         id: "def-1",
         _count: { records: 0 },
       });
       mockDefUpdate.mockResolvedValue({});
 
-      await deleteDefinition("def-1");
+      await deleteDefinition("def-1", "t-1");
 
       expect(mockDefUpdate).toHaveBeenCalledWith({
         where: { id: "def-1" },
@@ -111,12 +113,12 @@ describe("custom-objects.server", () => {
 
     it("throws when definition has records", async () => {
       const { deleteDefinition, CustomObjectError } = await import("../custom-objects.server");
-      mockDefFindUniqueOrThrow.mockResolvedValue({
+      mockDefFindFirst.mockResolvedValue({
         id: "def-1",
         _count: { records: 5 },
       });
 
-      await expect(deleteDefinition("def-1")).rejects.toThrow(CustomObjectError);
+      await expect(deleteDefinition("def-1", "t-1")).rejects.toThrow(CustomObjectError);
     });
   });
 
@@ -155,7 +157,7 @@ describe("custom-objects.server", () => {
   describe("createRecord", () => {
     it("creates a record for an active definition", async () => {
       const { createRecord } = await import("../custom-objects.server");
-      mockDefFindUniqueOrThrow.mockResolvedValue({
+      mockDefFindFirst.mockResolvedValue({
         id: "def-1",
         isActive: true,
         fields: [{ name: "plate", label: "License Plate", dataType: "TEXT", required: false }],
@@ -177,7 +179,7 @@ describe("custom-objects.server", () => {
 
     it("throws for inactive definition", async () => {
       const { createRecord, CustomObjectError } = await import("../custom-objects.server");
-      mockDefFindUniqueOrThrow.mockResolvedValue({
+      mockDefFindFirst.mockResolvedValue({
         id: "def-1",
         isActive: false,
         fields: [],
@@ -190,7 +192,7 @@ describe("custom-objects.server", () => {
 
     it("throws when required field is missing", async () => {
       const { createRecord, CustomObjectError } = await import("../custom-objects.server");
-      mockDefFindUniqueOrThrow.mockResolvedValue({
+      mockDefFindFirst.mockResolvedValue({
         id: "def-1",
         isActive: true,
         fields: [{ name: "plate", label: "License Plate", dataType: "TEXT", required: true }],
@@ -205,9 +207,10 @@ describe("custom-objects.server", () => {
   describe("deleteRecord", () => {
     it("deletes a record", async () => {
       const { deleteRecord } = await import("../custom-objects.server");
+      mockRecFindFirst.mockResolvedValue({ id: "rec-1" });
       mockRecDelete.mockResolvedValue({});
 
-      await deleteRecord("rec-1");
+      await deleteRecord("rec-1", "t-1");
 
       expect(mockRecDelete).toHaveBeenCalledWith({ where: { id: "rec-1" } });
     });

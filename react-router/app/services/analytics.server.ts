@@ -110,7 +110,10 @@ export async function getDashboardMetrics(tenantId: string): Promise<DashboardMe
       },
     }),
     prisma.session.count({
-      where: { expirationDate: { gt: new Date() } },
+      where: {
+        expirationDate: { gt: new Date() },
+        user: { tenantId },
+      },
     }),
     prisma.user.groupBy({
       by: ["status"],
@@ -183,29 +186,29 @@ function aggregateByDay(dates: Date[], days: number): TimeSeriesPoint[] {
   return Array.from(map.entries()).map(([date, count]) => ({ date, count }));
 }
 
-export async function getUserGrowth(tenantId: string | null, days = 30): Promise<TimeSeriesPoint[]> {
+export async function getUserGrowth(tenantId: string, days = 30): Promise<TimeSeriesPoint[]> {
   const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
   const users = await prisma.user.findMany({
-    where: { ...(tenantId ? { tenantId } : {}), deletedAt: null, createdAt: { gte: since } } as any,
+    where: { tenantId, deletedAt: null, createdAt: { gte: since } },
     select: { createdAt: true },
     orderBy: { createdAt: "asc" },
   });
   return aggregateByDay(users.map((u) => u.createdAt), days);
 }
 
-export async function getLoginActivity(tenantId: string | null, days = 30): Promise<TimeSeriesPoint[]> {
+export async function getLoginActivity(tenantId: string, days = 30): Promise<TimeSeriesPoint[]> {
   const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
   const logs = await prisma.auditLog.findMany({
-    where: { ...(tenantId ? { tenantId } : {}), action: "LOGIN", createdAt: { gte: since } },
+    where: { tenantId, action: "LOGIN", createdAt: { gte: since } },
     select: { createdAt: true },
     orderBy: { createdAt: "asc" },
   });
   return aggregateByDay(logs.map((l) => l.createdAt), days);
 }
 
-export async function getRoleDistribution(tenantId: string | null): Promise<Array<{ name: string; value: number }>> {
+export async function getRoleDistribution(tenantId: string): Promise<Array<{ name: string; value: number }>> {
   const roles = await prisma.role.findMany({
-    where: { ...(tenantId ? { tenantId } : {}), deletedAt: null },
+    where: { tenantId, deletedAt: null },
     select: { name: true, _count: { select: { userRoles: true } } },
   });
   return roles
@@ -214,10 +217,10 @@ export async function getRoleDistribution(tenantId: string | null): Promise<Arra
     .sort((a, b) => b.value - a.value);
 }
 
-export async function getSessionActivity(days = 30): Promise<TimeSeriesPoint[]> {
+export async function getSessionActivity(tenantId: string, days = 30): Promise<TimeSeriesPoint[]> {
   const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
   const sessions = await prisma.session.findMany({
-    where: { createdAt: { gte: since } },
+    where: { createdAt: { gte: since }, user: { tenantId } },
     select: { createdAt: true },
     orderBy: { createdAt: "asc" },
   });

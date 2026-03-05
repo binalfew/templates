@@ -38,7 +38,7 @@ export async function resolveActiveView(
 
   if (viewId) {
     try {
-      activeView = await getView(viewId);
+      activeView = await getView(viewId, tenantId);
     } catch {
       // View not found — fall through to default
     }

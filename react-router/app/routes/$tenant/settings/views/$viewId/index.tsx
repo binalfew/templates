@@ -36,9 +36,9 @@ const VIEW_TYPE_LABELS: Record<string, string> = {
 };
 
 export async function loader({ request, params }: Route.LoaderArgs) {
-  const { user } = await requireRoleAndFeature(request, [...ADMIN_OR_TENANT_ADMIN], FEATURE_FLAG_KEYS.SAVED_VIEWS);
+  const { user, tenantId } = await requireRoleAndFeature(request, [...ADMIN_OR_TENANT_ADMIN], FEATURE_FLAG_KEYS.SAVED_VIEWS);
 
-  const view = await getView(params.viewId);
+  const view = await getView(params.viewId, tenantId);
   return { view, isOwner: view.userId === user.id };
 }
 

@@ -154,7 +154,7 @@ export async function action({ request, params }: Route.ActionArgs) {
     try {
       const definition = JSON.parse(definitionJson);
       await prisma.sectionTemplate.update({
-        where: { id: params.templateId },
+        where: { id: params.templateId, tenantId },
         data: { definition },
       });
       return data({ definitionSaved: true });

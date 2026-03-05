@@ -16,17 +16,17 @@ import type { Route } from "./+types/delete";
 export const handle = { breadcrumb: "Delete Record" };
 
 export async function loader({ request, params }: Route.LoaderArgs) {
-  await requireRoleAndFeature(request, [...ADMIN_ONLY], FEATURE_FLAG_KEYS.CUSTOM_OBJECTS);
-  const record = await getRecord(params.recordId!);
+  const { tenantId } = await requireRoleAndFeature(request, [...ADMIN_ONLY], FEATURE_FLAG_KEYS.CUSTOM_OBJECTS);
+  const record = await getRecord(params.recordId!, tenantId);
   const fields = (record.definition.fields as unknown as CustomFieldDefinition[]) ?? [];
   return { record, fields, slug: params.slug! };
 }
 
 export async function action({ request, params }: Route.ActionArgs) {
-  await requireRoleAndFeature(request, [...ADMIN_ONLY], FEATURE_FLAG_KEYS.CUSTOM_OBJECTS);
+  const { tenantId } = await requireRoleAndFeature(request, [...ADMIN_ONLY], FEATURE_FLAG_KEYS.CUSTOM_OBJECTS);
 
   try {
-    await deleteRecord(params.recordId!);
+    await deleteRecord(params.recordId!, tenantId);
     return redirect(`/${params.tenant}/settings/objects/${params.slug}`);
   } catch (error) {
     return handleServiceError(error);

@@ -18,8 +18,8 @@ import type { Route } from "./+types/edit";
 export const handle = { breadcrumb: "Edit Record" };
 
 export async function loader({ request, params }: Route.LoaderArgs) {
-  await requireRoleAndFeature(request, [...ADMIN_ONLY], FEATURE_FLAG_KEYS.CUSTOM_OBJECTS);
-  const record = await getRecord(params.recordId!);
+  const { tenantId } = await requireRoleAndFeature(request, [...ADMIN_ONLY], FEATURE_FLAG_KEYS.CUSTOM_OBJECTS);
+  const record = await getRecord(params.recordId!, tenantId);
   const fields = (record.definition.fields as unknown as CustomFieldDefinition[]) ?? [];
   return { record, fields, slug: params.slug! };
 }
@@ -27,7 +27,7 @@ export async function loader({ request, params }: Route.LoaderArgs) {
 export async function action({ request, params }: Route.ActionArgs) {
   const { user, tenantId } = await requireRoleAndFeature(request, [...ADMIN_ONLY], FEATURE_FLAG_KEYS.CUSTOM_OBJECTS);
 
-  const record = await getRecord(params.recordId!);
+  const record = await getRecord(params.recordId!, tenantId);
   const fields = (record.definition.fields as unknown as CustomFieldDefinition[]) ?? [];
   const formData = await request.formData();
 
@@ -44,7 +44,7 @@ export async function action({ request, params }: Route.ActionArgs) {
   }
 
   try {
-    await updateRecord(params.recordId!, recordData);
+    await updateRecord(params.recordId!, tenantId, recordData);
     return redirect(`/${params.tenant}/settings/objects/${params.slug}`);
   } catch (error) {
     return handleServiceError(error);

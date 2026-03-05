@@ -73,7 +73,7 @@ describe("saved-views.server", () => {
   describe("updateView", () => {
     it("updates a view owned by the user", async () => {
       const { updateView } = await import("../saved-views.server");
-      mockFindUniqueOrThrow.mockResolvedValue({
+      mockFindFirst.mockResolvedValue({
         id: "v-1",
         userId: "u-1",
         tenantId: "t-1",
@@ -81,25 +81,25 @@ describe("saved-views.server", () => {
       });
       mockUpdate.mockResolvedValue({ id: "v-1", name: "Renamed" });
 
-      const result = await updateView("v-1", "u-1", { name: "Renamed" });
+      const result = await updateView("v-1", "u-1", "t-1", { name: "Renamed" });
 
       expect(result.name).toBe("Renamed");
     });
 
     it("throws when updating another user's view", async () => {
       const { updateView, SavedViewError } = await import("../saved-views.server");
-      mockFindUniqueOrThrow.mockResolvedValue({
+      mockFindFirst.mockResolvedValue({
         id: "v-1",
         userId: "u-other",
         tenantId: "t-1",
       });
 
-      await expect(updateView("v-1", "u-1", { name: "Hack" })).rejects.toThrow(SavedViewError);
+      await expect(updateView("v-1", "u-1", "t-1", { name: "Hack" })).rejects.toThrow(SavedViewError);
     });
 
     it("unsets other defaults when setting a view as default", async () => {
       const { updateView } = await import("../saved-views.server");
-      mockFindUniqueOrThrow.mockResolvedValue({
+      mockFindFirst.mockResolvedValue({
         id: "v-1",
         userId: "u-1",
         tenantId: "t-1",
@@ -108,7 +108,7 @@ describe("saved-views.server", () => {
       mockUpdateMany.mockResolvedValue({ count: 1 });
       mockUpdate.mockResolvedValue({ id: "v-1", isDefault: true });
 
-      await updateView("v-1", "u-1", { isDefault: true });
+      await updateView("v-1", "u-1", "t-1", { isDefault: true });
 
       expect(mockUpdateMany).toHaveBeenCalledWith({
         where: {
@@ -126,19 +126,19 @@ describe("saved-views.server", () => {
   describe("deleteView", () => {
     it("deletes a view owned by the user", async () => {
       const { deleteView } = await import("../saved-views.server");
-      mockFindUniqueOrThrow.mockResolvedValue({ id: "v-1", userId: "u-1" });
+      mockFindFirst.mockResolvedValue({ id: "v-1", userId: "u-1" });
       mockDelete.mockResolvedValue({});
 
-      await deleteView("v-1", "u-1");
+      await deleteView("v-1", "u-1", "t-1");
 
       expect(mockDelete).toHaveBeenCalledWith({ where: { id: "v-1" } });
     });
 
     it("throws when deleting another user's view", async () => {
       const { deleteView, SavedViewError } = await import("../saved-views.server");
-      mockFindUniqueOrThrow.mockResolvedValue({ id: "v-1", userId: "u-other" });
+      mockFindFirst.mockResolvedValue({ id: "v-1", userId: "u-other" });
 
-      await expect(deleteView("v-1", "u-1")).rejects.toThrow(SavedViewError);
+      await expect(deleteView("v-1", "u-1", "t-1")).rejects.toThrow(SavedViewError);
     });
   });
 
@@ -188,7 +188,7 @@ describe("saved-views.server", () => {
   describe("duplicateView", () => {
     it("creates a copy of the view", async () => {
       const { duplicateView } = await import("../saved-views.server");
-      mockFindUniqueOrThrow.mockResolvedValue({
+      mockFindFirst.mockResolvedValue({
         id: "v-source",
         name: "Original",
         entityType: "Participant",

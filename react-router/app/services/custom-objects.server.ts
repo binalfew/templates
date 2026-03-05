@@ -71,7 +71,11 @@ export async function createDefinition(input: CreateDefinitionInput) {
   return definition;
 }
 
-export async function updateDefinition(definitionId: string, input: UpdateDefinitionInput) {
+export async function updateDefinition(definitionId: string, tenantId: string, input: UpdateDefinitionInput) {
+  const existing = await prisma.customObjectDefinition.findFirst({
+    where: { id: definitionId, tenantId },
+  });
+  if (!existing) throw new CustomObjectError("Definition not found", 404);
   const definition = await prisma.customObjectDefinition.update({
     where: { id: definitionId },
     data: {
@@ -86,11 +90,12 @@ export async function updateDefinition(definitionId: string, input: UpdateDefini
   return definition;
 }
 
-export async function deleteDefinition(definitionId: string) {
-  const definition = await prisma.customObjectDefinition.findUniqueOrThrow({
-    where: { id: definitionId },
+export async function deleteDefinition(definitionId: string, tenantId: string) {
+  const definition = await prisma.customObjectDefinition.findFirst({
+    where: { id: definitionId, tenantId },
     include: { _count: { select: { records: true } } },
   });
+  if (!definition) throw new CustomObjectError("Definition not found", 404);
   if (definition._count.records > 0) {
     throw new CustomObjectError(
       `Cannot delete definition with ${definition._count.records} existing record(s). Delete records first or deactivate the definition.`,
@@ -101,11 +106,13 @@ export async function deleteDefinition(definitionId: string) {
   logger.info({ definitionId }, "Custom object definition deleted");
 }
 
-export async function getDefinition(definitionId: string) {
-  return prisma.customObjectDefinition.findUniqueOrThrow({
-    where: { id: definitionId },
+export async function getDefinition(definitionId: string, tenantId: string) {
+  const def = await prisma.customObjectDefinition.findFirst({
+    where: { id: definitionId, tenantId },
     include: { _count: { select: { records: true } } },
   });
+  if (!def) throw new CustomObjectError("Definition not found", 404);
+  return def;
 }
 
 export async function getDefinitionBySlug(tenantId: string, slug: string) {
@@ -145,9 +152,10 @@ export async function listDefinitionsPaginated(
 }
 
 export async function createRecord(input: CreateRecordInput) {
-  const definition = await prisma.customObjectDefinition.findUniqueOrThrow({
-    where: { id: input.definitionId },
+  const definition = await prisma.customObjectDefinition.findFirst({
+    where: { id: input.definitionId, tenantId: input.tenantId },
   });
+  if (!definition) throw new CustomObjectError("Definition not found", 404);
   if (!definition.isActive) {
     throw new CustomObjectError("Cannot create records for an inactive definition", 400);
   }
@@ -169,11 +177,12 @@ export async function createRecord(input: CreateRecordInput) {
   return record;
 }
 
-export async function updateRecord(recordId: string, recordData: Record<string, unknown>) {
-  const existing = await prisma.customObjectRecord.findUniqueOrThrow({
-    where: { id: recordId },
+export async function updateRecord(recordId: string, tenantId: string, recordData: Record<string, unknown>) {
+  const existing = await prisma.customObjectRecord.findFirst({
+    where: { id: recordId, tenantId },
     include: { definition: true },
   });
+  if (!existing) throw new CustomObjectError("Record not found", 404);
   const fields = existing.definition.fields as unknown as CustomFieldDefinition[];
   for (const field of fields) {
     if (field.required && (recordData[field.name] === undefined || recordData[field.name] === "")) {
@@ -188,16 +197,22 @@ export async function updateRecord(recordId: string, recordData: Record<string, 
   return record;
 }
 
-export async function deleteRecord(recordId: string) {
+export async function deleteRecord(recordId: string, tenantId: string) {
+  const existing = await prisma.customObjectRecord.findFirst({
+    where: { id: recordId, tenantId },
+  });
+  if (!existing) throw new CustomObjectError("Record not found", 404);
   await prisma.customObjectRecord.delete({ where: { id: recordId } });
   logger.info({ recordId }, "Custom object record deleted");
 }
 
-export async function getRecord(recordId: string) {
-  return prisma.customObjectRecord.findUniqueOrThrow({
-    where: { id: recordId },
+export async function getRecord(recordId: string, tenantId: string) {
+  const record = await prisma.customObjectRecord.findFirst({
+    where: { id: recordId, tenantId },
     include: { definition: true },
   });
+  if (!record) throw new CustomObjectError("Record not found", 404);
+  return record;
 }
 
 export async function listRecords(definitionId: string, tenantId: string) {
