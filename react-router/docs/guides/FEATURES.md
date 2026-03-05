@@ -98,7 +98,15 @@ app/
 │   └── analytics/       # Chart components
 ├── hooks/               # React hooks (use-sse, use-form-designer, autosave, toast)
 ├── lib/                 # Core utilities
-│   └── schemas/         # Shared Zod validation schemas
+│   ├── auth/            # Session, RBAC, API auth, 2FA
+│   ├── config/          # Environment, settings, feature flags
+│   ├── db/              # Prisma client, soft-delete, cache
+│   ├── email/           # Email service, templates
+│   ├── errors/          # ServiceError base, error handler
+│   ├── events/          # Event bus, job queue, webhook emitter
+│   ├── monitoring/      # Logger, Sentry
+│   └── schemas/         # 18 shared Zod validation schemas
+├── config/              # Navigation config with role-based visibility
 ├── locales/
 │   ├── en/              # English translations (8 namespaces)
 │   └── fr/              # French translations (8 namespaces)
@@ -122,10 +130,23 @@ prisma/
 └── seed.ts              # Seed data
 
 tests/
+├── unit/                # All unit tests (mirrors app/ structure)
+│   ├── services/        # Service layer tests (26 files)
+│   ├── lib/             # Lib utility tests
+│   │   ├── auth/        # Auth helper tests
+│   │   ├── config/      # Feature flags, settings tests
+│   │   ├── db/          # Cache, soft-delete tests
+│   │   ├── email/       # Email service and template tests
+│   │   ├── errors/      # Error handling tests
+│   │   ├── events/      # Event bus, job queue, webhook emitter tests
+│   │   └── schemas/     # Zod schema validation tests (18 schemas)
+│   ├── components/      # Component logic tests
+│   │   └── fields/      # Field component tests
+│   └── server/          # Express middleware tests
 ├── e2e/                 # Playwright E2E tests
 ├── factories/           # Test data factories
 ├── mocks/               # MSW request handlers
-└── setup.ts             # Vitest setup (MSW, Prisma mock)
+└── setup/               # Vitest setup (unit + integration)
 ```
 
 ### File Naming Conventions
@@ -427,7 +448,25 @@ When the `FF_TWO_FACTOR` feature flag is enabled, users who haven't set up 2FA a
 
 **UserRole:** Join table linking users to roles. Includes optional `eventId` and `stepId` for event-scoped assignments.
 
-### Auth Helpers (`app/lib/require-auth.server.ts`)
+### Role Constants (`app/lib/auth/roles.ts`)
+
+Predefined role arrays for route guards:
+
+```typescript
+import { ADMIN_ONLY, ADMIN_OR_TENANT_ADMIN } from "~/lib/auth/roles";
+
+// ADMIN_ONLY = ["ADMIN"]
+// ADMIN_OR_TENANT_ADMIN = ["ADMIN", "TENANT_ADMIN"]
+```
+
+Use these in `requireAnyRole` calls for consistency:
+
+```typescript
+await requireAnyRole(request, [...ADMIN_ONLY]);
+await requireAnyRole(request, [...ADMIN_OR_TENANT_ADMIN]);
+```
+
+### Auth Helpers (`app/lib/auth/require-auth.server.ts`)
 
 ```typescript
 import {
@@ -436,6 +475,8 @@ import {
   requireAnyRole,
   requirePermission,
   requireGlobalAdmin,
+  requireFeature,
+  requireRoleAndFeature,
   hasPermission,
 } from "~/lib/auth/require-auth.server";
 ```
@@ -447,7 +488,35 @@ import {
 | `requireAnyRole(request, roleNames[])` | Throws 403 if user doesn't have any of the specified roles |
 | `requirePermission(request, resource, action, opts?)` | Checks `resource:action` permission with scope (GLOBAL always allowed, TENANT requires matching tenant, EVENT requires matching event). Supports `"own"` access check |
 | `requireGlobalAdmin(request)` | Throws 403 if user doesn't have a GLOBAL-scoped role |
+| `requireFeature(request, flagKey)` | Combines `requireAuth` + tenant null check + `isFeatureEnabled`. Returns `{ user, roles, isSuperAdmin, tenantId: string }` |
+| `requireRoleAndFeature(request, roleNames[], flagKey)` | Combines `requireAnyRole` + `requireFeature` in one call. Use for feature-gated routes that also need role checks |
 | `hasPermission(request, resource, action)` | Returns `boolean` without throwing |
+
+### Access Control Matrix
+
+Routes enforce role-based access control. The navigation sidebar automatically hides items the user cannot access.
+
+**ADMIN only (structural/system-level):**
+
+| Feature | Guard |
+|---------|-------|
+| Custom Objects (`settings/objects/**`) | `requireRoleAndFeature(request, ADMIN_ONLY, FF_CUSTOM_OBJECTS)` |
+| Custom Fields (`settings/fields/**`) | `requireRoleAndFeature(request, ADMIN_ONLY, FF_CUSTOM_FIELDS)` |
+| Form Designer (`settings/forms/**`) | `requireRoleAndFeature(request, ADMIN_ONLY, FF_FORM_DESIGNER)` |
+| Reference Data (`data/references/**`) | `requireAnyRole(request, ADMIN_ONLY)` |
+| Data Import/Export (`data/import`, `data/export`) | `requireAnyRole(request, ADMIN_ONLY)` |
+| Feature Flags (`settings/features`) | `requireGlobalAdmin(request)` |
+
+**ADMIN + TENANT_ADMIN (operational):**
+
+| Feature | Guard |
+|---------|-------|
+| API Keys (`settings/api-keys/**`) | `requireRoleAndFeature(request, ADMIN_OR_TENANT_ADMIN, FF_REST_API)` |
+| Webhooks (`settings/webhooks/**`) | `requireRoleAndFeature(request, ADMIN_OR_TENANT_ADMIN, FF_WEBHOOKS)` |
+| Message Templates (`settings/templates/**`) | `requireRoleAndFeature(request, ADMIN_OR_TENANT_ADMIN, FF_BROADCASTS)` |
+| Broadcasts (`settings/broadcasts/**`) | `requireRoleAndFeature(request, ADMIN_OR_TENANT_ADMIN, FF_BROADCASTS)` |
+| Saved Views (`settings/views/**`) | `requireRoleAndFeature(request, ADMIN_OR_TENANT_ADMIN, FF_SAVED_VIEWS)` |
+| General/Org/Security Settings | `requireAnyRole(request, ADMIN_OR_TENANT_ADMIN)` |
 
 **Permission evaluation logic:**
 - GLOBAL scope → always allowed
@@ -521,12 +590,74 @@ The tenant layout provides:
 - Feature flag loading per request
 - Tenant context for child routes
 
+### Navigation Config (`app/config/navigation.ts`)
+
+Navigation items support both role restrictions and feature flag gating. The sidebar automatically hides items the user cannot access:
+
+```typescript
+// Each nav item can have:
+{
+  title: "Broadcasts",
+  url: `${base}/settings/broadcasts`,
+  icon: Megaphone,
+  roles: ["ADMIN", "TENANT_ADMIN"],  // hidden if user lacks these roles
+  featureFlag: "FF_BROADCASTS",       // hidden if flag is disabled
+}
+```
+
+The `isVisibleEntry` function evaluates both `roles` (user must have at least one) and `featureFlag` (must be enabled) to determine visibility. Items without restrictions are always visible.
+
+### Tenant Isolation (MANDATORY)
+
+Every service function that accesses tenant-scoped data **must** include `tenantId` in the Prisma `where` clause. This prevents cross-tenant data leaks (IDOR vulnerabilities).
+
+**Pattern — use `findFirst` with tenantId, not `findUniqueOrThrow` by ID alone:**
+
+```typescript
+// WRONG — allows cross-tenant access
+const record = await prisma.myModel.findUniqueOrThrow({
+  where: { id: recordId },
+});
+
+// CORRECT — scoped to tenant
+const record = await prisma.myModel.findFirst({
+  where: { id: recordId, tenantId },
+});
+if (!record) throw new MyError("Not found", 404);
+```
+
+**All services enforce this pattern:**
+- `custom-objects.server.ts` — all definition and record operations require `tenantId`
+- `saved-views.server.ts` — `getView`, `updateView`, `deleteView`, `duplicateView` require `tenantId`
+- `analytics.server.ts` — all chart functions require non-null `tenantId`
+- `users.server.ts` — `assignRoles` validates roles belong to the tenant
+- `file-upload.server.ts` — `getFileMetadata` scoped to tenant directory
+- `view-filters.server.ts` — `resolveActiveView` passes `tenantId` to view queries
+
+### Shared Context Helpers
+
+Use these helpers in routes instead of building context objects manually:
+
+```typescript
+import { buildServiceContext } from "~/lib/request-context.server";
+
+// In a route loader/action:
+const { user } = await requireAuth(request);
+const ctx = buildServiceContext(request, user, tenantId);
+// ctx = { userId, tenantId, ipAddress, userAgent, isSuperAdmin }
+
+// Pass to service functions:
+await createUser(input, ctx);
+```
+
 ### How to Add Tenant-Scoped Features
 
 1. Create route files under `app/routes/$tenant/your-feature/`
-2. In your loader, extract the tenant from the URL: `params.tenant`
-3. Use `requireAuth(request)` to get the authenticated user and verify tenant access
-4. Filter all database queries by `tenantId`
+2. In your loader, use `requireAuth(request)` or `requireAnyRole(request, [...ADMIN_ONLY])`
+3. Extract `tenantId` from the auth result (it's guaranteed non-null after `requireFeature`)
+4. **Always** include `tenantId` in every Prisma query `where` clause
+5. Use `buildServiceContext(request, user, tenantId)` for service calls that need audit context
+6. Never trust route params alone — validate that the record belongs to the tenant
 
 ---
 
@@ -561,13 +692,13 @@ await createInvitation({
   invitedById: "inviter-user-id",
 });
 
-// Accept (assigns roles, marks as ACCEPTED)
+// Accept (validates token, checks expiry, assigns all roles, marks as ACCEPTED)
 await acceptInvitation(token, userId);
 
-// Revoke
-await revokeInvitation(invitationId);
+// Revoke (validates invitation belongs to tenant)
+await revokeInvitation(invitationId, tenantId);
 
-// List
+// List all invitations for a tenant (ordered by creation date, includes inviter)
 const invitations = await getInvitations(tenantId);
 ```
 
@@ -942,7 +1073,7 @@ import {
   deleteNotification,
 } from "~/services/notifications.server";
 
-// Create (also publishes SSE event)
+// Create (also publishes SSE event on the "notifications" channel)
 await createNotification({
   userId: "...",
   tenantId: "...",
@@ -952,17 +1083,23 @@ await createNotification({
   data: { key: "value" },  // optional JSON
 });
 
-// List with filters
-const { notifications, total } = await listNotifications(userId, tenantId, {
+// List with filters and pagination
+const { notifications, total, totalPages } = await listNotifications(userId, {
   page: 1,
   perPage: 20,
   type: "info",
   read: false,
 });
 
-// Mark as read
-await markAsRead(notificationId);
-await markAllAsRead(userId, tenantId);
+// Mark as read (validates ownership)
+await markAsRead(notificationId, userId);
+await markAllAsRead(userId);
+
+// Delete (validates ownership)
+await deleteNotification(notificationId, userId);
+
+// Get unread count (used by navbar bell icon)
+const count = await getUnreadCount(userId);
 ```
 
 ### Notification Model
@@ -1050,6 +1187,7 @@ import {
 ### Definition
 
 ```typescript
+// Create a new custom object definition
 await createDefinition({
   tenantId: "...",
   name: "Contacts",
@@ -1063,6 +1201,12 @@ await createDefinition({
   ],
   createdBy: "user-id",
 });
+
+// All read/write operations require tenantId for isolation
+const def = await getDefinition("def-id", tenantId);
+await updateDefinition("def-id", tenantId, { name: "Updated Name" });
+await deleteDefinition("def-id", tenantId);  // soft-delete, blocked if records exist
+const defs = await listDefinitions(tenantId);
 ```
 
 **Slug validation:** Must start with a letter, followed by lowercase alphanumeric characters, hyphens, or underscores.
@@ -1072,12 +1216,19 @@ await createDefinition({
 ### Records
 
 ```typescript
+// Create — validates required fields and that definition is active
 await createRecord({
   definitionId: "...",
   tenantId: "...",
   data: { email: "test@example.com", age: 30, active: true },
   createdBy: "user-id",
 });
+
+// All record operations require tenantId
+const record = await getRecord("rec-id", tenantId);
+await updateRecord("rec-id", tenantId, { email: "new@example.com" });
+await deleteRecord("rec-id", tenantId);
+const records = await listRecords("def-id", tenantId);
 ```
 
 Required fields are validated on create and update. Soft-delete on definitions is blocked if records exist.
@@ -1196,6 +1347,37 @@ SavedView {
 - Setting `isDefault: true` unsets the default on other views for the same entity
 - Shared views are visible to all users in the tenant
 - `duplicateView()` creates a copy with "(copy)" suffix, always unshared and non-default
+- All operations require `tenantId` for tenant isolation
+
+```typescript
+// All view operations require tenantId
+const view = await getView("view-id", tenantId);
+await updateView("view-id", userId, tenantId, { name: "Renamed" });
+await deleteView("view-id", userId, tenantId);
+await duplicateView("view-id", userId, tenantId);
+```
+
+### View Resolution Helper (`app/services/view-filters.server.ts`)
+
+The `resolveViewContext` helper combines feature flag checking, active view resolution, and filter/sort building for paginated index pages:
+
+```typescript
+import { resolveViewContext } from "~/services/view-filters.server";
+
+// In a loader:
+const viewCtx = await resolveViewContext(request, tenantId, userId, "User", {
+  name: "user.name",      // fieldMap: view field → Prisma field
+  email: "user.email",
+  status: "user.status",
+});
+// viewCtx = { activeView, availableViews, viewWhere, viewOrderBy }
+
+// Use in Prisma query:
+const users = await prisma.user.findMany({
+  where: { tenantId, ...viewCtx.viewWhere },
+  orderBy: viewCtx.viewOrderBy.length ? viewCtx.viewOrderBy : [{ name: "asc" }],
+});
+```
 
 ### Components
 
@@ -1321,7 +1503,10 @@ const result = await importData({
 ```typescript
 import { globalSearch } from "~/services/search.server";
 
-const { results, total, query } = await globalSearch(tenantId, "search term");
+const { results, total, query } = await globalSearch("search term", tenantId, userId, {
+  limit: 50,  // default 50, max 100
+  page: 1,    // pagination
+});
 ```
 
 **Searched entities:** Users, Roles, Permissions, Custom Objects, Audit Logs
@@ -1490,10 +1675,78 @@ npx shadcn add <component-name>
 
 Available components include: Button, Card, Dialog, Dropdown Menu, Input, Label, Select, Table, Tabs, Toast, Tooltip, Slot, and more.
 
+### DataTable Component (`app/components/data-table/`)
+
+A reusable, feature-rich table component used by every entity list page:
+
+```typescript
+import { DataTable } from "~/components/data-table/data-table";
+import type { ColumnDef, PaginationMeta } from "~/components/data-table/data-table-types";
+
+type UserRow = { id: string; name: string; email: string; status: string };
+
+const columns: ColumnDef<UserRow>[] = [
+  {
+    id: "name",
+    header: "Name",
+    sortable: true,
+    cell: (row) => (
+      <Link to={`${basePath}/${row.id}`} className="hover:underline">
+        {row.name}
+      </Link>
+    ),
+    cellClassName: "font-medium text-foreground",
+  },
+  { id: "email", header: "Email", cell: "email" },
+  {
+    id: "status",
+    header: "Status",
+    align: "center",
+    cell: (row) => <Badge variant={row.status === "ACTIVE" ? "default" : "secondary"}>{row.status}</Badge>,
+  },
+];
+
+<DataTable
+  data={users}
+  columns={columns}
+  searchConfig={{ placeholder: "Search users..." }}
+  filters={[
+    { paramKey: "status", label: "Status", options: [
+      { label: "Active", value: "active" },
+      { label: "Inactive", value: "inactive" },
+    ], placeholder: "All statuses" },
+  ]}
+  toolbarActions={[
+    { label: "New User", icon: Plus, href: `${basePath}/new` },
+  ]}
+  rowActions={[
+    { label: "Edit", icon: Pencil, href: (row) => `${basePath}/${row.id}/edit` },
+    { label: "Delete", icon: Trash2, href: (row) => `${basePath}/${row.id}/delete`, variant: "destructive" },
+  ]}
+  pagination={pagination}
+  emptyState={{
+    icon: Users,
+    title: "No users found",
+    description: "Users will appear here once they are created.",
+  }}
+/>
+```
+
+**Features:**
+- Server-side search via `q` query parameter
+- Server-side filtering via custom `paramKey` query parameters
+- Server-side pagination with page/pageSize controls
+- Column sorting with `sortable` flag
+- Row actions dropdown (edit, delete, custom actions)
+- Toolbar actions (new, back, custom buttons)
+- Responsive — columns with `hideOnMobile: true` are hidden on small screens
+- Empty state with icon, title, and description
+
 ### Custom Components
 
 | Component | Location | Purpose |
 |-----------|----------|---------|
+| DataTable | `app/components/data-table/` | Reusable table with search, filters, pagination, row actions |
 | Command Palette | `app/components/layout/command-palette.tsx` | Global search (`Cmd+K`) |
 | Route Error Boundary | `app/components/route-error-boundary.tsx` | Contextual error display with retry |
 | Analytics Charts | `app/components/analytics/` | Recharts-based dashboard charts |
@@ -1570,6 +1823,57 @@ export async function action({ request }: ActionFunctionArgs) {
 ---
 
 ## 27. Error Handling
+
+### ServiceError Base Class (`app/lib/errors/service-error.server.ts`)
+
+All domain errors extend a common base class:
+
+```typescript
+import { ServiceError } from "~/lib/errors/service-error.server";
+
+class UserError extends ServiceError {
+  constructor(message: string, status = 400, code?: string) {
+    super(message, status, code);
+    this.name = "UserError";
+  }
+}
+
+// Usage in services:
+throw new UserError("User not found", 404, "NOT_FOUND");
+throw new UserError("Email already taken", 409, "DUPLICATE");
+throw new UserError("Cannot delete admin user", 403, "FORBIDDEN");
+```
+
+Every service module defines its own error class (e.g., `RoleError`, `PermissionError`, `BroadcastError`, `CustomObjectError`, `SavedViewError`, `FieldError`, `TemplateError`, `ReferenceDataError`, `SectionTemplateError`). All inherit `status` and optional `code` from `ServiceError`.
+
+### handleServiceError (`app/lib/errors/handle-service-error.server.ts`)
+
+A unified handler for route action catch blocks. Replaces repetitive 5-line `instanceof` patterns:
+
+```typescript
+import { handleServiceError } from "~/lib/errors/handle-service-error.server";
+
+// In a route action — with Conform form:
+export async function action({ request }: Route.ActionArgs) {
+  const submission = parseWithZod(formData, { schema });
+  if (submission.status !== "success") return { result: submission.reply() };
+  try {
+    await createUser(submission.value, ctx);
+    return redirect(`/${tenant}/users`);
+  } catch (error) {
+    return handleServiceError(error, { submission });
+    // Returns { result } with form errors for the UI
+  }
+}
+
+// In a route action — without Conform:
+try {
+  await deleteUser(id, ctx);
+} catch (error) {
+  return handleServiceError(error);
+  // Returns { error: "message" } with appropriate HTTP status
+}
+```
 
 ### Root Error Boundary
 
@@ -1714,39 +2018,171 @@ return handleConditionalRequest(request, jsonBody, extraHeaders);
 
 ## 32. Testing
 
-### Unit & Integration Tests (Vitest)
+### Test Suite Overview
+
+The project has comprehensive test coverage with **57 test files** and **1,664+ unit tests** covering all services, lib modules, and schemas.
+
+| Category | Files | Tests | Covers |
+|----------|-------|-------|--------|
+| Services | 26 | ~900 | All 26 service modules (users, roles, permissions, tenants, broadcasts, message-templates, notifications, invitations, analytics, search, fields, section-templates, recovery-codes, 2fa-enforcement, webhook-dispatcher, webhook-delivery, data-import, data-export, reference-data, view-filters, custom-objects, saved-views, file-upload, webhooks, api-keys, optimistic-lock) |
+| Lib modules | 15 | ~250 | Feature flags, settings, api-auth, api-response, cache, email, email-templates, event-bus, job-queue, webhook-emitter, service-error, handle-service-error, request-context, theme, sidebar |
+| Schemas | 3 | ~510 | All 18 Zod schemas (user, role, permission, tenant, auth, profile, broadcast, message-template, field, section-template, invitation, custom-object, reference-data, api-keys, import-export, settings, password-reset, organization) |
+| Components | 3 | ~50 | Field types, enum options, field utilities |
+| Server | 2 | ~18 | Rate limiting, rate limit audit |
+
+### Running Tests
 
 ```bash
-npm run test             # Run all unit tests
+npm run test             # Run all unit tests (vitest run)
 npm run test:watch       # Watch mode
 npm run test:coverage    # Coverage report
 npm run test:integration # Integration tests (uses test DB on port 5433)
+npm run test:e2e         # Playwright E2E tests
+npm run test:e2e:ui      # Playwright UI mode
 ```
 
 Run a single file:
 ```bash
-npx vitest run app/services/__tests__/custom-objects.server.test.ts
-```
-
-**Test setup (`tests/setup.ts`):**
-- MSW (Mock Service Worker) for HTTP mocking
-- Prisma mock via `vi.mock()` for database operations
-- Global test utilities
-
-**Test factories (`tests/factories/`):**
-- Reusable data builders for creating test fixtures
-- Consistent, randomized test data
-
-### E2E Tests (Playwright)
-
-```bash
-npm run test:e2e        # Run all E2E tests
-npm run test:e2e:ui     # Playwright UI mode
-```
-
-Run a single test:
-```bash
+npx vitest run tests/unit/services/users.server.test.ts
+npx vitest run tests/unit/lib/schemas/schemas-batch1.test.ts
 npx playwright test tests/e2e/smoke.spec.ts
+```
+
+### Test Directory Structure
+
+All unit tests live in `tests/unit/`, mirroring the source structure:
+
+```
+tests/unit/
+├── services/                    # One test file per service
+│   ├── users.server.test.ts
+│   ├── roles.server.test.ts
+│   ├── permissions.server.test.ts
+│   ├── tenants.server.test.ts
+│   ├── broadcasts.server.test.ts
+│   ├── message-templates.server.test.ts
+│   ├── ... (26 files total)
+├── lib/
+│   ├── auth/                    # Auth helper tests
+│   ├── config/                  # Feature flags, settings tests
+│   ├── db/                      # Cache tests
+│   ├── email/                   # Email service and template tests
+│   ├── errors/                  # ServiceError, handleServiceError tests
+│   ├── events/                  # Event bus, job queue, webhook emitter tests
+│   ├── schemas/                 # 3 batch files covering all 18 Zod schemas
+│   ├── api-response.server.test.ts
+│   ├── request-context.server.test.ts
+│   ├── theme.server.test.ts
+│   ├── sidebar.server.test.ts
+│   └── ... (15 files total)
+├── components/fields/           # Field component logic tests
+└── server/                      # Express middleware tests
+```
+
+### Writing Unit Tests
+
+Follow the established patterns. Here's the standard service test template:
+
+```typescript
+import { describe, it, expect, vi, beforeEach } from "vitest";
+
+// 1. Define mock functions for each Prisma method used
+const mockCreate = vi.fn();
+const mockFindFirst = vi.fn();
+const mockFindMany = vi.fn();
+const mockUpdate = vi.fn();
+const mockDelete = vi.fn();
+
+// 2. Mock the Prisma module
+vi.mock("~/lib/db/db.server", () => ({
+  prisma: {
+    myModel: {
+      create: (...args: unknown[]) => mockCreate(...args),
+      findFirst: (...args: unknown[]) => mockFindFirst(...args),
+      findMany: (...args: unknown[]) => mockFindMany(...args),
+      update: (...args: unknown[]) => mockUpdate(...args),
+      delete: (...args: unknown[]) => mockDelete(...args),
+    },
+    auditLog: { create: vi.fn() },
+  },
+}));
+
+// 3. Mock the logger
+vi.mock("~/lib/monitoring/logger.server", () => ({
+  logger: { info: vi.fn(), warn: vi.fn(), error: vi.fn() },
+}));
+
+describe("my-service.server", () => {
+  beforeEach(() => {
+    vi.resetAllMocks();
+  });
+
+  describe("createItem", () => {
+    it("creates an item with valid input", async () => {
+      // 4. Use dynamic imports (required for vi.mock to work)
+      const { createItem } = await import("~/services/my-service.server");
+
+      // 5. Set up mock return values
+      mockCreate.mockResolvedValue({ id: "item-1", name: "Test" });
+
+      // 6. Call the function
+      const result = await createItem({ name: "Test", tenantId: "t-1" });
+
+      // 7. Assert results
+      expect(result.id).toBe("item-1");
+      expect(mockCreate).toHaveBeenCalledWith({
+        data: expect.objectContaining({ name: "Test", tenantId: "t-1" }),
+      });
+    });
+
+    it("throws when item not found", async () => {
+      const { getItem, MyServiceError } = await import("~/services/my-service.server");
+      mockFindFirst.mockResolvedValue(null);
+
+      await expect(getItem("missing-id", "t-1")).rejects.toThrow(MyServiceError);
+    });
+  });
+});
+```
+
+**Key conventions:**
+- **Dynamic imports** inside each test (`await import("~/services/...")`) — required for `vi.mock` to intercept
+- **`vi.resetAllMocks()`** in `beforeEach` — clears call history and mock implementations between tests
+- **Mock per Prisma method** — each method gets its own `vi.fn()` for independent control
+- **Test both paths** — happy path + error cases (not found, duplicate, unauthorized, invalid input)
+- **Verify audit logs** — state-changing operations should assert `auditLog.create` was called
+- **Verify no side effects** — when validation fails, assert that no update/delete/audit calls were made
+
+### Writing Schema Tests
+
+Schema tests validate Zod schemas using `safeParse`:
+
+```typescript
+import { describe, it, expect } from "vitest";
+import { createUserSchema } from "~/lib/schemas/user";
+
+describe("createUserSchema", () => {
+  it("accepts valid data", () => {
+    const result = createUserSchema.safeParse({
+      email: "test@example.com",
+      name: "Test User",
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it("rejects missing email", () => {
+    const result = createUserSchema.safeParse({ name: "Test" });
+    expect(result.success).toBe(false);
+  });
+
+  it("enforces email format", () => {
+    const result = createUserSchema.safeParse({
+      email: "not-an-email",
+      name: "Test",
+    });
+    expect(result.success).toBe(false);
+  });
+});
 ```
 
 ### Integration Tests
@@ -1757,13 +2193,12 @@ Integration tests use a separate PostgreSQL database on port 5433 (started by Do
 npm run test:integration
 ```
 
-### Writing Tests
+### Test Infrastructure
 
-Follow existing patterns in `app/services/__tests__/`. Key conventions:
-- Mock Prisma with `vi.mock("~/lib/db/db.server")`
-- Use factories for test data
-- Test both success and error paths
-- Verify audit log creation for state-changing operations
+- **Setup:** `tests/setup/unit-setup.ts` — configured in `vitest.config.ts`
+- **Factories:** `tests/factories/` — reusable data builders for test fixtures
+- **Mocks:** `tests/mocks/` — MSW request handlers for HTTP mocking
+- **Config:** `vitest.config.ts` — path alias (`~` → `app/`), test includes, coverage settings
 
 ---
 

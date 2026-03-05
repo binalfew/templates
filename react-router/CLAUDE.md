@@ -34,7 +34,7 @@ npm run test:e2e         # Playwright E2E tests
 npm run test:e2e:ui      # Playwright with UI
 ```
 
-Run a single unit test file: `npx vitest run app/path/to/file.test.ts`
+Run a single unit test file: `npx vitest run tests/unit/services/file.test.ts`
 Run a single E2E test: `npx playwright test tests/e2e/file.spec.ts`
 
 ## Architecture
