@@ -1,5 +1,5 @@
 import { Link, useLoaderData } from "react-router";
-import { User, Plus, Pencil, Trash2 } from "lucide-react";
+import { ArrowLeft, User, Plus, Pencil, Trash2 } from "lucide-react";
 
 export const handle = { breadcrumb: "Titles" };
 
@@ -118,6 +118,7 @@ export default function TitlesListPage() {
           },
         ]}
         toolbarActions={[
+          { label: "Back", icon: ArrowLeft, href: `${base}/data/references`, variant: "outline" },
           { label: "New Title", icon: Plus, href: `${basePath}/new` },
         ]}
         rowActions={[

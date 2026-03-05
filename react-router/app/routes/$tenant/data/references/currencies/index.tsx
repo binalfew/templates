@@ -1,5 +1,5 @@
 import { Link, useLoaderData } from "react-router";
-import { Banknote, Plus, Pencil, Trash2 } from "lucide-react";
+import { ArrowLeft, Banknote, Plus, Pencil, Trash2 } from "lucide-react";
 
 export const handle = { breadcrumb: "Currencies" };
 
@@ -132,6 +132,7 @@ export default function CurrenciesListPage() {
           },
         ]}
         toolbarActions={[
+          { label: "Back", icon: ArrowLeft, href: `${base}/data/references`, variant: "outline" },
           { label: "New Currency", icon: Plus, href: `${basePath}/new` },
         ]}
         rowActions={[

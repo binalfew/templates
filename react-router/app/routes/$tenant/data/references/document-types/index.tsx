@@ -1,5 +1,5 @@
 import { Link, useLoaderData } from "react-router";
-import { FileText, Plus, Pencil, Trash2 } from "lucide-react";
+import { ArrowLeft, FileText, Plus, Pencil, Trash2 } from "lucide-react";
 
 export const handle = { breadcrumb: "Document Types" };
 
@@ -133,6 +133,7 @@ export default function DocumentTypesListPage() {
           },
         ]}
         toolbarActions={[
+          { label: "Back", icon: ArrowLeft, href: `${base}/data/references`, variant: "outline" },
           { label: "New Document Type", icon: Plus, href: `${basePath}/new` },
         ]}
         rowActions={[

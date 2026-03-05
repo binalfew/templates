@@ -1,5 +1,5 @@
 import { Link, useLoaderData } from "react-router";
-import { Globe, Plus, Pencil, Trash2 } from "lucide-react";
+import { ArrowLeft, Globe, Plus, Pencil, Trash2 } from "lucide-react";
 
 export const handle = { breadcrumb: "Countries" };
 
@@ -130,6 +130,7 @@ export default function CountriesListPage() {
           },
         ]}
         toolbarActions={[
+          { label: "Back", icon: ArrowLeft, href: `${base}/data/references`, variant: "outline" },
           { label: "New Country", icon: Plus, href: `${basePath}/new` },
         ]}
         rowActions={[

@@ -1,5 +1,5 @@
 import { Link, useLoaderData } from "react-router";
-import { Languages, Plus, Pencil, Trash2 } from "lucide-react";
+import { ArrowLeft, Languages, Plus, Pencil, Trash2 } from "lucide-react";
 
 export const handle = { breadcrumb: "Languages" };
 
@@ -125,6 +125,7 @@ export default function LanguagesListPage() {
           },
         ]}
         toolbarActions={[
+          { label: "Back", icon: ArrowLeft, href: `${base}/data/references`, variant: "outline" },
           { label: "New Language", icon: Plus, href: `${basePath}/new` },
         ]}
         rowActions={[
