@@ -166,7 +166,8 @@ try {
     warn("Phase 1: .env.example not found — skipping .env creation.");
   } else {
     copyFileSync(ENV_EXAMPLE, ENV_FILE);
-    log("Phase 1: Copied .env.example → .env");
+    rmSync(ENV_EXAMPLE);
+    log("Phase 1: Copied .env.example → .env and removed .env.example");
   }
 } catch (err) {
   warn(`Phase 1: Failed to copy .env — ${err.message}`);
