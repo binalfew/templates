@@ -21,3 +21,6 @@ tests/test-results/
 
 # File uploads
 /data/uploads/
+
+# Setup marker
+.setup-done
