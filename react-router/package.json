@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "build": "react-router build",
-    "dev": "cross-env NODE_ENV=development node server.js",
+    "dev": "node scripts/setup.mjs && cross-env NODE_ENV=development node server.js",
     "start": "node server.js",
     "typecheck": "react-router typegen && tsc -b",
     "db:migrate": "npx prisma migrate dev",
