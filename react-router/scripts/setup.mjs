@@ -158,8 +158,7 @@ function initHusky() {
 // ─── Phase 0: Marker check ─────────────────────────────
 
 if (existsSync(MARKER)) {
-  log("Phase 0: .setup-done found — skipping bootstrap phases.");
-  initHusky();
+  log("Phase 0: .setup-done found — skipping. Delete .setup-done to re-run setup.");
   process.exit(0);
 }
 
