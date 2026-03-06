@@ -14,7 +14,7 @@
     "db:studio": "npx prisma studio",
     "lint": "tsc -b --noEmit",
     "format": "prettier --write .",
-    "prepare": "node scripts/setup.mjs",
+    "prepare": "husky",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
