@@ -293,52 +293,53 @@ try {
   warn(`Phase 3: Port detection failed — ${err.message}`);
 }
 
-// ─── Phase 4: Package name ──────────────────────────────
+// ─── Phase 4: Package name + DB name ────────────────────
 
 try {
+  const folderName = basename(ROOT);
+  const newName = sanitizePackageName(folderName);
+  const dbName = sanitizeDbName(folderName);
+
+  // 4a: Update package.json name
   const pkgPath = resolve(ROOT, "package.json");
   const pkg = JSON.parse(readFileSync(pkgPath, "utf-8"));
 
   if (pkg.name !== "react-router-template") {
-    log("Phase 4: Package name already changed — skipping.");
+    log("Phase 4a: Package name already changed — skipping.");
+  } else if (newName && newName !== "react-router-template") {
+    pkg.name = newName;
+    writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + "\n");
+    log(`Phase 4a: Updated package name to "${newName}".`);
   } else {
-    const folderName = basename(ROOT);
-    const newName = sanitizePackageName(folderName);
+    log("Phase 4a: Folder name matches template — skipping.");
+  }
 
-    if (newName && newName !== "react-router-template") {
-      pkg.name = newName;
-      writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + "\n");
+  // 4b: Update DB names in .env (independent of package name check)
+  if (existsSync(ENV_FILE) && dbName && dbName !== "app") {
+    let env = readFileSync(ENV_FILE, "utf-8");
+    const hasDefault = env.match(/^DB_NAME=app$/m);
 
-      // Update DB names in .env to match the app name
-      if (existsSync(ENV_FILE)) {
-        let env = readFileSync(ENV_FILE, "utf-8");
-        const dbName = sanitizeDbName(folderName);
-
-        if (dbName && dbName !== "app") {
-          env = env.replace(/^DB_NAME=app$/m, `DB_NAME=${dbName}`);
-          env = env.replace(/^DB_TEST_NAME=app_test$/m, `DB_TEST_NAME=${dbName}_test`);
-          env = env.replace(
-            /^(DATABASE_URL="postgresql:\/\/[^/]+\/)app(")/m,
-            `$1${dbName}$2`,
-          );
-          env = env.replace(
-            /^(SMTP_FROM="noreply@)app(\.local")/m,
-            `$1${dbName}$2`,
-          );
-          writeFileSync(ENV_FILE, env);
-          log(`Phase 4: Updated package name to "${newName}", DB name to "${dbName}".`);
-        } else {
-          log(`Phase 4: Updated package name to "${newName}".`);
-        }
-      } else {
-        log(`Phase 4: Updated package name to "${newName}".`);
-      }
+    if (hasDefault) {
+      env = env.replace(/^DB_NAME=app$/m, `DB_NAME=${dbName}`);
+      env = env.replace(/^DB_TEST_NAME=app_test$/m, `DB_TEST_NAME=${dbName}_test`);
+      env = env.replace(
+        /^(DATABASE_URL="postgresql:\/\/[^/]+\/)app(")/m,
+        `$1${dbName}$2`,
+      );
+      env = env.replace(
+        /^(SMTP_FROM="noreply@)app(\.local")/m,
+        `$1${dbName}$2`,
+      );
+      writeFileSync(ENV_FILE, env);
+      log(`Phase 4b: Updated DB name to "${dbName}".`);
     } else {
-      log("Phase 4: Folder name matches template — skipping.");
+      log("Phase 4b: DB name already customized — skipping.");
     }
+  } else {
+    log("Phase 4b: DB name unchanged — skipping.");
   }
 } catch (err) {
-  warn(`Phase 4: Failed to update package name — ${err.message}`);
+  warn(`Phase 4: Failed to update package/DB name — ${err.message}`);
 }
 
 // ─── Phase 5: Husky ─────────────────────────────────────
