@@ -134,6 +134,14 @@ function sanitizePackageName(name) {
     .replace(/^[._-]+/, "");
 }
 
+function sanitizeDbName(name) {
+  return name
+    .toLowerCase()
+    .replace(/[^a-z0-9_]/g, "_")
+    .replace(/^_+/, "")
+    .replace(/_+$/g, "");
+}
+
 function initHusky() {
   if (isGitRepo()) {
     try {
@@ -300,7 +308,31 @@ try {
     if (newName && newName !== "react-router-template") {
       pkg.name = newName;
       writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + "\n");
-      log(`Phase 4: Updated package name to "${newName}".`);
+
+      // Update DB names in .env to match the app name
+      if (existsSync(ENV_FILE)) {
+        let env = readFileSync(ENV_FILE, "utf-8");
+        const dbName = sanitizeDbName(folderName);
+
+        if (dbName && dbName !== "app") {
+          env = env.replace(/^DB_NAME=app$/m, `DB_NAME=${dbName}`);
+          env = env.replace(/^DB_TEST_NAME=app_test$/m, `DB_TEST_NAME=${dbName}_test`);
+          env = env.replace(
+            /^(DATABASE_URL="postgresql:\/\/[^/]+\/)app(")/m,
+            `$1${dbName}$2`,
+          );
+          env = env.replace(
+            /^(SMTP_FROM="noreply@)app(\.local")/m,
+            `$1${dbName}$2`,
+          );
+          writeFileSync(ENV_FILE, env);
+          log(`Phase 4: Updated package name to "${newName}", DB name to "${dbName}".`);
+        } else {
+          log(`Phase 4: Updated package name to "${newName}".`);
+        }
+      } else {
+        log(`Phase 4: Updated package name to "${newName}".`);
+      }
     } else {
       log("Phase 4: Folder name matches template — skipping.");
     }
