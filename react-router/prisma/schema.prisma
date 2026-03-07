@@ -77,12 +77,6 @@ enum DeliveryStatus {
   DEAD_LETTER
 }
 
-enum FormTemplateStatus {
-  DRAFT
-  PUBLISHED
-  ARCHIVED
-}
-
 // ─── Models ─────────────────────────────────────────────
 
 model Tenant {
@@ -142,7 +136,6 @@ model User {
   verifications Verification[]
   auditLogs          AuditLog[]
   savedViews         SavedView[]
-  messageDeliveries  MessageDelivery[]
   recoveryCodes      RecoveryCode[]
   invitationsSent    Invitation[]
   @@index([tenantId])
@@ -476,21 +469,6 @@ model DocumentType {
   @@index([isActive, sortOrder])
 }
 
-// ─── Analytics ──────────────────────────────────────────
-
-model AnalyticsSnapshot {
-  id         String   @id @default(cuid())
-  tenantId   String
-  metric     String
-  value      Float
-  dimensions Json     @default("{}")
-  period     String
-  timestamp  DateTime
-  createdAt  DateTime @default(now())
-
-  @@index([tenantId, metric, period, timestamp])
-}
-
 // ─── Saved Views ────────────────────────────────────────
 
 enum ViewType {
@@ -522,168 +500,6 @@ model SavedView {
   @@index([userId])
 }
 
-// ─── Custom Fields ──────────────────────────────────────
-
-enum FieldDataType {
-  TEXT
-  LONG_TEXT
-  NUMBER
-  BOOLEAN
-  DATE
-  DATETIME
-  ENUM
-  MULTI_ENUM
-  EMAIL
-  URL
-  PHONE
-  FILE
-  IMAGE
-  REFERENCE
-  FORMULA
-  JSON
-}
-
-model FieldDefinition {
-  id           String        @id @default(cuid())
-  tenantId     String
-  entityType   String        @default("Generic")
-  name         String
-  label        String
-  description  String?
-  dataType     FieldDataType @default(TEXT)
-  sortOrder    Int           @default(0)
-  isRequired   Boolean       @default(false)
-  isUnique     Boolean       @default(false)
-  isSearchable Boolean       @default(false)
-  isFilterable Boolean       @default(false)
-  defaultValue String?
-  config       Json          @default("{}")
-  validation   Json          @default("[]")
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
-
-  @@unique([tenantId, entityType, name])
-  @@index([tenantId, entityType, sortOrder])
-}
-
-// ─── Custom Objects ─────────────────────────────────────
-
-model CustomObjectDefinition {
-  id          String    @id @default(cuid())
-  tenantId    String
-  name        String
-  slug        String
-  description String?
-  icon        String?
-  fields      Json      @default("[]")
-  isActive    Boolean   @default(true)
-  createdBy   String?
-  deletedAt   DateTime?
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-
-  records CustomObjectRecord[]
-
-  @@unique([tenantId, slug])
-  @@index([tenantId, isActive])
-  @@index([deletedAt])
-}
-
-model CustomObjectRecord {
-  id           String   @id @default(cuid())
-  definitionId String
-  tenantId     String
-  data         Json     @default("{}")
-  createdBy    String?
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-
-  definition CustomObjectDefinition @relation(fields: [definitionId], references: [id], onDelete: Cascade)
-
-  @@index([definitionId, tenantId])
-}
-
-// ─── Message Templates & Broadcasts ─────────────────────
-
-enum MessageChannel {
-  EMAIL
-  SMS
-  PUSH
-  IN_APP
-}
-
-enum BroadcastStatus {
-  DRAFT
-  SCHEDULED
-  SENDING
-  SENT
-  FAILED
-  CANCELLED
-}
-
-model MessageTemplate {
-  id        String         @id @default(cuid())
-  tenantId  String
-  name      String
-  subject   String?
-  body      String
-  channel   MessageChannel @default(EMAIL)
-  isSystem  Boolean        @default(false)
-  variables String[]       @default([])
-  createdBy String?
-  updatedBy String?
-  createdAt DateTime       @default(now())
-  updatedAt DateTime       @updatedAt
-
-  broadcasts BroadcastMessage[]
-
-  @@unique([tenantId, name])
-  @@index([tenantId, channel])
-}
-
-model BroadcastMessage {
-  id             String          @id @default(cuid())
-  tenantId       String
-  templateId     String?
-  subject        String?
-  body           String
-  channel        MessageChannel  @default(EMAIL)
-  status         BroadcastStatus @default(DRAFT)
-  filters        Json            @default("{}")
-  recipientCount Int             @default(0)
-  sentCount      Int             @default(0)
-  failedCount    Int             @default(0)
-  scheduledAt    DateTime?
-  sentAt         DateTime?
-  createdBy      String?
-  cancelledBy    String?
-  createdAt      DateTime        @default(now())
-  updatedAt      DateTime        @updatedAt
-
-  template   MessageTemplate?  @relation(fields: [templateId], references: [id])
-  deliveries MessageDelivery[]
-
-  @@index([tenantId, status])
-}
-
-model MessageDelivery {
-  id           String   @id @default(cuid())
-  broadcastId  String
-  userId       String
-  channel      String
-  recipient    String?
-  status       String   @default("PENDING")
-  sentAt       DateTime?
-  error        String?
-  errorMessage String?
-  createdAt    DateTime @default(now())
-
-  broadcast BroadcastMessage @relation(fields: [broadcastId], references: [id], onDelete: Cascade)
-  user      User             @relation(fields: [userId], references: [id])
-
-  @@index([broadcastId, status])
-}
-
 // ─── File Uploads ───────────────────────────────────────
 
 model UploadedFile {
@@ -698,27 +514,6 @@ model UploadedFile {
   createdAt    DateTime @default(now())
 
   @@index([tenantId])
-}
-
-// ─── Section Templates (Form Designer) ──────────────────
-
-model SectionTemplate {
-  id          String             @id @default(cuid())
-  tenantId    String
-  name        String
-  description String?
-  entityType  String             @default("Generic")
-  definition  Json               @default("{}")
-  isActive    Boolean            @default(true)
-  status      FormTemplateStatus @default(DRAFT)
-  publishedAt DateTime?
-  createdAt   DateTime           @default(now())
-  updatedAt   DateTime           @updatedAt
-
-  @@unique([tenantId, name])
-  @@index([tenantId, isActive])
-  @@index([tenantId, status])
-  @@index([tenantId, entityType, status])
 }
 
 // ─── Background Jobs ──────────────────────────────────

@@ -53,7 +53,6 @@ function withSoftDelete(client: PrismaClient) {
       user: softDeleteExtension("user"),
       role: softDeleteExtension("role"),
       webhookSubscription: softDeleteExtension("webhookSubscription"),
-      customObjectDefinition: softDeleteExtension("customObjectDefinition"),
     },
   });
 }

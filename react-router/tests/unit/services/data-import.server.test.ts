@@ -13,7 +13,6 @@ const mockCurrencyFindUnique = vi.fn();
 const mockCurrencyCreate = vi.fn();
 const mockDocumentTypeFindUnique = vi.fn();
 const mockDocumentTypeCreate = vi.fn();
-const mockCustomObjectRecordCreate = vi.fn();
 const mockHashPassword = vi.fn();
 
 vi.mock("~/utils/db/db.server", () => ({
@@ -44,9 +43,6 @@ vi.mock("~/utils/db/db.server", () => ({
     documentType: {
       findUnique: (...args: unknown[]) => mockDocumentTypeFindUnique(...args),
       create: (...args: unknown[]) => mockDocumentTypeCreate(...args),
-    },
-    customObjectRecord: {
-      create: (...args: unknown[]) => mockCustomObjectRecordCreate(...args),
     },
   },
 }));
@@ -790,97 +786,6 @@ describe("data-import.server", () => {
           sortOrder: 10,
         },
       });
-    });
-  });
-
-  // ---------- importData: custom-object-records ----------
-
-  describe("importData - custom-object-records", () => {
-    const baseOptions = {
-      entity: "custom-object-records",
-      tenantId: "tenant-1",
-      userId: "user-1",
-      objectId: "obj-1",
-      dryRun: false,
-    };
-
-    it("throws when objectId is missing", async () => {
-      const { importData } = await import("~/services/data-import.server");
-
-      await expect(
-        importData({
-          entity: "custom-object-records",
-          tenantId: "tenant-1",
-          userId: "user-1",
-          dryRun: false,
-          rows: [{ data: '{"key":"val"}' }],
-        }),
-      ).rejects.toThrow("objectId required");
-    });
-
-    it("validates rows in dry run (all rows are valid)", async () => {
-      const { importData } = await import("~/services/data-import.server");
-
-      const result = await importData({
-        ...baseOptions,
-        dryRun: true,
-        rows: [{ data: '{"key":"val"}' }, { plate: "ABC-123" }],
-      });
-
-      expect(result.validRows).toBe(2);
-      expect(result.errorRows).toBe(0);
-      expect(result.imported).toBe(0);
-    });
-
-    it("creates records with parsed JSON data field", async () => {
-      const { importData } = await import("~/services/data-import.server");
-      mockCustomObjectRecordCreate.mockResolvedValue({ id: "rec-1" });
-
-      const result = await importData({
-        ...baseOptions,
-        dryRun: false,
-        rows: [{ data: '{"plate":"XYZ-789"}' }],
-      });
-
-      expect(result.imported).toBe(1);
-      expect(mockCustomObjectRecordCreate).toHaveBeenCalledWith({
-        data: {
-          definitionId: "obj-1",
-          tenantId: "tenant-1",
-          data: { plate: "XYZ-789" },
-          createdBy: "user-1",
-        },
-      });
-    });
-
-    it("uses row directly when no data field is present", async () => {
-      const { importData } = await import("~/services/data-import.server");
-      mockCustomObjectRecordCreate.mockResolvedValue({ id: "rec-1" });
-
-      await importData({
-        ...baseOptions,
-        dryRun: false,
-        rows: [{ plate: "ABC-123", color: "red" }],
-      });
-
-      expect(mockCustomObjectRecordCreate).toHaveBeenCalledWith({
-        data: expect.objectContaining({
-          data: { plate: "ABC-123", color: "red" },
-        }),
-      });
-    });
-
-    it("handles create failure gracefully", async () => {
-      const { importData } = await import("~/services/data-import.server");
-      mockCustomObjectRecordCreate.mockRejectedValue(new Error("DB error"));
-
-      const result = await importData({
-        ...baseOptions,
-        dryRun: false,
-        rows: [{ data: '{"key":"val"}' }],
-      });
-
-      expect(result.imported).toBe(0);
     });
   });
 

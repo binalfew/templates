@@ -10,7 +10,6 @@ import {
   LayoutDashboard,
   Shield,
   KeyRound,
-  Box,
   ClipboardList,
 } from "lucide-react";
 import { Dialog, DialogContent, DialogTitle } from "~/components/ui/dialog";
@@ -49,11 +48,6 @@ const ENTITY_CONFIG: Record<
     icon: KeyRound,
     label: "Permission",
     colorClass: "bg-amber-100 text-amber-800",
-  },
-  CustomObject: {
-    icon: Box,
-    label: "Object",
-    colorClass: "bg-green-100 text-green-800",
   },
   AuditLog: {
     icon: ClipboardList,
@@ -146,7 +140,7 @@ export function CommandPalette({ open, onOpenChange, basePrefix = "/admin" }: Co
 
   // Group results by entity type for display
   const groupedResults: { type: string; items: SearchResultItem[] }[] = [];
-  const entityOrder = ["User", "Role", "Permission", "CustomObject", "AuditLog"];
+  const entityOrder = ["User", "Role", "Permission", "AuditLog"];
   for (const type of entityOrder) {
     const items = results.filter((r) => r.entityType === type);
     if (items.length > 0) {

@@ -18,13 +18,10 @@ import { handleServiceError } from "~/utils/errors/handle-service-error.server";
 import { createUser } from "~/services/users.server";
 import { listTenants } from "~/services/tenants.server";
 import { createUserSchema } from "~/utils/schemas/user";
-import { loadExtrasForEntity, parseExtrasForEntity } from "~/services/section-templates.server";
-import { FormRenderer } from "~/components/form-renderer/form-renderer";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { NativeSelect, NativeSelectOption } from "~/components/ui/native-select";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
-import { Separator } from "~/components/ui/separator";
 import { Field } from "~/components/ui/field";
 import { useBasePrefix } from "~/hooks/use-base-prefix";
 import { buildServiceContext } from "~/utils/request-context.server";
@@ -39,11 +36,7 @@ export async function loader({ request }: Route.LoaderArgs) {
     tenants = (await listTenants()).map((t) => ({ id: t.id, name: t.name, slug: t.slug }));
   }
 
-  const { extrasDefinition, extrasFieldDefs } = tenantId
-    ? await loadExtrasForEntity(tenantId, "User")
-    : { extrasDefinition: null, extrasFieldDefs: [] };
-
-  return { tenants, isSuperAdmin, extrasDefinition, extrasFieldDefs };
+  return { tenants, isSuperAdmin };
 }
 
 export async function action({ request, params }: Route.ActionArgs) {
@@ -61,18 +54,10 @@ export async function action({ request, params }: Route.ActionArgs) {
   const targetTenantId =
     isSuperAdmin && submission.value.tenantId ? submission.value.tenantId : tenantId;
 
-  const extrasResult = await parseExtrasForEntity(targetTenantId, "User", formData);
-  if (extrasResult?.extrasErrors) {
-    return data(
-      { result: submission.reply(), extrasErrors: extrasResult.extrasErrors },
-      { status: 400 },
-    );
-  }
-
   const ctx = buildServiceContext(request, user, targetTenantId);
 
   try {
-    await createUser({ ...submission.value, tenantId: undefined, extras: extrasResult?.extras }, ctx);
+    await createUser({ ...submission.value, tenantId: undefined }, ctx);
     const redirectTo = new URL(request.url).searchParams.get("redirectTo");
     return redirect(redirectTo || `/${params.tenant}/security/users`);
   } catch (error) {
@@ -81,8 +66,7 @@ export async function action({ request, params }: Route.ActionArgs) {
 }
 
 export default function NewUserPage() {
-  const { tenants, isSuperAdmin, extrasDefinition, extrasFieldDefs } =
-    useLoaderData<typeof loader>();
+  const { tenants, isSuperAdmin } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
   const basePrefix = useBasePrefix();
   const [searchParams] = useSearchParams();
@@ -96,11 +80,6 @@ export default function NewUserPage() {
     shouldValidate: "onBlur",
     shouldRevalidate: "onInput",
   });
-
-  const extrasErrors =
-    actionData && "extrasErrors" in actionData
-      ? (actionData.extrasErrors as Record<string, string[]>)
-      : undefined;
 
   return (
     <div className="space-y-6">
@@ -197,21 +176,6 @@ export default function NewUserPage() {
                 </NativeSelect>
               </Field>
             </div>
-
-            {extrasDefinition && extrasFieldDefs.length > 0 && (
-              <>
-                <Separator />
-                <h3 className="text-lg font-semibold">Additional Information</h3>
-                <FormRenderer
-                  mode="inline"
-                  fieldNamePrefix="extras"
-                  layoutDefinition={extrasDefinition}
-                  fieldDefinitions={extrasFieldDefs}
-                  defaultValues={{}}
-                  errors={extrasErrors}
-                />
-              </>
-            )}
 
             <div className="flex gap-3 pt-4">
               <Button type="submit">Create User</Button>

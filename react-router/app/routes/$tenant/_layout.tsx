@@ -32,15 +32,10 @@ export async function loader({ request, params }: Route.LoaderArgs) {
   const i18nEnabled = await isFeatureEnabled(FEATURE_FLAG_KEYS.I18N, flagContext);
   const pwaEnabled = await isFeatureEnabled(FEATURE_FLAG_KEYS.PWA, flagContext);
   const offlineEnabled = await isFeatureEnabled(FEATURE_FLAG_KEYS.OFFLINE_MODE, flagContext);
-  const analyticsEnabled = await isFeatureEnabled(FEATURE_FLAG_KEYS.ANALYTICS, flagContext);
   const restApiEnabled = await isFeatureEnabled(FEATURE_FLAG_KEYS.REST_API, flagContext);
   const webhooksEnabled = await isFeatureEnabled(FEATURE_FLAG_KEYS.WEBHOOKS, flagContext);
   const savedViewsEnabled = await isFeatureEnabled(FEATURE_FLAG_KEYS.SAVED_VIEWS, flagContext);
-  const customFieldsEnabled = await isFeatureEnabled(FEATURE_FLAG_KEYS.CUSTOM_FIELDS, flagContext);
-  const broadcastsEnabled = await isFeatureEnabled(FEATURE_FLAG_KEYS.BROADCASTS, flagContext);
   const globalSearchEnabled = await isFeatureEnabled(FEATURE_FLAG_KEYS.GLOBAL_SEARCH, flagContext);
-  const customObjectsEnabled = await isFeatureEnabled(FEATURE_FLAG_KEYS.CUSTOM_OBJECTS, flagContext);
-  const formDesignerEnabled = await isFeatureEnabled(FEATURE_FLAG_KEYS.FORM_DESIGNER, flagContext);
   const twoFactorEnabled = await isFeatureEnabled(FEATURE_FLAG_KEYS.TWO_FACTOR, flagContext);
   const dataImportExportEnabled = await isFeatureEnabled(
     FEATURE_FLAG_KEYS.DATA_IMPORT_EXPORT,
@@ -50,15 +45,10 @@ export async function loader({ request, params }: Route.LoaderArgs) {
 
   const enabledFeatures: Record<string, boolean> = {
     FF_NOTIFICATIONS: notificationsEnabled,
-    FF_ANALYTICS: analyticsEnabled,
     FF_REST_API: restApiEnabled,
     FF_WEBHOOKS: webhooksEnabled,
     FF_SAVED_VIEWS: savedViewsEnabled,
-    FF_CUSTOM_FIELDS: customFieldsEnabled,
-    FF_BROADCASTS: broadcastsEnabled,
     FF_GLOBAL_SEARCH: globalSearchEnabled,
-    FF_CUSTOM_OBJECTS: customObjectsEnabled,
-    FF_FORM_DESIGNER: formDesignerEnabled,
     FF_TWO_FACTOR: twoFactorEnabled,
     FF_DATA_IMPORT_EXPORT: dataImportExportEnabled,
     FF_INVITATIONS: invitationsEnabled,

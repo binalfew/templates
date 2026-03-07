@@ -76,9 +76,8 @@ export async function importData(options: {
   rows: ImportRow[];
   dryRun: boolean;
   userId: string;
-  objectId?: string;
 }): Promise<ImportResult> {
-  const { entity, tenantId, rows, dryRun, userId, objectId } = options;
+  const { entity, tenantId, rows, dryRun, userId } = options;
   const result: ImportResult = {
     totalRows: rows.length,
     validRows: 0,
@@ -382,36 +381,6 @@ export async function importData(options: {
               result.imported++;
             } catch (err) {
               logger.error({ code: row.code, err }, "Import: failed to create document type");
-            }
-          }
-        }
-      }
-      break;
-    }
-
-    case "custom-object-records": {
-      if (!objectId) throw new Error("objectId required");
-      for (let i = 0; i < rows.length; i++) {
-        result.validRows++;
-      }
-
-      if (!dryRun) {
-        for (let i = 0; i < rows.length; i += BATCH_SIZE) {
-          const batch = rows.slice(i, i + BATCH_SIZE);
-          for (const row of batch) {
-            try {
-              const data = row.data ? JSON.parse(row.data) : row;
-              await prisma.customObjectRecord.create({
-                data: {
-                  definitionId: objectId,
-                  tenantId,
-                  data,
-                  createdBy: userId,
-                },
-              });
-              result.imported++;
-            } catch (err) {
-              logger.error({ err }, "Import: failed to create custom object record");
             }
           }
         }

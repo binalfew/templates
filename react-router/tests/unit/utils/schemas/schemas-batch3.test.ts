@@ -617,18 +617,6 @@ describe("exportSchema", () => {
     expect(result.success).toBe(true);
   });
 
-  it("accepts custom-object-records entity", () => {
-    const result = exportSchema.safeParse({
-      entity: "custom-object-records",
-      objectId: "obj-123",
-    });
-    expect(result.success).toBe(true);
-    if (result.success) {
-      expect(result.data.entity).toBe("custom-object-records");
-      expect(result.data.objectId).toBe("obj-123");
-    }
-  });
-
   it("rejects missing entity", () => {
     const result = exportSchema.safeParse({ format: "csv" });
     expect(result.success).toBe(false);
@@ -645,17 +633,9 @@ describe("exportSchema", () => {
   });
 
   it("accepts all valid entity values", () => {
-    for (const entity of ["users", "roles", "custom-object-records"] as const) {
+    for (const entity of ["users", "roles"] as const) {
       const result = exportSchema.safeParse({ entity });
       expect(result.success).toBe(true);
-    }
-  });
-
-  it("accepts optional objectId", () => {
-    const result = exportSchema.safeParse({ entity: "users" });
-    expect(result.success).toBe(true);
-    if (result.success) {
-      expect(result.data.objectId).toBeUndefined();
     }
   });
 });
@@ -694,17 +674,6 @@ describe("importSchema", () => {
     }
   });
 
-  it("accepts custom-object-records entity with objectId", () => {
-    const result = importSchema.safeParse({
-      entity: "custom-object-records",
-      objectId: "obj-456",
-    });
-    expect(result.success).toBe(true);
-    if (result.success) {
-      expect(result.data.objectId).toBe("obj-456");
-    }
-  });
-
   it("rejects missing entity", () => {
     const result = importSchema.safeParse({ dryRun: false });
     expect(result.success).toBe(false);
@@ -716,7 +685,7 @@ describe("importSchema", () => {
   });
 
   it("accepts all valid entity values", () => {
-    for (const entity of ["users", "roles", "custom-object-records"] as const) {
+    for (const entity of ["users", "roles"] as const) {
       const result = importSchema.safeParse({ entity });
       expect(result.success).toBe(true);
     }

@@ -20,14 +20,11 @@ import { getUser, updateUser, changePassword, UserError } from "~/services/users
 import { hasUserSetUp2FA, resetUserTwoFA } from "~/services/2fa-enforcement.server";
 import { handleServiceError } from "~/utils/errors/handle-service-error.server";
 import { updateUserSchema, changePasswordSchema } from "~/utils/schemas/user";
-import { loadExtrasForEntity, parseExtrasForEntity } from "~/services/section-templates.server";
-import { FormRenderer } from "~/components/form-renderer/form-renderer";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { NativeSelect, NativeSelectOption } from "~/components/ui/native-select";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
-import { Separator } from "~/components/ui/separator";
 import { Field } from "~/components/ui/field";
 import { useBasePrefix } from "~/hooks/use-base-prefix";
 import { buildServiceContext } from "~/utils/request-context.server";
@@ -46,9 +43,7 @@ export async function loader({ request, params }: Route.LoaderArgs) {
   });
   const userHas2FA = twoFactorEnabled ? await hasUserSetUp2FA(params.userId) : false;
 
-  const { extrasDefinition, extrasFieldDefs } = await loadExtrasForEntity(tenantId, "User");
-
-  return { targetUser, twoFactorEnabled, userHas2FA, extrasDefinition, extrasFieldDefs };
+  return { targetUser, twoFactorEnabled, userHas2FA };
 }
 
 export async function action({ request, params }: Route.ActionArgs) {
@@ -93,16 +88,8 @@ export async function action({ request, params }: Route.ActionArgs) {
     return data({ result: submission.reply() }, { status: 400 });
   }
 
-  const extrasResult = await parseExtrasForEntity(tenantId, "User", formData);
-  if (extrasResult?.extrasErrors) {
-    return data(
-      { result: submission.reply(), extrasErrors: extrasResult.extrasErrors },
-      { status: 400 },
-    );
-  }
-
   try {
-    await updateUser(params.userId, { ...submission.value, extras: extrasResult?.extras }, ctx);
+    await updateUser(params.userId, submission.value, ctx);
     const redirectTo = new URL(request.url).searchParams.get("redirectTo");
     return redirect(redirectTo || `/${params.tenant}/security/users`);
   } catch (error) {
@@ -111,8 +98,7 @@ export async function action({ request, params }: Route.ActionArgs) {
 }
 
 export default function EditUserPage() {
-  const { targetUser, twoFactorEnabled, userHas2FA, extrasDefinition, extrasFieldDefs } =
-    useLoaderData<typeof loader>();
+  const { targetUser, twoFactorEnabled, userHas2FA } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
   const basePrefix = useBasePrefix();
   const [searchParams] = useSearchParams();
@@ -142,15 +128,6 @@ export default function EditUserPage() {
     shouldValidate: "onBlur",
     shouldRevalidate: "onInput",
   });
-
-  const userExtras = (
-    targetUser.extras && typeof targetUser.extras === "object" ? targetUser.extras : {}
-  ) as Record<string, unknown>;
-
-  const extrasErrors =
-    actionData && "extrasErrors" in actionData
-      ? (actionData.extrasErrors as Record<string, string[]>)
-      : undefined;
 
   return (
     <div className="space-y-6">
@@ -209,21 +186,6 @@ export default function EditUserPage() {
                 <NativeSelectOption value="LOCKED">Locked</NativeSelectOption>
               </NativeSelect>
             </Field>
-
-            {extrasDefinition && extrasFieldDefs.length > 0 && (
-              <>
-                <Separator />
-                <h3 className="text-lg font-semibold">Additional Information</h3>
-                <FormRenderer
-                  mode="inline"
-                  fieldNamePrefix="extras"
-                  layoutDefinition={extrasDefinition}
-                  fieldDefinitions={extrasFieldDefs}
-                  defaultValues={userExtras}
-                  errors={extrasErrors}
-                />
-              </>
-            )}
 
             <div className="flex gap-3 pt-4">
               <Button type="submit">Save Changes</Button>

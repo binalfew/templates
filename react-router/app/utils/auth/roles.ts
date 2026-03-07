@@ -8,8 +8,8 @@ export const ROLE_ADMIN = "ADMIN";
 export const ROLE_TENANT_ADMIN = "TENANT_ADMIN";
 export const ROLE_VIEWER = "VIEWER";
 
-/** Structural / system-level features (objects, fields, forms, data). */
+/** Structural / system-level features (data). */
 export const ADMIN_ONLY = [ROLE_ADMIN] as const;
 
-/** Operational features (api-keys, webhooks, templates, broadcasts, views). */
+/** Operational features (api-keys, webhooks, views). */
 export const ADMIN_OR_TENANT_ADMIN = [ROLE_ADMIN, ROLE_TENANT_ADMIN] as const;

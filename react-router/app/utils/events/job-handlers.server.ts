@@ -18,16 +18,4 @@ registerJobHandler("webhook-delivery", async (payload) => {
   await deliverWebhook(deliveryId);
 });
 
-// --- Broadcast Send Handler ---
-
-registerJobHandler("broadcast-send", async (payload) => {
-  const { broadcastId, tenantId, userId } = payload as {
-    broadcastId: string;
-    tenantId: string;
-    userId: string;
-  };
-  const { sendBroadcast } = await import("~/services/broadcasts.server");
-  await sendBroadcast(broadcastId, { tenantId, userId });
-});
-
 logger.debug("Job handlers registered");

@@ -37,25 +37,6 @@ export function buildRole(overrides?: Record<string, unknown>) {
   };
 }
 
-export function buildFieldDefinition(overrides?: Record<string, unknown>) {
-  const n = unique();
-  return {
-    entityType: "Generic",
-    name: `field_${n}`,
-    label: `Field ${n}`,
-    description: `Description for field ${n}`,
-    dataType: "TEXT" as const,
-    sortOrder: n,
-    isRequired: false,
-    isUnique: false,
-    isSearchable: false,
-    isFilterable: false,
-    config: {},
-    validation: [],
-    ...overrides,
-  };
-}
-
 export async function seedFullScenario(prisma: PrismaClient) {
   const tenant = await prisma.tenant.create({ data: buildTenant() });
   const passwordHash = await hash("TestPassword123!", 10);

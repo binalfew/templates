@@ -25,9 +25,9 @@ vi.mock("~/services/webhook-delivery.server", () => ({
 }));
 
 const TENANT_ID = "tenant-1";
-const EVENT_TYPE = "broadcast.sent";
+const EVENT_TYPE = "user.created";
 const EVENT_ID = "evt-abc-123";
-const PAYLOAD = { broadcastId: "bc-1", recipientCount: 42 };
+const PAYLOAD = { userId: "u-1", email: "test@example.com" };
 
 function makeSubscription(overrides: Record<string, unknown> = {}) {
   return {

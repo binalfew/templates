@@ -125,7 +125,6 @@ app.get("/resources/export-download", async (req, res) => {
       entity,
       tenantId: user.tenantId,
       format,
-      objectId: (req.query.objectId as string) || undefined,
     });
 
     res.setHeader("Content-Type", result.contentType);

@@ -44,9 +44,9 @@ function makeDelivery(overrides: Record<string, unknown> = {}) {
     id: "del-1",
     tenantId: "tenant-1",
     subscriptionId: "sub-1",
-    eventType: "broadcast.sent",
+    eventType: "user.created",
     eventId: "evt-1",
-    payload: { broadcastId: "bc-1" },
+    payload: { userId: "u-1" },
     attempts: 0,
     maxAttempts: 5,
     status: "PENDING",
@@ -198,7 +198,7 @@ describe("webhook-delivery.server", () => {
       await deliverWebhook("del-1");
 
       expect(capturedHeaders["Content-Type"]).toBe("application/json");
-      expect(capturedHeaders["X-Webhook-Event"]).toBe("broadcast.sent");
+      expect(capturedHeaders["X-Webhook-Event"]).toBe("user.created");
       expect(capturedHeaders["X-Webhook-Delivery"]).toBe("del-1");
       expect(capturedHeaders["X-Webhook-Signature"]).toMatch(/^sha256=[a-f0-9]{64}$/);
 

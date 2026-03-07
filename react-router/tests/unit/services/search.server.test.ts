@@ -4,7 +4,6 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 const mockUserFindMany = vi.fn();
 const mockRoleFindMany = vi.fn();
 const mockPermissionFindMany = vi.fn();
-const mockCustomObjectDefFindMany = vi.fn();
 const mockAuditLogFindMany = vi.fn();
 
 vi.mock("~/utils/db/db.server", () => ({
@@ -17,9 +16,6 @@ vi.mock("~/utils/db/db.server", () => ({
     },
     permission: {
       findMany: (...args: unknown[]) => mockPermissionFindMany(...args),
-    },
-    customObjectDefinition: {
-      findMany: (...args: unknown[]) => mockCustomObjectDefFindMany(...args),
     },
     auditLog: {
       findMany: (...args: unknown[]) => mockAuditLogFindMany(...args),
@@ -34,7 +30,6 @@ describe("search.server", () => {
     mockUserFindMany.mockResolvedValue([]);
     mockRoleFindMany.mockResolvedValue([]);
     mockPermissionFindMany.mockResolvedValue([]);
-    mockCustomObjectDefFindMany.mockResolvedValue([]);
     mockAuditLogFindMany.mockResolvedValue([]);
   });
 
@@ -91,9 +86,6 @@ describe("search.server", () => {
       mockPermissionFindMany.mockResolvedValue([
         { id: "p-1", resource: "admin", action: "read", description: "Admin read" },
       ]);
-      mockCustomObjectDefFindMany.mockResolvedValue([
-        { id: "co-1", name: "Admin Panel", slug: "admin-panel", description: null },
-      ]);
       mockAuditLogFindMany.mockResolvedValue([
         {
           id: "al-1",
@@ -106,15 +98,14 @@ describe("search.server", () => {
 
       const result = await globalSearch("admin", "t-1");
 
-      expect(result.total).toBe(5);
+      expect(result.total).toBe(4);
       expect(result.query).toBe("admin");
-      expect(result.results).toHaveLength(5);
+      expect(result.results).toHaveLength(4);
 
       const types = result.results.map((r) => r.type);
       expect(types).toContain("User");
       expect(types).toContain("Role");
       expect(types).toContain("Permission");
-      expect(types).toContain("CustomObject");
       expect(types).toContain("AuditLog");
     });
 
@@ -189,34 +180,6 @@ describe("search.server", () => {
       expect(perm?.title).toBe("user:write");
       expect(perm?.subtitle).toBe("Write users");
       expect(perm?.url).toBe("security/permissions/p-1");
-    });
-
-    it("formats CustomObject results with slug as subtitle when description is null", async () => {
-      const { globalSearch } = await import("~/services/search.server");
-
-      mockCustomObjectDefFindMany.mockResolvedValue([
-        { id: "co-1", name: "Vehicles", slug: "vehicles", description: null },
-      ]);
-
-      const result = await globalSearch("vehicles", "t-1");
-
-      const co = result.results.find((r) => r.type === "CustomObject");
-      expect(co?.title).toBe("Vehicles");
-      expect(co?.subtitle).toBe("vehicles");
-      expect(co?.url).toBe("objects/vehicles");
-    });
-
-    it("formats CustomObject results with description as subtitle when present", async () => {
-      const { globalSearch } = await import("~/services/search.server");
-
-      mockCustomObjectDefFindMany.mockResolvedValue([
-        { id: "co-2", name: "Assets", slug: "assets", description: "Company assets" },
-      ]);
-
-      const result = await globalSearch("assets", "t-1");
-
-      const co = result.results.find((r) => r.type === "CustomObject");
-      expect(co?.subtitle).toBe("Company assets");
     });
 
     it("formats AuditLog results correctly", async () => {

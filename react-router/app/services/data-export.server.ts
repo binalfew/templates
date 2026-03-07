@@ -4,11 +4,10 @@ interface ExportOptions {
   entity: string;
   tenantId: string;
   format: "csv" | "json";
-  objectId?: string;
 }
 
 export async function exportData(options: ExportOptions): Promise<{ content: string; filename: string; contentType: string }> {
-  const { entity, tenantId, format, objectId } = options;
+  const { entity, tenantId, format } = options;
   let rows: Record<string, unknown>[];
 
   switch (entity) {
@@ -142,21 +141,6 @@ export async function exportData(options: ExportOptions): Promise<{ content: str
         category: d.category ?? "",
         sortOrder: d.sortOrder,
         isActive: d.isActive,
-      }));
-      break;
-    }
-    case "custom-object-records": {
-      if (!objectId) throw new Error("objectId is required for custom object records");
-      const records = await prisma.customObjectRecord.findMany({
-        where: { definitionId: objectId, tenantId },
-        select: { id: true, data: true, createdBy: true, createdAt: true },
-        orderBy: { createdAt: "desc" },
-      });
-      rows = records.map((r) => ({
-        id: r.id,
-        data: JSON.stringify(r.data),
-        createdBy: r.createdBy ?? "",
-        createdAt: r.createdAt.toISOString(),
       }));
       break;
     }

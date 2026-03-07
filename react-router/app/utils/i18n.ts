@@ -9,7 +9,6 @@ import enAuth from "~/locales/en/auth.json";
 import enValidation from "~/locales/en/validation.json";
 import enSettings from "~/locales/en/settings.json";
 import enUsers from "~/locales/en/users.json";
-import enAnalytics from "~/locales/en/analytics.json";
 import enNotifications from "~/locales/en/notifications.json";
 
 // French
@@ -19,7 +18,6 @@ import frAuth from "~/locales/fr/auth.json";
 import frValidation from "~/locales/fr/validation.json";
 import frSettings from "~/locales/fr/settings.json";
 import frUsers from "~/locales/fr/users.json";
-import frAnalytics from "~/locales/fr/analytics.json";
 import frNotifications from "~/locales/fr/notifications.json";
 
 export const supportedLanguages = [
@@ -41,7 +39,6 @@ const resources = {
     validation: enValidation,
     settings: enSettings,
     users: enUsers,
-    analytics: enAnalytics,
     notifications: enNotifications,
   },
   fr: {
@@ -51,7 +48,6 @@ const resources = {
     validation: frValidation,
     settings: frSettings,
     users: frUsers,
-    analytics: frAnalytics,
     notifications: frNotifications,
   },
 };
@@ -73,7 +69,7 @@ export function initI18n(language?: string) {
       resources,
       fallbackLng: "en",
       defaultNS: "common",
-      ns: ["common", "nav", "auth", "validation", "settings", "users", "analytics", "notifications"],
+      ns: ["common", "nav", "auth", "validation", "settings", "users", "notifications"],
       ...(language ? { lng: language } : {}),
       detection: {
         order: ["cookie", "navigator"],

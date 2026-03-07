@@ -134,13 +134,6 @@ export function buildSettingsChildren(basePrefix: string): NavChild[] {
       featureFlag: "FF_WEBHOOKS",
     },
     {
-      title: "Fields",
-      tKey: "customFields",
-      url: `${basePrefix}/settings/fields`,
-      roles: [...ADMIN_ONLY],
-      featureFlag: "FF_CUSTOM_FIELDS",
-    },
-    {
       title: "Security",
       tKey: "security",
       url: `${basePrefix}/settings/security`,
@@ -153,34 +146,6 @@ export function buildSettingsChildren(basePrefix: string): NavChild[] {
       url: `${basePrefix}/settings/views`,
       roles: [...ADMIN_OR_TENANT_ADMIN],
       featureFlag: "FF_SAVED_VIEWS",
-    },
-    {
-      title: "Objects",
-      tKey: "customObjects",
-      url: `${basePrefix}/settings/objects`,
-      roles: [...ADMIN_ONLY],
-      featureFlag: "FF_CUSTOM_OBJECTS",
-    },
-    {
-      title: "Templates",
-      tKey: "messageTemplates",
-      url: `${basePrefix}/settings/templates`,
-      roles: [...ADMIN_OR_TENANT_ADMIN],
-      featureFlag: "FF_BROADCASTS",
-    },
-    {
-      title: "Broadcasts",
-      tKey: "broadcasts",
-      url: `${basePrefix}/settings/broadcasts`,
-      roles: [...ADMIN_OR_TENANT_ADMIN],
-      featureFlag: "FF_BROADCASTS",
-    },
-    {
-      title: "Forms",
-      tKey: "formDesigner",
-      url: `${basePrefix}/settings/forms`,
-      roles: [...ADMIN_ONLY],
-      featureFlag: "FF_FORM_DESIGNER",
     },
   ];
 }

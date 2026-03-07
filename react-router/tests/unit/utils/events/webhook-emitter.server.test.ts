@@ -126,7 +126,7 @@ describe("webhook-emitter.server", () => {
 
       mockIsFeatureEnabled.mockResolvedValueOnce(false);
 
-      await emitWebhookEvent("tenant-special-99", "broadcast.sent", { broadcastId: "b-1" });
+      await emitWebhookEvent("tenant-special-99", "user.created", { userId: "u-1" });
 
       expect(mockIsFeatureEnabled).toHaveBeenCalledWith("FF_WEBHOOKS", {
         tenantId: "tenant-special-99",

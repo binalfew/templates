@@ -7,7 +7,6 @@ const mockTitleFindMany = vi.fn();
 const mockLanguageFindMany = vi.fn();
 const mockCurrencyFindMany = vi.fn();
 const mockDocumentTypeFindMany = vi.fn();
-const mockCustomObjectRecordFindMany = vi.fn();
 
 vi.mock("~/utils/db/db.server", () => ({
   prisma: {
@@ -31,9 +30,6 @@ vi.mock("~/utils/db/db.server", () => ({
     },
     documentType: {
       findMany: (...args: unknown[]) => mockDocumentTypeFindMany(...args),
-    },
-    customObjectRecord: {
-      findMany: (...args: unknown[]) => mockCustomObjectRecordFindMany(...args),
     },
   },
 }));
@@ -425,88 +421,6 @@ describe("data-export.server", () => {
       expect(parsed[0].description).toBe("Travel document");
       expect(parsed[1].description).toBe("");
       expect(parsed[1].category).toBe("");
-    });
-  });
-
-  // ---------- exportData: custom-object-records ----------
-
-  describe("exportData - custom-object-records", () => {
-    it("exports custom object records as JSON", async () => {
-      const { exportData } = await import("~/services/data-export.server");
-      mockCustomObjectRecordFindMany.mockResolvedValue([
-        {
-          id: "rec-1",
-          data: { plate: "ABC-123", color: "red" },
-          createdBy: "user-1",
-          createdAt: new Date("2025-03-01T08:00:00Z"),
-        },
-      ]);
-
-      const result = await exportData({
-        entity: "custom-object-records",
-        tenantId: "tenant-1",
-        format: "json",
-        objectId: "obj-1",
-      });
-
-      const parsed = JSON.parse(result.content);
-      expect(parsed).toHaveLength(1);
-      expect(parsed[0].id).toBe("rec-1");
-      expect(parsed[0].data).toBe(JSON.stringify({ plate: "ABC-123", color: "red" }));
-      expect(parsed[0].createdBy).toBe("user-1");
-    });
-
-    it("throws when objectId is missing", async () => {
-      const { exportData } = await import("~/services/data-export.server");
-
-      await expect(
-        exportData({
-          entity: "custom-object-records",
-          tenantId: "tenant-1",
-          format: "json",
-        }),
-      ).rejects.toThrow("objectId is required for custom object records");
-    });
-
-    it("queries with correct definitionId and tenantId", async () => {
-      const { exportData } = await import("~/services/data-export.server");
-      mockCustomObjectRecordFindMany.mockResolvedValue([]);
-
-      await exportData({
-        entity: "custom-object-records",
-        tenantId: "tenant-1",
-        format: "json",
-        objectId: "obj-1",
-      });
-
-      expect(mockCustomObjectRecordFindMany).toHaveBeenCalledWith(
-        expect.objectContaining({
-          where: { definitionId: "obj-1", tenantId: "tenant-1" },
-          orderBy: { createdAt: "desc" },
-        }),
-      );
-    });
-
-    it("handles null createdBy as empty string", async () => {
-      const { exportData } = await import("~/services/data-export.server");
-      mockCustomObjectRecordFindMany.mockResolvedValue([
-        {
-          id: "rec-1",
-          data: {},
-          createdBy: null,
-          createdAt: new Date("2025-03-01"),
-        },
-      ]);
-
-      const result = await exportData({
-        entity: "custom-object-records",
-        tenantId: "tenant-1",
-        format: "json",
-        objectId: "obj-1",
-      });
-
-      const parsed = JSON.parse(result.content);
-      expect(parsed[0].createdBy).toBe("");
     });
   });
 

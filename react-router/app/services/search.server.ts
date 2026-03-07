@@ -30,7 +30,7 @@ export async function globalSearch(
   const term = query.trim();
   const contains = { contains: term, mode: "insensitive" as const };
 
-  const [users, roles, permissions, customObjects, auditLogs] = await Promise.all([
+  const [users, roles, permissions, auditLogs] = await Promise.all([
     prisma.user.findMany({
       where: {
         tenantId,
@@ -54,15 +54,6 @@ export async function globalSearch(
         OR: [{ resource: contains }, { action: contains }, { description: contains }],
       },
       select: { id: true, resource: true, action: true, description: true },
-      take: limit,
-    }),
-    prisma.customObjectDefinition.findMany({
-      where: {
-        tenantId,
-        deletedAt: null,
-        OR: [{ name: contains }, { slug: contains }, { description: contains }],
-      },
-      select: { id: true, name: true, slug: true, description: true },
       take: limit,
     }),
     prisma.auditLog.findMany({
@@ -100,14 +91,6 @@ export async function globalSearch(
       subtitle: p.description ?? undefined,
       url: `security/permissions/${p.id}`,
       score: scoreMatch(term, [p.resource, p.action, p.description]),
-    })),
-    ...customObjects.map((co) => ({
-      id: co.id,
-      type: "CustomObject",
-      title: co.name,
-      subtitle: co.description ?? co.slug,
-      url: `objects/${co.slug}`,
-      score: scoreMatch(term, [co.name, co.slug, co.description]),
     })),
     ...auditLogs.map((al) => ({
       id: al.id,
