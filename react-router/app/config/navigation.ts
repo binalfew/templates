@@ -139,11 +139,23 @@ export function buildSettingsChildren(basePrefix: string): NavChild[] {
       featureFlag: "FF_TWO_FACTOR",
     },
     {
+      title: "Health",
+      tKey: "health",
+      url: `${basePrefix}/settings/health`,
+      roles: [...ADMIN_ONLY],
+    },
+    {
       title: "Views",
       tKey: "savedViews",
       url: `${basePrefix}/settings/views`,
       roles: [...ADMIN_OR_TENANT_ADMIN],
       featureFlag: "FF_SAVED_VIEWS",
+    },
+    {
+      title: "Announcements",
+      tKey: "announcements",
+      url: `${basePrefix}/settings/announcements`,
+      roles: [...ADMIN_OR_TENANT_ADMIN],
     },
   ];
 }

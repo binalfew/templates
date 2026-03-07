@@ -1,11 +1,13 @@
 import { data, useLoaderData } from "react-router";
 import { RouteErrorBoundary } from "~/components/route-error-boundary";
 import { requireAuth, toClientUser } from "~/utils/auth/require-auth.server";
+import { getImpersonationState } from "~/utils/auth/session.server";
 import { resolveTenant } from "~/utils/tenant.server";
 import { getSidebarState, getSidebarGroupState } from "~/utils/sidebar.server";
 import { getTheme } from "~/utils/theme.server";
 import { isFeatureEnabled, FEATURE_FLAG_KEYS } from "~/utils/config/feature-flags.server";
 import { getUnreadCount, listNotifications } from "~/services/notifications.server";
+import { getActiveAnnouncements } from "~/services/announcements.server";
 import { DashboardLayout } from "~/components/layout/dashboard-layout";
 import type { Route } from "./+types/_layout";
 
@@ -36,6 +38,11 @@ export async function loader({ request, params }: Route.LoaderArgs) {
     FF_TWO_FACTOR: twoFactorEnabled,
   };
 
+  const impersonationState = await getImpersonationState(request);
+  const impersonation = impersonationState.isImpersonating
+    ? { isImpersonating: true as const, impersonatedUserName: user.name || user.email }
+    : undefined;
+
   return {
     user: { id: user.id, name: user.name, email: user.email, photoUrl: user.photoUrl },
     clientUser: toClientUser(user),
@@ -64,8 +71,16 @@ export async function loader({ request, params }: Route.LoaderArgs) {
         createdAt: n.createdAt.toISOString(),
       }),
     ),
+    announcements: (await getActiveAnnouncements(tenant.id, user.id)).map((a) => ({
+      id: a.id,
+      title: a.title,
+      message: a.message,
+      type: a.type,
+      dismissible: a.dismissible,
+    })),
     enabledFeatures,
     inactivityTimeoutMinutes: 60,
+    impersonation,
   };
 }
 
@@ -95,8 +110,10 @@ export default function TenantLayout() {
       pwaEnabled={loaderData.pwaEnabled}
       unreadCount={loaderData.unreadCount}
       recentNotifications={loaderData.recentNotifications}
+      announcements={loaderData.announcements}
       enabledFeatures={loaderData.enabledFeatures}
       inactivityTimeoutMinutes={loaderData.inactivityTimeoutMinutes}
+      impersonation={loaderData.impersonation}
     />
   );
 }

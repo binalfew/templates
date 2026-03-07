@@ -11,6 +11,8 @@ import {
 import { InstallPrompt } from "~/components/pwa/install-prompt";
 import { SwUpdatePrompt } from "~/components/pwa/sw-update-prompt";
 import { LogoutTimer } from "~/components/logout-timer";
+import { ImpersonationBanner } from "~/components/impersonation-banner";
+import { AnnouncementBanner } from "~/components/announcement-banner";
 import type { Theme } from "~/utils/theme.server";
 
 type TenantInfo = {
@@ -43,6 +45,17 @@ export type DashboardLayoutProps = {
   recentNotifications: NotificationItem[];
   enabledFeatures?: Record<string, boolean>;
   inactivityTimeoutMinutes?: number;
+  announcements?: Array<{
+    id: string;
+    title: string;
+    message: string;
+    type: string;
+    dismissible: boolean;
+  }>;
+  impersonation?: {
+    isImpersonating: boolean;
+    impersonatedUserName: string;
+  };
 };
 
 export function DashboardLayout({
@@ -58,7 +71,9 @@ export function DashboardLayout({
   unreadCount,
   recentNotifications,
   enabledFeatures,
+  announcements,
   inactivityTimeoutMinutes,
+  impersonation,
 }: DashboardLayoutProps) {
   const navigation = useNavigation();
   const isNavigating = navigation.state === "loading";
@@ -80,6 +95,12 @@ export function DashboardLayout({
           <div className="fixed inset-x-0 top-0 z-50 h-0.5 overflow-hidden bg-primary/20">
             <div className="h-full w-1/3 animate-[progress_1s_ease-in-out_infinite] bg-primary" />
           </div>
+        )}
+        {announcements && announcements.length > 0 && (
+          <AnnouncementBanner announcements={announcements} basePrefix={basePrefix} />
+        )}
+        {impersonation?.isImpersonating && (
+          <ImpersonationBanner impersonatedUserName={impersonation.impersonatedUserName} />
         )}
         <TopNavbar
           user={user}

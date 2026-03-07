@@ -1,9 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
 const mockValidateApiKey = vi.fn();
+const mockTrackApiKeyUsage = vi.fn();
 
 vi.mock("~/services/api-keys.server", () => ({
   validateApiKey: (...args: unknown[]) => mockValidateApiKey(...args),
+  trackApiKeyUsage: (...args: unknown[]) => mockTrackApiKeyUsage(...args),
 }));
 
 describe("api-auth.server", () => {
@@ -19,6 +21,8 @@ describe("api-auth.server", () => {
         tenantId: "tenant-1",
         apiKeyId: "key-1",
         permissions: ["events:read", "events:write"],
+        rateLimitTier: "STANDARD",
+        rateLimitCustom: null,
       });
 
       const request = new Request("http://localhost/api/v1/events", {
@@ -33,6 +37,7 @@ describe("api-auth.server", () => {
         permissions: ["events:read", "events:write"],
       });
       expect(mockValidateApiKey).toHaveBeenCalledWith("ak_test_abc123");
+      expect(mockTrackApiKeyUsage).toHaveBeenCalledWith("key-1", "unknown");
     });
 
     it("throws 401 Response when Authorization header is missing", async () => {
@@ -119,6 +124,8 @@ describe("api-auth.server", () => {
         tenantId: "tenant-2",
         apiKeyId: "key-2",
         permissions: ["*"],
+        rateLimitTier: "STANDARD",
+        rateLimitCustom: null,
       });
 
       const longToken = "ak_prod_" + "f".repeat(64);

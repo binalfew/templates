@@ -1,5 +1,5 @@
-import { Link, useLoaderData } from "react-router";
-import { User, ArrowLeft, Pencil, Trash2, Shield, Mail, Clock } from "lucide-react";
+import { Form, Link, useLoaderData } from "react-router";
+import { User, ArrowLeft, Pencil, Trash2, Shield, Mail, Clock, UserCheck } from "lucide-react";
 import { invariantResponse } from "@epic-web/invariant";
 
 export const handle = { breadcrumb: "Details" };
@@ -25,11 +25,11 @@ export async function loader({ request, params }: Route.LoaderArgs) {
   invariantResponse(tenantId, "User is not associated with a tenant", { status: 403 });
 
   const targetUser = await getUserWithCounts(params.userId, isSuperAdmin ? undefined : tenantId);
-  return { targetUser };
+  return { targetUser, isSuperAdmin, currentUserId: user.id };
 }
 
 export default function UserDetailPage() {
-  const { targetUser } = useLoaderData<typeof loader>();
+  const { targetUser, isSuperAdmin, currentUserId } = useLoaderData<typeof loader>();
   const base = useBasePrefix();
 
   return (
@@ -61,6 +61,16 @@ export default function UserDetailPage() {
               Delete
             </Link>
           </Button>
+          {isSuperAdmin && targetUser.id !== currentUserId && (
+            <Form method="post" action="/resources/impersonate" className="inline">
+              <input type="hidden" name="_action" value="start" />
+              <input type="hidden" name="targetUserId" value={targetUser.id} />
+              <Button type="submit" variant="secondary" size="sm" className="w-full sm:w-auto">
+                <UserCheck className="mr-1.5 size-3.5" />
+                Login As
+              </Button>
+            </Form>
+          )}
         </div>
       </div>
 

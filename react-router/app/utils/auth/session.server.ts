@@ -73,6 +73,12 @@ export async function getUserId(request: Request): Promise<string | null> {
     }
   }
 
+  // If impersonating another user, return their ID instead
+  const impersonatingUserId = session.get("impersonatingUserId");
+  if (impersonatingUserId && typeof impersonatingUserId === "string") {
+    return impersonatingUserId;
+  }
+
   return dbSession.userId;
 }
 
@@ -201,5 +207,58 @@ export async function logout(request: Request) {
     headers: {
       "Set-Cookie": await sessionStorage.destroySession(session),
     },
+  });
+}
+
+/**
+ * Get the current impersonation state from the session cookie.
+ */
+export async function getImpersonationState(request: Request) {
+  const session = await getSession(request);
+  const impersonatingUserId = session.get("impersonatingUserId");
+  const originalUserId = session.get("originalUserId");
+  return {
+    isImpersonating: !!impersonatingUserId,
+    impersonatedUserId: impersonatingUserId as string | undefined,
+    originalUserId: originalUserId as string | undefined,
+  };
+}
+
+/**
+ * Start impersonating a target user. Stores the admin's original user ID
+ * and the target user ID in the cookie session.
+ */
+export async function startImpersonating(
+  request: Request,
+  targetUserId: string,
+  redirectTo: string,
+) {
+  const session = await getSession(request);
+  const sessionId = session.get("sessionId");
+
+  const dbSession = await prisma.session.findFirst({
+    where: { id: sessionId },
+    select: { userId: true },
+  });
+  if (!dbSession) throw redirect("/auth/login");
+
+  session.set("originalUserId", dbSession.userId);
+  session.set("impersonatingUserId", targetUserId);
+
+  return redirect(redirectTo, {
+    headers: { "Set-Cookie": await sessionStorage.commitSession(session) },
+  });
+}
+
+/**
+ * Stop impersonating and restore the admin's original session.
+ */
+export async function stopImpersonating(request: Request, redirectTo: string) {
+  const session = await getSession(request);
+  session.unset("impersonatingUserId");
+  session.unset("originalUserId");
+
+  return redirect(redirectTo, {
+    headers: { "Set-Cookie": await sessionStorage.commitSession(session) },
   });
 }

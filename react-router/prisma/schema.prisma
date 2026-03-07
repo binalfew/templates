@@ -32,6 +32,14 @@ enum AuditAction {
   RATE_LIMIT
   TWO_FACTOR_ENABLE
   TWO_FACTOR_DISABLE
+  IMPERSONATE_START
+  IMPERSONATE_END
+}
+
+enum AnnouncementType {
+  INFO
+  WARNING
+  CRITICAL
 }
 
 enum JobStatus {
@@ -106,6 +114,7 @@ model Tenant {
   apiKeys              ApiKey[]
   webhookSubscriptions WebhookSubscription[]
   invitations          Invitation[]
+  announcements        Announcement[]
 }
 
 model User {
@@ -586,4 +595,39 @@ model Invitation {
 
   @@index([token])
   @@index([tenantId])
+}
+
+// ─── Announcements ───────────────────────────────────
+
+model Announcement {
+  id          String           @id @default(cuid())
+  tenantId    String?
+  title       String
+  message     String
+  type        AnnouncementType @default(INFO)
+  active      Boolean          @default(true)
+  dismissible Boolean          @default(true)
+  startsAt    DateTime         @default(now())
+  endsAt      DateTime?
+  createdBy   String
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  tenant     Tenant?                @relation(fields: [tenantId], references: [id])
+  dismissals AnnouncementDismissal[]
+
+  @@index([tenantId, active])
+  @@index([startsAt, endsAt])
+}
+
+model AnnouncementDismissal {
+  id             String   @id @default(cuid())
+  announcementId String
+  userId         String
+  dismissedAt    DateTime @default(now())
+
+  announcement Announcement @relation(fields: [announcementId], references: [id], onDelete: Cascade)
+
+  @@unique([announcementId, userId])
+  @@index([userId])
 }
