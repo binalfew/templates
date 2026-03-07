@@ -1,4 +1,4 @@
-import { data, Link, useLoaderData, useFetcher } from "react-router";
+import { data, Link, useLoaderData } from "react-router";
 
 export const handle = { breadcrumb: "API Keys" };
 
@@ -82,7 +82,6 @@ type ApiKeyRow = Awaited<ReturnType<typeof loader>>["apiKeys"][number];
 export default function ApiKeysIndexPage() {
   const { apiKeys, pagination } = useLoaderData<typeof loader>();
   const base = useBasePrefix();
-  const fetcher = useFetcher<typeof action>();
 
   const columns: ColumnDef<ApiKeyRow>[] = [
     {
@@ -120,7 +119,11 @@ export default function ApiKeysIndexPage() {
     {
       id: "rateLimitTier",
       header: "Rate Limit",
-      cell: (row) => <Badge variant="secondary">{row.rateLimitTier}</Badge>,
+      cell: (row) => (
+        <Badge variant="secondary">
+          {row.rateLimitCustom ? `${row.rateLimitCustom}/min` : row.rateLimitTier}
+        </Badge>
+      ),
       hideOnMobile: true,
     },
     {
@@ -168,9 +171,7 @@ export default function ApiKeysIndexPage() {
           {
             label: "Revoke",
             icon: Trash2,
-            onClick: (row) => {
-              fetcher.submit({ _action: "revoke", id: row.id }, { method: "POST" });
-            },
+            href: (row) => `${base}/settings/apis/${row.id}/delete`,
             variant: "destructive",
             visible: (row) => row.status === "ACTIVE",
           },

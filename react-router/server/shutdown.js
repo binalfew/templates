@@ -1,7 +1,8 @@
 /** @type {Array<() => void>} */
-const hooks: Array<() => void> = [];
+const hooks = [];
 
-export function onShutdown(hook: () => void) {
+/** @param {() => void} hook */
+export function onShutdown(hook) {
   hooks.push(hook);
 }
 

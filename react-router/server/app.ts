@@ -21,12 +21,30 @@ declare module "react-router" {
 
 export const app = express();
 
+// ─── Swagger UI (API docs) — mounted before security middleware to avoid CSP blocking ───
+import swaggerUi from "swagger-ui-express";
+import fs from "node:fs";
+import path from "node:path";
+import yaml from "js-yaml";
+
+const openapiPath = path.resolve(import.meta.dirname, "../docs/openapi.yaml");
+const openapiSpec = yaml.load(fs.readFileSync(openapiPath, "utf8")) as Record<string, unknown>;
+app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(openapiSpec));
+
 // ─── Security middleware (order matters) ───────────────────
 // 1. Generate a per-request nonce first (used by helmet CSP and React)
-app.use(nonceMiddleware);
+// Skip for Swagger UI — its scripts don't carry nonces
+app.use((req, res, next) => {
+  if (req.path.startsWith("/api/docs")) return next();
+  nonceMiddleware(req, res, next);
+});
 
 // 2. Set security headers (CSP with nonce, HSTS, X-Frame-Options, etc.)
-app.use(helmetMiddleware);
+// Skip for Swagger UI — CSP strict-dynamic blocks its inline scripts
+app.use((req, res, next) => {
+  if (req.path.startsWith("/api/docs")) return next();
+  helmetMiddleware(req, res, next);
+});
 
 // 3. Permissions-Policy header
 app.use(permissionsPolicy);

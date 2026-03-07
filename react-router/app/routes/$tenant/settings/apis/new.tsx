@@ -1,3 +1,4 @@
+import { useState, useCallback } from "react";
 import { data, useActionData, Form, Link } from "react-router";
 
 export const handle = { breadcrumb: "Create API Key" };
@@ -18,32 +19,59 @@ import {
   NativeSelectOption,
 } from "~/components/ui/native-select";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
+import { Badge } from "~/components/ui/badge";
+import { Shield } from "lucide-react";
 import { RawKeyAlert } from "./shared";
 import type { Route } from "./+types/new";
 
 // --- Constants ---
 
-const API_PERMISSIONS = [
-  { value: "users:read", label: "Users: Read" },
-  { value: "users:create", label: "Users: Create" },
-  { value: "users:update", label: "Users: Update" },
-  { value: "users:delete", label: "Users: Delete" },
-  { value: "users:*", label: "Users: All" },
-  { value: "roles:read", label: "Roles: Read" },
-  { value: "roles:update", label: "Roles: Update" },
-  { value: "roles:*", label: "Roles: All" },
-  { value: "tenants:read", label: "Tenants: Read" },
-  { value: "tenants:update", label: "Tenants: Update" },
-  { value: "tenants:*", label: "Tenants: All" },
-  { value: "settings:read", label: "Settings: Read" },
-  { value: "settings:update", label: "Settings: Update" },
-  { value: "settings:*", label: "Settings: All" },
+const API_PERMISSION_GROUPS = [
+  {
+    label: "Users",
+    permissions: [
+      { value: "user:read", label: "Read" },
+      { value: "user:write", label: "Write" },
+      { value: "user:*", label: "All" },
+    ],
+  },
+  {
+    label: "Roles",
+    permissions: [
+      { value: "role:read", label: "Read" },
+      { value: "role:write", label: "Write" },
+      { value: "role:*", label: "All" },
+    ],
+  },
+  {
+    label: "Tenants",
+    permissions: [
+      { value: "tenant:read", label: "Read" },
+      { value: "tenant:write", label: "Write" },
+      { value: "tenant:*", label: "All" },
+    ],
+  },
+  {
+    label: "Permissions",
+    permissions: [{ value: "permission:read", label: "Read" }],
+  },
+  {
+    label: "Settings",
+    permissions: [
+      { value: "setting:read", label: "Read" },
+      { value: "setting:write", label: "Write" },
+      { value: "setting:*", label: "All" },
+    ],
+  },
 ];
 
 const RATE_LIMIT_TIERS = [
-  { value: "STANDARD", label: "Standard (100/min)" },
-  { value: "ELEVATED", label: "Elevated (500/min)" },
-  { value: "PREMIUM", label: "Premium (2000/min)" },
+  { value: "10", label: "10 requests/min" },
+  { value: "30", label: "30 requests/min" },
+  { value: "50", label: "50 requests/min" },
+  { value: "100", label: "100 requests/min" },
+  { value: "500", label: "500 requests/min" },
+  { value: "1000", label: "1,000 requests/min" },
 ];
 
 // --- Loader ---
@@ -62,7 +90,7 @@ export async function action({ request, params }: Route.ActionArgs) {
   const name = formData.get("name") as string;
   const description = formData.get("description") as string;
   const permissions = formData.getAll("permissions") as string[];
-  const rateLimitTier = (formData.get("rateLimitTier") as string) || "STANDARD";
+  const rateLimitValue = parseInt((formData.get("rateLimitTier") as string) || "100");
   const expiresIn = formData.get("expiresIn") as string;
   const allowedIps =
     (formData.get("allowedIps") as string)
@@ -91,7 +119,8 @@ export async function action({ request, params }: Route.ActionArgs) {
         name,
         description,
         permissions,
-        rateLimitTier: rateLimitTier as "STANDARD" | "ELEVATED" | "PREMIUM" | "CUSTOM",
+        rateLimitTier: "CUSTOM" as const,
+        rateLimitCustom: rateLimitValue,
         expiresAt,
         allowedIps,
       },
@@ -106,9 +135,54 @@ export async function action({ request, params }: Route.ActionArgs) {
 
 // --- Component ---
 
+const ALL_PERMISSION_VALUES = API_PERMISSION_GROUPS.flatMap((g) =>
+  g.permissions.map((p) => p.value),
+);
+
 export default function NewApiKeyPage() {
   const actionData = useActionData<typeof action>();
   const base = useBasePrefix();
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+
+  const toggle = useCallback((value: string) => {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(value)) next.delete(value);
+      else next.add(value);
+      // If wildcard is unchecked after individual change, remove it
+      if (value !== "*" && next.has("*") && !ALL_PERMISSION_VALUES.every((v) => next.has(v))) {
+        next.delete("*");
+      }
+      return next;
+    });
+  }, []);
+
+  const toggleGroup = useCallback((group: (typeof API_PERMISSION_GROUPS)[number]) => {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      const groupValues = group.permissions.map((p) => p.value);
+      const allSelected = groupValues.every((v) => next.has(v));
+      for (const v of groupValues) {
+        if (allSelected) next.delete(v);
+        else next.add(v);
+      }
+      if (next.has("*") && !ALL_PERMISSION_VALUES.every((v) => next.has(v))) {
+        next.delete("*");
+      }
+      return next;
+    });
+  }, []);
+
+  const toggleAll = useCallback(() => {
+    setSelected((prev) => {
+      if (prev.has("*")) return new Set();
+      return new Set([...ALL_PERMISSION_VALUES, "*"]);
+    });
+  }, []);
+
+  const selectedCount = selected.has("*")
+    ? ALL_PERMISSION_VALUES.length
+    : ALL_PERMISSION_VALUES.filter((v) => selected.has(v)).length;
 
   // After successful creation, show the raw key instead of the form
   if (actionData && "rawKey" in actionData && typeof actionData.rawKey === "string") {
@@ -169,7 +243,7 @@ export default function NewApiKeyPage() {
                 <NativeSelect
                   id="rateLimitTier"
                   name="rateLimitTier"
-                  defaultValue="STANDARD"
+                  defaultValue="100"
                   className="w-full"
                 >
                   {RATE_LIMIT_TIERS.map((tier) => (
@@ -204,16 +278,76 @@ export default function NewApiKeyPage() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Permissions</CardTitle>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Shield className="size-5 text-muted-foreground" />
+                <CardTitle>Permissions</CardTitle>
+              </div>
+              <Badge variant={selectedCount > 0 ? "default" : "secondary"}>
+                {selectedCount} / {ALL_PERMISSION_VALUES.length} selected
+              </Badge>
+            </div>
           </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-              {API_PERMISSIONS.map((perm) => (
-                <label key={perm.value} className="flex items-center gap-2 text-sm cursor-pointer">
-                  <Checkbox name="permissions" value={perm.value} />
-                  {perm.label}
-                </label>
-              ))}
+          <CardContent className="space-y-4">
+            <div className="flex items-center justify-between rounded-md border bg-muted/50 p-3">
+              <label className="flex items-center gap-2 text-sm font-medium cursor-pointer">
+                <Checkbox
+                  name="permissions"
+                  value="*"
+                  checked={selected.has("*")}
+                  onCheckedChange={toggleAll}
+                />
+                Grant all permissions
+              </label>
+              <span className="text-xs text-muted-foreground">Full API access</span>
+            </div>
+
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              {API_PERMISSION_GROUPS.map((group) => {
+                const groupValues = group.permissions.map((p) => p.value);
+                const groupSelectedCount = groupValues.filter(
+                  (v) => selected.has(v) || selected.has("*"),
+                ).length;
+                const allGroupSelected = groupSelectedCount === groupValues.length;
+
+                return (
+                  <div
+                    key={group.label}
+                    className={`rounded-md border p-3 space-y-2 transition-colors ${
+                      allGroupSelected ? "border-primary/50 bg-primary/5" : ""
+                    }`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <button
+                        type="button"
+                        onClick={() => toggleGroup(group)}
+                        className="text-sm font-medium text-foreground hover:text-primary transition-colors"
+                      >
+                        {group.label}
+                      </button>
+                      <Badge variant="outline" className="text-xs">
+                        {groupSelectedCount}/{groupValues.length}
+                      </Badge>
+                    </div>
+                    <div className="space-y-1">
+                      {group.permissions.map((perm) => (
+                        <label
+                          key={perm.value}
+                          className="flex items-center gap-2 text-sm cursor-pointer text-muted-foreground hover:text-foreground transition-colors"
+                        >
+                          <Checkbox
+                            name="permissions"
+                            value={perm.value}
+                            checked={selected.has(perm.value) || selected.has("*")}
+                            onCheckedChange={() => toggle(perm.value)}
+                          />
+                          {perm.label}
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </CardContent>
         </Card>
