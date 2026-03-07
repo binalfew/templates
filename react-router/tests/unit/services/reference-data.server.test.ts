@@ -43,7 +43,7 @@ const mockDocTypeCount = vi.fn();
 // ─── AuditLog mock ──────────────────────────────────────
 const mockAuditLogCreate = vi.fn();
 
-vi.mock("~/lib/db/db.server", () => ({
+vi.mock("~/utils/db/db.server", () => ({
   prisma: {
     country: {
       findMany: (...args: unknown[]) => mockCountryFindMany(...args),
@@ -91,7 +91,7 @@ vi.mock("~/lib/db/db.server", () => ({
   },
 }));
 
-vi.mock("~/lib/monitoring/logger.server", () => ({
+vi.mock("~/utils/monitoring/logger.server", () => ({
   logger: { info: vi.fn(), warn: vi.fn(), error: vi.fn() },
 }));
 

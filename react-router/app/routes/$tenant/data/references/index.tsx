@@ -3,8 +3,8 @@ import { Globe, User, Languages, Banknote, FileText } from "lucide-react";
 
 export const handle = { breadcrumb: "References" };
 
-import { requireAnyRole } from "~/lib/auth/require-auth.server";
-import { ADMIN_ONLY } from "~/lib/auth/roles";
+import { requireAnyRole } from "~/utils/auth/require-auth.server";
+import { ADMIN_ONLY } from "~/utils/auth/roles";
 import { getReferenceDataCounts } from "~/services/reference-data.server";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { useBasePrefix } from "~/hooks/use-base-prefix";

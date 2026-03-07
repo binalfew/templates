@@ -53,16 +53,16 @@ Run a single E2E test: `npx playwright test tests/e2e/file.spec.ts`
 - `app/routes/` — File-based routing via `react-router-auto-routes`. Routes auto-generated from file paths.
 - `app/components/ui/` — shadcn/ui components (do not edit directly; use `npx shadcn add`)
 - `app/components/` — Custom components (layout, fields, form-designer, analytics, views)
-- `app/lib/` — Core utilities, organized into subdirectories. Files ending in `.server.ts` are server-only.
-  - `app/lib/auth/` — Authentication & authorization (session, RBAC, 2FA, API auth)
-  - `app/lib/db/` — Database client, soft-delete extensions, cache
-  - `app/lib/errors/` — ServiceError base class and error handler
-  - `app/lib/email/` — Email sending, templates, messaging constants
-  - `app/lib/events/` — Event bus, job queue, webhook emitter
-  - `app/lib/config/` — Environment variables, settings, feature flags
-  - `app/lib/monitoring/` — Logger, Sentry (server + client)
-  - `app/lib/offline/` — Offline store, fetch queue, sync manager
-  - `app/lib/schemas/` — Shared Zod schemas for validation
+- `app/utils/` — Core utilities, organized into subdirectories. Files ending in `.server.ts` are server-only.
+  - `app/utils/auth/` — Authentication & authorization (session, RBAC, 2FA, API auth)
+  - `app/utils/db/` — Database client, soft-delete extensions, cache
+  - `app/utils/errors/` — ServiceError base class and error handler
+  - `app/utils/email/` — Email sending, templates, messaging constants
+  - `app/utils/events/` — Event bus, job queue, webhook emitter
+  - `app/utils/config/` — Environment variables, settings, feature flags
+  - `app/utils/monitoring/` — Logger, Sentry (server + client)
+  - `app/utils/offline/` — Offline store, fetch queue, sync manager
+  - `app/utils/schemas/` — Shared Zod schemas for validation
 - `app/services/` — Business logic layer (server-only). Each service handles a domain (users, tenants, roles, permissions, etc.)
 - `app/hooks/` — React hooks (autosave, SSE, toast, form-designer)
 - `server/` — Express app setup, security middleware (CSP, CORS, rate limiting, helmet), SSE
@@ -75,14 +75,14 @@ Routes under `app/routes/$tenant/` are tenant-scoped. The `$tenant` URL paramete
 
 ### Authentication & Authorization
 
-- Session helpers in `app/lib/auth/session.server.ts`: `getUserId()`, `requireUserId()`, `requireUser()`, `requireAnonymous()`
-- RBAC checks in `app/lib/auth/require-auth.server.ts`: `requireAuth()`, `requireRole()`, `requireAnyRole()`, `requirePermission()`, `requireGlobalAdmin()`, `requireFeature()`
+- Session helpers in `app/utils/auth/session.server.ts`: `getUserId()`, `requireUserId()`, `requireUser()`, `requireAnonymous()`
+- RBAC checks in `app/utils/auth/require-auth.server.ts`: `requireAuth()`, `requireRole()`, `requireAnyRole()`, `requirePermission()`, `requireGlobalAdmin()`, `requireFeature()`
 - Roles have scopes: `GLOBAL`, `TENANT`, `EVENT`
 - Permissions are resource:action pairs (e.g., `user:read`, `user:write`)
 
 ### Feature Flags
 
-DB-backed feature flags evaluated per-request with tenant/role/user scoping. Defined in `app/lib/config/feature-flags.server.ts`. Keys prefixed with `FF_` (e.g., `FF_TWO_FACTOR`, `FF_ANALYTICS`, `FF_PWA`). Admin UI at `/$tenant/settings/features`.
+DB-backed feature flags evaluated per-request with tenant/role/user scoping. Defined in `app/utils/config/feature-flags.server.ts`. Keys prefixed with `FF_` (e.g., `FF_TWO_FACTOR`, `FF_ANALYTICS`, `FF_PWA`). Admin UI at `/$tenant/settings/features`.
 
 ### Data Patterns
 
@@ -94,12 +94,12 @@ DB-backed feature flags evaluated per-request with tenant/role/user scoping. Def
 
 ### Shared Types & Helpers (DO NOT duplicate)
 
-- **`app/lib/types.server.ts`** — `ServiceContext` (optional tenantId), `TenantServiceContext` (required tenantId), `PaginatedQueryOptions`. All services import these; never define local variants.
-- **`app/lib/request-context.server.ts`** — `buildServiceContext(request, user)` returns `ServiceContext`; `buildServiceContext(request, user, tenantId)` returns `TenantServiceContext`. Use in route actions instead of inline `{ userId, tenantId, ipAddress, userAgent }` objects.
-- **`requireFeature(request, flagKey)`** in `app/lib/auth/require-auth.server.ts` — combines `requireAuth` + tenant null check + `isFeatureEnabled` in one call. Returns `{ user, roles, isSuperAdmin, tenantId: string }`. Use in feature-gated route loaders/actions instead of manual 8-line guard blocks.
+- **`app/utils/types.server.ts`** — `ServiceContext` (optional tenantId), `TenantServiceContext` (required tenantId), `PaginatedQueryOptions`. All services import these; never define local variants.
+- **`app/utils/request-context.server.ts`** — `buildServiceContext(request, user)` returns `ServiceContext`; `buildServiceContext(request, user, tenantId)` returns `TenantServiceContext`. Use in route actions instead of inline `{ userId, tenantId, ipAddress, userAgent }` objects.
+- **`requireFeature(request, flagKey)`** in `app/utils/auth/require-auth.server.ts` — combines `requireAuth` + tenant null check + `isFeatureEnabled` in one call. Returns `{ user, roles, isSuperAdmin, tenantId: string }`. Use in feature-gated route loaders/actions instead of manual 8-line guard blocks.
 - **`resolveViewContext(request, tenantId, userId, entityType, fieldMap)`** in `app/services/view-filters.server.ts` — checks the SAVED_VIEWS feature flag, resolves active view, and builds `viewWhere`/`viewOrderBy`. Use in paginated index page loaders instead of ~25 lines of inline view resolution.
-- **`app/lib/errors/service-error.server.ts`** — `ServiceError` base class. All domain error classes (UserError, RoleError, etc.) extend this. Normalizes `status` and optional `code` properties.
-- **`app/lib/errors/handle-service-error.server.ts`** — `handleServiceError(error, options?)` for route action catch blocks. Pass `{ submission }` for Conform form errors (returns `{ result }`), omit for simple errors (returns `{ error }`). Replaces 5-line instanceof catch blocks with a single call.
+- **`app/utils/errors/service-error.server.ts`** — `ServiceError` base class. All domain error classes (UserError, RoleError, etc.) extend this. Normalizes `status` and optional `code` properties.
+- **`app/utils/errors/handle-service-error.server.ts`** — `handleServiceError(error, options?)` for route action catch blocks. Pass `{ submission }` for Conform form errors (returns `{ result }`), omit for simple errors (returns `{ error }`). Replaces 5-line instanceof catch blocks with a single call.
 
 ### Entity Route Structure (MANDATORY)
 

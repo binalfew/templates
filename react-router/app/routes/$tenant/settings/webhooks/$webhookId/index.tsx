@@ -3,9 +3,9 @@ import { useState } from "react";
 
 export const handle = { breadcrumb: "Webhook Details" };
 
-import { requireRoleAndFeature } from "~/lib/auth/require-auth.server";
-import { ADMIN_OR_TENANT_ADMIN } from "~/lib/auth/roles";
-import { FEATURE_FLAG_KEYS } from "~/lib/config/feature-flags.server";
+import { requireRoleAndFeature } from "~/utils/auth/require-auth.server";
+import { ADMIN_OR_TENANT_ADMIN } from "~/utils/auth/roles";
+import { FEATURE_FLAG_KEYS } from "~/utils/config/feature-flags.server";
 import {
   getWebhookSubscriptionWithCounts,
   getDeliveryLog,

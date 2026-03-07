@@ -14,14 +14,14 @@ vi.mock("~/services/saved-views.server", () => ({
 // ─── feature-flags mocks ────────────────────────────────
 const mockIsFeatureEnabled = vi.fn();
 
-vi.mock("~/lib/config/feature-flags.server", () => ({
+vi.mock("~/utils/config/feature-flags.server", () => ({
   isFeatureEnabled: (...args: unknown[]) => mockIsFeatureEnabled(...args),
   FEATURE_FLAG_KEYS: {
     SAVED_VIEWS: "FF_SAVED_VIEWS",
   },
 }));
 
-vi.mock("~/lib/monitoring/logger.server", () => ({
+vi.mock("~/utils/monitoring/logger.server", () => ({
   logger: { info: vi.fn(), warn: vi.fn(), error: vi.fn() },
 }));
 

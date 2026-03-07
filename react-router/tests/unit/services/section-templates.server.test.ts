@@ -9,7 +9,7 @@ const mockTemplateUpdate = vi.fn();
 const mockAuditLogCreate = vi.fn();
 const mockFieldDefFindMany = vi.fn();
 
-vi.mock("~/lib/db/db.server", () => ({
+vi.mock("~/utils/db/db.server", () => ({
   prisma: {
     sectionTemplate: {
       findMany: (...args: unknown[]) => mockTemplateFindMany(...args),
@@ -27,16 +27,16 @@ vi.mock("~/lib/db/db.server", () => ({
   },
 }));
 
-vi.mock("~/lib/monitoring/logger.server", () => ({
+vi.mock("~/utils/monitoring/logger.server", () => ({
   logger: { info: vi.fn(), warn: vi.fn(), error: vi.fn() },
 }));
 
-vi.mock("~/lib/fields", () => ({
+vi.mock("~/utils/fields", () => ({
   collectFieldDefIds: vi.fn(),
   buildFieldSchema: vi.fn(),
 }));
 
-vi.mock("~/lib/fields.server", () => ({
+vi.mock("~/utils/fields.server", () => ({
   parseExtrasFormData: vi.fn(),
 }));
 
@@ -758,7 +758,7 @@ describe("section-templates.server", () => {
 
     it("returns definition with empty fields when no fieldDefIds found", async () => {
       const { loadExtrasForEntity } = await import("~/services/section-templates.server");
-      const { collectFieldDefIds } = await import("~/lib/fields");
+      const { collectFieldDefIds } = await import("~/utils/fields");
 
       const def = {
         pages: [{ id: "p1", title: "P1", sections: [{ id: "s1", title: "S1", fields: [] }] }],
@@ -777,7 +777,7 @@ describe("section-templates.server", () => {
 
     it("returns definition and mapped field defs when fields exist", async () => {
       const { loadExtrasForEntity } = await import("~/services/section-templates.server");
-      const { collectFieldDefIds } = await import("~/lib/fields");
+      const { collectFieldDefIds } = await import("~/utils/fields");
 
       const def = templateWithFields.definition;
       mockTemplateFindFirst.mockResolvedValue({
@@ -853,7 +853,7 @@ describe("section-templates.server", () => {
 
     it("returns null when no field def IDs are collected", async () => {
       const { parseExtrasForEntity } = await import("~/services/section-templates.server");
-      const { collectFieldDefIds } = await import("~/lib/fields");
+      const { collectFieldDefIds } = await import("~/utils/fields");
 
       mockTemplateFindFirst.mockResolvedValue({
         ...sampleTemplate,
@@ -872,8 +872,8 @@ describe("section-templates.server", () => {
 
     it("returns extras on successful validation", async () => {
       const { parseExtrasForEntity } = await import("~/services/section-templates.server");
-      const { collectFieldDefIds, buildFieldSchema } = await import("~/lib/fields");
-      const { parseExtrasFormData } = await import("~/lib/fields.server");
+      const { collectFieldDefIds, buildFieldSchema } = await import("~/utils/fields");
+      const { parseExtrasFormData } = await import("~/utils/fields.server");
 
       mockTemplateFindFirst.mockResolvedValue({
         ...sampleTemplate,
@@ -903,8 +903,8 @@ describe("section-templates.server", () => {
 
     it("returns extrasErrors on validation failure", async () => {
       const { parseExtrasForEntity } = await import("~/services/section-templates.server");
-      const { collectFieldDefIds, buildFieldSchema } = await import("~/lib/fields");
-      const { parseExtrasFormData } = await import("~/lib/fields.server");
+      const { collectFieldDefIds, buildFieldSchema } = await import("~/utils/fields");
+      const { parseExtrasFormData } = await import("~/utils/fields.server");
 
       mockTemplateFindFirst.mockResolvedValue({
         ...sampleTemplate,
@@ -943,8 +943,8 @@ describe("section-templates.server", () => {
 
     it("uses custom prefix when provided", async () => {
       const { parseExtrasForEntity } = await import("~/services/section-templates.server");
-      const { collectFieldDefIds, buildFieldSchema } = await import("~/lib/fields");
-      const { parseExtrasFormData } = await import("~/lib/fields.server");
+      const { collectFieldDefIds, buildFieldSchema } = await import("~/utils/fields");
+      const { parseExtrasFormData } = await import("~/utils/fields.server");
 
       mockTemplateFindFirst.mockResolvedValue({
         ...sampleTemplate,
@@ -971,7 +971,7 @@ describe("section-templates.server", () => {
   describe("SectionTemplateError", () => {
     it("extends ServiceError with correct properties", async () => {
       const { SectionTemplateError } = await import("~/services/section-templates.server");
-      const { ServiceError } = await import("~/lib/errors/service-error.server");
+      const { ServiceError } = await import("~/utils/errors/service-error.server");
 
       const err = new SectionTemplateError("Something failed", "CUSTOM_CODE", 422);
 

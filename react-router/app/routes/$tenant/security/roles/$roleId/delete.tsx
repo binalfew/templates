@@ -3,13 +3,13 @@ import { invariantResponse } from "@epic-web/invariant";
 
 export const handle = { breadcrumb: "Delete Role" };
 
-import { requirePermission } from "~/lib/auth/require-auth.server";
+import { requirePermission } from "~/utils/auth/require-auth.server";
 import { getRoleWithCounts, deleteRole } from "~/services/roles.server";
-import { handleServiceError } from "~/lib/errors/handle-service-error.server";
+import { handleServiceError } from "~/utils/errors/handle-service-error.server";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { useBasePrefix } from "~/hooks/use-base-prefix";
-import { buildServiceContext } from "~/lib/request-context.server";
+import { buildServiceContext } from "~/utils/request-context.server";
 import type { Route } from "./+types/delete";
 
 export async function loader({ request, params }: Route.LoaderArgs) {

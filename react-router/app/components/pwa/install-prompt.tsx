@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { Download, X } from "lucide-react";
 import { Button } from "~/components/ui/button";
-import { cn } from "~/lib/utils";
+import { cn } from "~/utils/utils";
 
 interface BeforeInstallPromptEvent extends Event {
   prompt(): Promise<void>;

@@ -1,7 +1,7 @@
 import { useState, useMemo } from "react";
 import { Keyboard, Search } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "~/components/ui/dialog";
-import type { ShortcutInfo } from "~/lib/use-keyboard-shortcuts";
+import type { ShortcutInfo } from "~/utils/use-keyboard-shortcuts";
 
 // ─── Types ───────────────────────────────────────────────
 

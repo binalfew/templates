@@ -1,6 +1,6 @@
-import { prisma } from "~/lib/db/db.server";
-import { logger } from "~/lib/monitoring/logger.server";
-import { ServiceError } from "~/lib/errors/service-error.server";
+import { prisma } from "~/utils/db/db.server";
+import { logger } from "~/utils/monitoring/logger.server";
+import { ServiceError } from "~/utils/errors/service-error.server";
 import type { ViewType } from "~/generated/prisma/client.js";
 
 export interface SavedViewFilter {

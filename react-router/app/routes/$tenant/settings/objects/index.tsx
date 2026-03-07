@@ -3,9 +3,9 @@ import { Box, Plus, Pencil, Trash2, Database } from "lucide-react";
 
 export const handle = { breadcrumb: "Objects" };
 
-import { requireRoleAndFeature } from "~/lib/auth/require-auth.server";
-import { ADMIN_ONLY } from "~/lib/auth/roles";
-import { FEATURE_FLAG_KEYS } from "~/lib/config/feature-flags.server";
+import { requireRoleAndFeature } from "~/utils/auth/require-auth.server";
+import { ADMIN_ONLY } from "~/utils/auth/roles";
+import { FEATURE_FLAG_KEYS } from "~/utils/config/feature-flags.server";
 import { listDefinitionsPaginated } from "~/services/custom-objects.server";
 import type { CustomFieldDefinition } from "~/services/custom-objects.server";
 import { resolveViewContext } from "~/services/view-filters.server";

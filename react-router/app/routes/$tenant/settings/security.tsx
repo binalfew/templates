@@ -1,12 +1,12 @@
 import { Form, useLoaderData, redirect } from "react-router";
 import { invariantResponse } from "@epic-web/invariant";
 import { Info, Shield } from "lucide-react";
-import { isFeatureEnabled, FEATURE_FLAG_KEYS } from "~/lib/config/feature-flags.server";
-import { requireAnyRole } from "~/lib/auth/require-auth.server";
-import { ADMIN_OR_TENANT_ADMIN } from "~/lib/auth/roles";
+import { isFeatureEnabled, FEATURE_FLAG_KEYS } from "~/utils/config/feature-flags.server";
+import { requireAnyRole } from "~/utils/auth/require-auth.server";
+import { ADMIN_OR_TENANT_ADMIN } from "~/utils/auth/roles";
 import { listRoles } from "~/services/roles.server";
 import { getTwoFAPolicy } from "~/services/2fa-enforcement.server";
-import { setSetting } from "~/lib/config/settings.server";
+import { setSetting } from "~/utils/config/settings.server";
 import { Button } from "~/components/ui/button";
 import { Checkbox } from "~/components/ui/checkbox";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";

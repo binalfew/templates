@@ -1,7 +1,7 @@
-import { prisma } from "~/lib/db/db.server";
-import { apiAuth, requireApiPermission } from "~/lib/auth/api-auth.server";
-import { jsonPaginated, jsonSuccess, jsonError, parsePagination } from "~/lib/api-response.server";
-import { hashPassword } from "~/lib/auth/auth.server";
+import { prisma } from "~/utils/db/db.server";
+import { apiAuth, requireApiPermission } from "~/utils/auth/api-auth.server";
+import { jsonPaginated, jsonSuccess, jsonError, parsePagination } from "~/utils/api-response.server";
+import { hashPassword } from "~/utils/auth/auth.server";
 import type { Route } from "./+types/users";
 
 export async function loader({ request }: Route.LoaderArgs) {

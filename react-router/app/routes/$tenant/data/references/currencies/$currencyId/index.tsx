@@ -3,8 +3,8 @@ import { Banknote, ArrowLeft, Pencil, Trash2 } from "lucide-react";
 
 export const handle = { breadcrumb: "Details" };
 
-import { requireAnyRole } from "~/lib/auth/require-auth.server";
-import { ADMIN_ONLY } from "~/lib/auth/roles";
+import { requireAnyRole } from "~/utils/auth/require-auth.server";
+import { ADMIN_ONLY } from "~/utils/auth/roles";
 import { getCurrency } from "~/services/reference-data.server";
 import { Button } from "~/components/ui/button";
 import { Badge } from "~/components/ui/badge";

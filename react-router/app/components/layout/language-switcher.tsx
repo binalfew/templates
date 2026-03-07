@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { Languages } from "lucide-react";
-import { supportedLanguages, getLanguageDir } from "~/lib/i18n";
+import { supportedLanguages, getLanguageDir } from "~/utils/i18n";
 import { Button } from "~/components/ui/button";
 import {
   DropdownMenu,

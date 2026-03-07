@@ -1,4 +1,4 @@
-import { prisma } from "~/lib/db/db.server";
+import { prisma } from "~/utils/db/db.server";
 
 interface ExportOptions {
   entity: string;

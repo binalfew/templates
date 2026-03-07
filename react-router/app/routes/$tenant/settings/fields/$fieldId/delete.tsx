@@ -1,17 +1,17 @@
 import { redirect, useLoaderData, useActionData, Form, Link, useSearchParams } from "react-router";
 export const handle = { breadcrumb: "Delete Field" };
 
-import { requireRoleAndFeature } from "~/lib/auth/require-auth.server";
-import { ADMIN_ONLY } from "~/lib/auth/roles";
-import { FEATURE_FLAG_KEYS } from "~/lib/config/feature-flags.server";
+import { requireRoleAndFeature } from "~/utils/auth/require-auth.server";
+import { ADMIN_ONLY } from "~/utils/auth/roles";
+import { FEATURE_FLAG_KEYS } from "~/utils/config/feature-flags.server";
 import { deleteField, getField, getFieldDataCount } from "~/services/fields.server";
-import { handleServiceError } from "~/lib/errors/handle-service-error.server";
+import { handleServiceError } from "~/utils/errors/handle-service-error.server";
 import { formatDataType } from "~/components/fields/+utils";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { useBasePrefix } from "~/hooks/use-base-prefix";
-import { buildServiceContext } from "~/lib/request-context.server";
+import { buildServiceContext } from "~/utils/request-context.server";
 import type { Route } from "./+types/delete";
 
 export async function loader({ request, params }: Route.LoaderArgs) {

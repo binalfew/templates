@@ -1,11 +1,11 @@
 import { data, redirect, useLoaderData, useActionData, Form, Link, useSearchParams } from "react-router";
 export const handle = { breadcrumb: "Edit View" };
 
-import { requireRoleAndFeature } from "~/lib/auth/require-auth.server";
-import { ADMIN_OR_TENANT_ADMIN } from "~/lib/auth/roles";
-import { FEATURE_FLAG_KEYS } from "~/lib/config/feature-flags.server";
+import { requireRoleAndFeature } from "~/utils/auth/require-auth.server";
+import { ADMIN_OR_TENANT_ADMIN } from "~/utils/auth/roles";
+import { FEATURE_FLAG_KEYS } from "~/utils/config/feature-flags.server";
 import { getView, updateView } from "~/services/saved-views.server";
-import { handleServiceError } from "~/lib/errors/handle-service-error.server";
+import { handleServiceError } from "~/utils/errors/handle-service-error.server";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { NativeSelect, NativeSelectOption } from "~/components/ui/native-select";

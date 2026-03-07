@@ -1,7 +1,7 @@
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { GripVertical, Trash2, Eye } from "lucide-react";
-import { cn } from "~/lib/utils";
+import { cn } from "~/utils/utils";
 import { getFieldTypeIcon } from "./field-type-icons";
 import { makeFieldDndId } from "./dnd-designer-context";
 import type { FormFieldPlacement } from "~/types/form-designer";

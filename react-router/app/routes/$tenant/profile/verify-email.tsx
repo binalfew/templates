@@ -2,15 +2,15 @@ import { useForm, getFormProps, getInputProps } from "@conform-to/react";
 import { parseWithZod } from "@conform-to/zod/v4";
 import { data, Form, Link, redirect, useParams } from "react-router";
 import { ShieldCheck, ArrowLeft } from "lucide-react";
-import { prisma } from "~/lib/db/db.server";
-import { logger } from "~/lib/monitoring/logger.server";
+import { prisma } from "~/utils/db/db.server";
+import { logger } from "~/utils/monitoring/logger.server";
 import {
   isCodeValid,
   getVerifySession,
   destroyVerifySession,
   prepareVerification,
-} from "~/lib/auth/verification.server";
-import { verifyProfileEmailSchema as verifySchema } from "~/lib/schemas/profile";
+} from "~/utils/auth/verification.server";
+import { verifyProfileEmailSchema as verifySchema } from "~/utils/schemas/profile";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";

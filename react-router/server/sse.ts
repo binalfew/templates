@@ -1,7 +1,7 @@
 import { Router } from "express";
 import type { Request, Response } from "express";
-import { eventBus } from "../app/lib/events/event-bus.server.js";
-import type { BusEvent } from "../app/lib/events/event-bus.server.js";
+import { eventBus } from "../app/utils/events/event-bus.server.js";
+import type { BusEvent } from "../app/utils/events/event-bus.server.js";
 import { SSE_CHANNELS, type SSEChannel } from "../app/types/sse-events.js";
 
 // ─── Types ───────────────────────────────────────────────

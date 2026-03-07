@@ -1,4 +1,4 @@
-import { prisma } from "~/lib/db/db.server";
+import { prisma } from "~/utils/db/db.server";
 import type {
   CreateCountryInput,
   UpdateCountryInput,
@@ -10,10 +10,10 @@ import type {
   UpdateCurrencyInput,
   CreateDocumentTypeInput,
   UpdateDocumentTypeInput,
-} from "~/lib/schemas/reference-data";
+} from "~/utils/schemas/reference-data";
 
-import type { TenantServiceContext, PaginatedQueryOptions } from "~/lib/types.server";
-import { ServiceError } from "~/lib/errors/service-error.server";
+import type { TenantServiceContext, PaginatedQueryOptions } from "~/utils/types.server";
+import { ServiceError } from "~/utils/errors/service-error.server";
 
 export class ReferenceDataError extends ServiceError {
   constructor(message: string, status: number) {

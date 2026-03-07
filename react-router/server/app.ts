@@ -1,7 +1,7 @@
 import "react-router";
 import { createRequestHandler } from "@react-router/express";
 import express from "express";
-import { getSession, getUserId } from "~/lib/auth/session.server";
+import { getSession, getUserId } from "~/utils/auth/session.server";
 import {
   nonceMiddleware,
   helmetMiddleware,
@@ -48,11 +48,11 @@ app.use(
   createSSERouter(
     getUserId,
     async (key, context) => {
-      const { isFeatureEnabled } = await import("~/lib/config/feature-flags.server");
+      const { isFeatureEnabled } = await import("~/utils/config/feature-flags.server");
       return isFeatureEnabled(key, context);
     },
     async (userId) => {
-      const { prisma } = await import("~/lib/db/db.server");
+      const { prisma } = await import("~/utils/db/db.server");
       const user = await prisma.user.findFirst({
         where: { id: userId },
         include: { userRoles: { include: { role: true } } },
@@ -70,7 +70,7 @@ app.use(
 if (process.env.NODE_ENV === "development") {
   app.use(
     createSSETestRouter(getUserId, async (userId) => {
-      const { prisma } = await import("~/lib/db/db.server");
+      const { prisma } = await import("~/utils/db/db.server");
       const user = await prisma.user.findFirst({
         where: { id: userId },
       });
@@ -98,7 +98,7 @@ app.use("/auth", authLimiter);
 // ─── Data Export (direct download, bypasses React Router data layer) ───
 app.get("/resources/export-download", async (req, res) => {
   try {
-    const { requireUserId } = await import("~/lib/auth/session.server");
+    const { requireUserId } = await import("~/utils/auth/session.server");
     const request = new Request(`${req.protocol}://${req.get("host")}${req.originalUrl}`, {
       headers: Object.fromEntries(
         Object.entries(req.headers).filter(([, v]) => typeof v === "string") as [string, string][],
@@ -106,7 +106,7 @@ app.get("/resources/export-download", async (req, res) => {
     });
     const userId = await requireUserId(request);
 
-    const { prisma } = await import("~/lib/db/db.server");
+    const { prisma } = await import("~/utils/db/db.server");
     const user = await prisma.user.findFirst({ where: { id: userId }, select: { tenantId: true } });
     if (!user?.tenantId) {
       res.status(403).json({ error: "No tenant" });
@@ -142,8 +142,8 @@ app.get("/resources/export-download", async (req, res) => {
 });
 
 // ─── Background Job Processor ────────────────────────────────
-import("~/lib/events/job-handlers.server").then(() =>
-  import("~/lib/events/job-queue.server").then(({ startJobProcessor }) => startJobProcessor()),
+import("~/utils/events/job-handlers.server").then(() =>
+  import("~/utils/events/job-queue.server").then(({ startJobProcessor }) => startJobProcessor()),
 );
 
 // ─── React Router handler ──────────────────────────────────

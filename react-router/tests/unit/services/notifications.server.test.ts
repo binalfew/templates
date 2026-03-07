@@ -9,7 +9,7 @@ const mockDelete = vi.fn();
 
 const mockPublish = vi.fn();
 
-vi.mock("~/lib/db/db.server", () => ({
+vi.mock("~/utils/db/db.server", () => ({
   prisma: {
     notification: {
       create: (...args: unknown[]) => mockCreate(...args),
@@ -22,7 +22,7 @@ vi.mock("~/lib/db/db.server", () => ({
   },
 }));
 
-vi.mock("~/lib/events/event-bus.server", () => ({
+vi.mock("~/utils/events/event-bus.server", () => ({
   eventBus: {
     publish: (...args: unknown[]) => mockPublish(...args),
   },

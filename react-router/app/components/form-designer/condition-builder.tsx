@@ -3,8 +3,8 @@ import { Plus, Trash2, Eye } from "lucide-react";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { NativeSelect, NativeSelectOption } from "~/components/ui/native-select";
-import { cn } from "~/lib/utils";
-import { getOperatorsForType, type OperatorInfo } from "~/lib/condition-evaluator";
+import { cn } from "~/utils/utils";
+import { getOperatorsForType, type OperatorInfo } from "~/utils/condition-evaluator";
 import type {
   VisibilityCondition,
   SimpleCondition,

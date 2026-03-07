@@ -3,8 +3,8 @@ import { ArrowLeft, FileText, Plus, Pencil, Trash2 } from "lucide-react";
 
 export const handle = { breadcrumb: "Document Types" };
 
-import { requireAnyRole } from "~/lib/auth/require-auth.server";
-import { ADMIN_ONLY } from "~/lib/auth/roles";
+import { requireAnyRole } from "~/utils/auth/require-auth.server";
+import { ADMIN_ONLY } from "~/utils/auth/roles";
 import { listDocumentTypesPaginated } from "~/services/reference-data.server";
 import { useBasePrefix } from "~/hooks/use-base-prefix";
 import { DataTable } from "~/components/data-table/data-table";

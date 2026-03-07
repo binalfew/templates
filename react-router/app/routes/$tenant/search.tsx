@@ -1,5 +1,5 @@
-import { requireFeature } from "~/lib/auth/require-auth.server";
-import { FEATURE_FLAG_KEYS } from "~/lib/config/feature-flags.server";
+import { requireFeature } from "~/utils/auth/require-auth.server";
+import { FEATURE_FLAG_KEYS } from "~/utils/config/feature-flags.server";
 import { globalSearch } from "~/services/search.server";
 import type { SearchResults } from "~/services/search.server";
 import type { Route } from "./+types/search";

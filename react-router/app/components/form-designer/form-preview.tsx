@@ -19,9 +19,9 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "~/component
 import { Popover, PopoverContent, PopoverTrigger } from "~/components/ui/popover";
 import { Calendar } from "~/components/ui/calendar";
 import { Separator } from "~/components/ui/separator";
-import { cn } from "~/lib/utils";
-import { evaluateCondition } from "~/lib/condition-evaluator";
-import { generateMockData } from "~/lib/form-preview-data";
+import { cn } from "~/utils/utils";
+import { evaluateCondition } from "~/utils/condition-evaluator";
+import { generateMockData } from "~/utils/form-preview-data";
 import type { FormDefinition, FormSection, FormFieldPlacement } from "~/types/form-designer";
 
 // ─── Types ──────────────────────────────────────────────

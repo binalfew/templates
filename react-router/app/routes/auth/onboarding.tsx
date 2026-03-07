@@ -1,12 +1,12 @@
 import { useForm, getFormProps, getInputProps } from "@conform-to/react";
 import { parseWithZod } from "@conform-to/zod/v4";
 import { data, Form, redirect } from "react-router";
-import { hashPassword } from "~/lib/auth/auth.server";
-import { prisma } from "~/lib/db/db.server";
-import { logger } from "~/lib/monitoring/logger.server";
-import { requireAnonymous, getDefaultRedirect, createUserSession } from "~/lib/auth/session.server";
-import { requireOnboardingEmail, getVerifySession } from "~/lib/auth/verification.server";
-import { onboardingSchema } from "~/lib/schemas/auth";
+import { hashPassword } from "~/utils/auth/auth.server";
+import { prisma } from "~/utils/db/db.server";
+import { logger } from "~/utils/monitoring/logger.server";
+import { requireAnonymous, getDefaultRedirect, createUserSession } from "~/utils/auth/session.server";
+import { requireOnboardingEmail, getVerifySession } from "~/utils/auth/verification.server";
+import { onboardingSchema } from "~/utils/schemas/auth";
 import { Button } from "~/components/ui/button";
 import { Checkbox } from "~/components/ui/checkbox";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";

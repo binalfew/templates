@@ -1,16 +1,16 @@
 import { data, redirect, useActionData, useLoaderData, Form, Link } from "react-router";
 import { useForm, getFormProps, getInputProps } from "@conform-to/react";
 import { parseWithZod } from "@conform-to/zod/v4";
-import { requireRoleAndFeature } from "~/lib/auth/require-auth.server";
-import { ADMIN_ONLY } from "~/lib/auth/roles";
-import { FEATURE_FLAG_KEYS } from "~/lib/config/feature-flags.server";
+import { requireRoleAndFeature } from "~/utils/auth/require-auth.server";
+import { ADMIN_ONLY } from "~/utils/auth/roles";
+import { FEATURE_FLAG_KEYS } from "~/utils/config/feature-flags.server";
 import {
   getDefinitionBySlug,
   updateDefinition,
   type CustomFieldDefinition,
 } from "~/services/custom-objects.server";
-import { handleServiceError } from "~/lib/errors/handle-service-error.server";
-import { addFieldSchema, ADD_FIELD_DATA_TYPES as DATA_TYPES } from "~/lib/schemas/custom-object";
+import { handleServiceError } from "~/utils/errors/handle-service-error.server";
+import { addFieldSchema, ADD_FIELD_DATA_TYPES as DATA_TYPES } from "~/utils/schemas/custom-object";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Checkbox } from "~/components/ui/checkbox";

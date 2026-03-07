@@ -3,8 +3,8 @@ import { ArrowLeft, Languages, Plus, Pencil, Trash2 } from "lucide-react";
 
 export const handle = { breadcrumb: "Languages" };
 
-import { requireAnyRole } from "~/lib/auth/require-auth.server";
-import { ADMIN_ONLY } from "~/lib/auth/roles";
+import { requireAnyRole } from "~/utils/auth/require-auth.server";
+import { ADMIN_ONLY } from "~/utils/auth/roles";
 import { listLanguagesPaginated } from "~/services/reference-data.server";
 import { useBasePrefix } from "~/hooks/use-base-prefix";
 import { DataTable } from "~/components/data-table/data-table";

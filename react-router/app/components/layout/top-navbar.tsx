@@ -8,7 +8,7 @@ import {
   useKeyboardShortcuts,
   getShortcutInfo,
   type ShortcutDefinition,
-} from "~/lib/use-keyboard-shortcuts";
+} from "~/utils/use-keyboard-shortcuts";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -33,9 +33,9 @@ import { NotificationBell } from "~/components/notification-bell";
 import { OfflineIndicator } from "~/components/offline-indicator";
 import { LanguageSwitcher } from "~/components/layout/language-switcher";
 import { ThemeSwitch } from "~/routes/resources/theme-switch";
-import { cn } from "~/lib/utils";
+import { cn } from "~/utils/utils";
 import type { NavChild } from "~/config/navigation";
-import type { Theme } from "~/lib/theme.server";
+import type { Theme } from "~/utils/theme.server";
 
 interface NotificationItem {
   id: string;

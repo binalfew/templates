@@ -1,9 +1,9 @@
 import { Form, Link, redirect } from "react-router";
 import { AlertTriangle, Shield, ShieldOff, XCircle } from "lucide-react";
-import { twoFAVerificationType } from "~/lib/auth/2fa-constants";
-import { prisma } from "~/lib/db/db.server";
-import { isFeatureEnabled, FEATURE_FLAG_KEYS } from "~/lib/config/feature-flags.server";
-import { requireUserId } from "~/lib/auth/session.server";
+import { twoFAVerificationType } from "~/utils/auth/2fa-constants";
+import { prisma } from "~/utils/db/db.server";
+import { isFeatureEnabled, FEATURE_FLAG_KEYS } from "~/utils/config/feature-flags.server";
+import { requireUserId } from "~/utils/auth/session.server";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
 import type { Route } from "./+types/disable";

@@ -1,7 +1,7 @@
-import { prisma } from "~/lib/db/db.server";
-import { hashPassword } from "~/lib/auth/auth.server";
-import { ServiceError } from "~/lib/errors/service-error.server";
-import type { PaginatedQueryOptions, ServiceContext } from "~/lib/types.server";
+import { prisma } from "~/utils/db/db.server";
+import { hashPassword } from "~/utils/auth/auth.server";
+import { ServiceError } from "~/utils/errors/service-error.server";
+import type { PaginatedQueryOptions, ServiceContext } from "~/utils/types.server";
 
 export class TenantError extends ServiceError {
   constructor(message: string, status: number) {

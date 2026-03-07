@@ -4,7 +4,7 @@ import { invariantResponse } from "@epic-web/invariant";
 
 export const handle = { breadcrumb: "Details" };
 
-import { requirePermission } from "~/lib/auth/require-auth.server";
+import { requirePermission } from "~/utils/auth/require-auth.server";
 import { getUserWithCounts } from "~/services/users.server";
 import { Button } from "~/components/ui/button";
 import { Badge } from "~/components/ui/badge";

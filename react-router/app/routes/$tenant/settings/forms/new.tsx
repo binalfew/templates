@@ -4,12 +4,12 @@ import { parseWithZod } from "@conform-to/zod/v4";
 
 export const handle = { breadcrumb: "New Form" };
 
-import { requireRoleAndFeature } from "~/lib/auth/require-auth.server";
-import { ADMIN_ONLY } from "~/lib/auth/roles";
-import { FEATURE_FLAG_KEYS } from "~/lib/config/feature-flags.server";
+import { requireRoleAndFeature } from "~/utils/auth/require-auth.server";
+import { ADMIN_ONLY } from "~/utils/auth/roles";
+import { FEATURE_FLAG_KEYS } from "~/utils/config/feature-flags.server";
 import { createSectionTemplate } from "~/services/section-templates.server";
-import { handleServiceError } from "~/lib/errors/handle-service-error.server";
-import { createSectionTemplateSchema, ENTITY_TYPES_LIST } from "~/lib/schemas/section-template";
+import { handleServiceError } from "~/utils/errors/handle-service-error.server";
+import { createSectionTemplateSchema, ENTITY_TYPES_LIST } from "~/utils/schemas/section-template";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Textarea } from "~/components/ui/textarea";
@@ -17,7 +17,7 @@ import { NativeSelect, NativeSelectOption } from "~/components/ui/native-select"
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { Field } from "~/components/ui/field";
 import { useBasePrefix } from "~/hooks/use-base-prefix";
-import { buildServiceContext } from "~/lib/request-context.server";
+import { buildServiceContext } from "~/utils/request-context.server";
 import type { Route } from "./+types/new";
 
 export async function loader({ request }: Route.LoaderArgs) {

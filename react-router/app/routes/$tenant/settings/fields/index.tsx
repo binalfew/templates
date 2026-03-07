@@ -3,23 +3,23 @@ import { Columns3, Pencil, Plus, Trash2 } from "lucide-react";
 
 export const handle = { breadcrumb: "Fields" };
 
-import { requireRoleAndFeature } from "~/lib/auth/require-auth.server";
-import { ADMIN_ONLY } from "~/lib/auth/roles";
-import { FEATURE_FLAG_KEYS } from "~/lib/config/feature-flags.server";
+import { requireRoleAndFeature } from "~/utils/auth/require-auth.server";
+import { ADMIN_ONLY } from "~/utils/auth/roles";
+import { FEATURE_FLAG_KEYS } from "~/utils/config/feature-flags.server";
 import {
   listFields,
   listFieldsPaginated,
   deleteField,
   reorderFields,
 } from "~/services/fields.server";
-import { handleServiceError } from "~/lib/errors/handle-service-error.server";
+import { handleServiceError } from "~/utils/errors/handle-service-error.server";
 import { formatDataType } from "~/components/fields/+utils";
-import { FIELD_DATA_TYPES } from "~/lib/schemas/field";
+import { FIELD_DATA_TYPES } from "~/utils/schemas/field";
 import { Badge } from "~/components/ui/badge";
 import { DataTable } from "~/components/data-table/data-table";
 import type { ColumnDef, FilterDef, PaginationMeta } from "~/components/data-table/data-table-types";
 import { useBasePrefix } from "~/hooks/use-base-prefix";
-import { buildServiceContext } from "~/lib/request-context.server";
+import { buildServiceContext } from "~/utils/request-context.server";
 import type { Route } from "./+types/index";
 
 export async function loader({ request }: Route.LoaderArgs) {

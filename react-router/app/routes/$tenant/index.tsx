@@ -1,8 +1,8 @@
 import { Suspense } from "react";
 import { useLoaderData, useRouteLoaderData, Await } from "react-router";
-import { prisma } from "~/lib/db/db.server";
-import { requireAuth } from "~/lib/auth/require-auth.server";
-import { isFeatureEnabled, FEATURE_FLAG_KEYS } from "~/lib/config/feature-flags.server";
+import { prisma } from "~/utils/db/db.server";
+import { requireAuth } from "~/utils/auth/require-auth.server";
+import { isFeatureEnabled, FEATURE_FLAG_KEYS } from "~/utils/config/feature-flags.server";
 import { getUnreadCount } from "~/services/notifications.server";
 import {
   getUserGrowth,

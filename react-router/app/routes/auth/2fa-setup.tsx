@@ -9,16 +9,16 @@ import {
   twoFAVerificationType,
   twoFAVerifyVerificationType,
   unverifiedSessionIdKey,
-} from "~/lib/auth/2fa-constants";
-import { prisma } from "~/lib/db/db.server";
-import { env } from "~/lib/config/env.server";
+} from "~/utils/auth/2fa-constants";
+import { prisma } from "~/utils/db/db.server";
+import { env } from "~/utils/config/env.server";
 import {
   getVerifySession,
   isCodeValid,
   handleTwoFAVerification,
-} from "~/lib/auth/verification.server";
+} from "~/utils/auth/verification.server";
 import { generateRecoveryCodes } from "~/services/recovery-codes.server";
-import { twoFASetupSchema as verifySchema } from "~/lib/schemas/auth";
+import { twoFASetupSchema as verifySchema } from "~/utils/schemas/auth";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
 import { Input } from "~/components/ui/input";

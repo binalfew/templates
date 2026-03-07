@@ -8,7 +8,7 @@ const mockPermissionFindMany = vi.fn();
 const mockPermissionCount = vi.fn();
 const mockAuditLogCreate = vi.fn();
 
-vi.mock("~/lib/db/db.server", () => ({
+vi.mock("~/utils/db/db.server", () => ({
   prisma: {
     permission: {
       create: (...args: unknown[]) => mockPermissionCreate(...args),
@@ -24,7 +24,7 @@ vi.mock("~/lib/db/db.server", () => ({
   },
 }));
 
-vi.mock("~/lib/monitoring/logger.server", () => ({
+vi.mock("~/utils/monitoring/logger.server", () => ({
   logger: { info: vi.fn(), warn: vi.fn(), error: vi.fn() },
 }));
 
@@ -508,7 +508,7 @@ describe("permissions.server", () => {
   describe("PermissionError", () => {
     it("is an instance of ServiceError", async () => {
       const { PermissionError } = await import("~/services/permissions.server");
-      const { ServiceError } = await import("~/lib/errors/service-error.server");
+      const { ServiceError } = await import("~/utils/errors/service-error.server");
 
       const error = new PermissionError("test", 400);
 

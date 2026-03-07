@@ -1,11 +1,11 @@
 import { useForm, getFormProps, getInputProps } from "@conform-to/react";
 import { parseWithZod } from "@conform-to/zod/v4";
 import { data, Form, Link, redirect } from "react-router";
-import { hashPassword } from "~/lib/auth/auth.server";
-import { prisma } from "~/lib/db/db.server";
-import { logger } from "~/lib/monitoring/logger.server";
-import { createUserSession } from "~/lib/auth/session.server";
-import { acceptInviteSchema } from "~/lib/schemas/invitation";
+import { hashPassword } from "~/utils/auth/auth.server";
+import { prisma } from "~/utils/db/db.server";
+import { logger } from "~/utils/monitoring/logger.server";
+import { createUserSession } from "~/utils/auth/session.server";
+import { acceptInviteSchema } from "~/utils/schemas/invitation";
 import { getInvitationByToken, acceptInvitation } from "~/services/invitations.server";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";

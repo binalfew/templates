@@ -1,10 +1,10 @@
 import * as fs from "node:fs/promises";
 import * as path from "node:path";
 import crypto from "node:crypto";
-import { env } from "~/lib/config/env.server";
-import { logger } from "~/lib/monitoring/logger.server";
-import { ServiceError } from "~/lib/errors/service-error.server";
-import { prisma } from "~/lib/db/db.server";
+import { env } from "~/utils/config/env.server";
+import { logger } from "~/utils/monitoring/logger.server";
+import { ServiceError } from "~/utils/errors/service-error.server";
+import { prisma } from "~/utils/db/db.server";
 
 export interface UploadOptions {
   tenantId: string;

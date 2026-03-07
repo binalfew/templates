@@ -1,12 +1,12 @@
-import { prisma } from "~/lib/db/db.server";
-import { logger } from "~/lib/monitoring/logger.server";
-import type { CreateSectionTemplateInput, UpdateSectionTemplateInput } from "~/lib/schemas/section-template";
-import type { PaginatedQueryOptions, TenantServiceContext } from "~/lib/types.server";
+import { prisma } from "~/utils/db/db.server";
+import { logger } from "~/utils/monitoring/logger.server";
+import type { CreateSectionTemplateInput, UpdateSectionTemplateInput } from "~/utils/schemas/section-template";
+import type { PaginatedQueryOptions, TenantServiceContext } from "~/utils/types.server";
 import type { FormDefinition } from "~/types/form-designer";
 import type { RendererFieldDef } from "~/components/form-renderer/form-renderer";
-import { collectFieldDefIds, buildFieldSchema } from "~/lib/fields";
-import { parseExtrasFormData } from "~/lib/fields.server";
-import { ServiceError } from "~/lib/errors/service-error.server";
+import { collectFieldDefIds, buildFieldSchema } from "~/utils/fields";
+import { parseExtrasFormData } from "~/utils/fields.server";
+import { ServiceError } from "~/utils/errors/service-error.server";
 
 // ─── Types ────────────────────────────────────────────────
 

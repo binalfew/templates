@@ -7,7 +7,7 @@ const mockPermissionFindMany = vi.fn();
 const mockCustomObjectDefFindMany = vi.fn();
 const mockAuditLogFindMany = vi.fn();
 
-vi.mock("~/lib/db/db.server", () => ({
+vi.mock("~/utils/db/db.server", () => ({
   prisma: {
     user: {
       findMany: (...args: unknown[]) => mockUserFindMany(...args),

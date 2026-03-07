@@ -1,10 +1,10 @@
 import { useForm, getFormProps, getInputProps } from "@conform-to/react";
 import { parseWithZod } from "@conform-to/zod/v4";
 import { data, Form, Link, redirect } from "react-router";
-import { twoFAVerificationType, unverifiedSessionIdKey } from "~/lib/auth/2fa-constants";
-import { prisma } from "~/lib/db/db.server";
-import { getVerifySession, isCodeValid, handleTwoFAVerification } from "~/lib/auth/verification.server";
-import { twoFAVerifySchema as twoFASchema } from "~/lib/schemas/auth";
+import { twoFAVerificationType, unverifiedSessionIdKey } from "~/utils/auth/2fa-constants";
+import { prisma } from "~/utils/db/db.server";
+import { getVerifySession, isCodeValid, handleTwoFAVerification } from "~/utils/auth/verification.server";
+import { twoFAVerifySchema as twoFASchema } from "~/utils/schemas/auth";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
 import { Input } from "~/components/ui/input";

@@ -1,6 +1,6 @@
-import { prisma } from "~/lib/db/db.server";
-import type { PaginatedQueryOptions, TenantServiceContext } from "~/lib/types.server";
-import { ServiceError } from "~/lib/errors/service-error.server";
+import { prisma } from "~/utils/db/db.server";
+import type { PaginatedQueryOptions, TenantServiceContext } from "~/utils/types.server";
+import { ServiceError } from "~/utils/errors/service-error.server";
 
 // Re-export for backward compatibility (canonical source: permissions.server.ts)
 export { listPermissions } from "~/services/permissions.server";

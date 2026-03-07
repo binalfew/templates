@@ -6,7 +6,7 @@ import {
   Bell,
   Database,
 } from "lucide-react";
-import { ADMIN_ONLY, ADMIN_OR_TENANT_ADMIN } from "~/lib/auth/roles";
+import { ADMIN_ONLY, ADMIN_OR_TENANT_ADMIN } from "~/utils/auth/roles";
 
 export type NavChild = {
   title: string;

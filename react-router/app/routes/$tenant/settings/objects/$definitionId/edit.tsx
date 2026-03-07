@@ -4,12 +4,12 @@ import { parseWithZod } from "@conform-to/zod/v4";
 
 export const handle = { breadcrumb: "Edit Object" };
 
-import { requireRoleAndFeature } from "~/lib/auth/require-auth.server";
-import { ADMIN_ONLY } from "~/lib/auth/roles";
-import { FEATURE_FLAG_KEYS } from "~/lib/config/feature-flags.server";
+import { requireRoleAndFeature } from "~/utils/auth/require-auth.server";
+import { ADMIN_ONLY } from "~/utils/auth/roles";
+import { FEATURE_FLAG_KEYS } from "~/utils/config/feature-flags.server";
 import { getDefinition, updateDefinition } from "~/services/custom-objects.server";
-import { handleServiceError } from "~/lib/errors/handle-service-error.server";
-import { updateCustomObjectSchema } from "~/lib/schemas/custom-object";
+import { handleServiceError } from "~/utils/errors/handle-service-error.server";
+import { updateCustomObjectSchema } from "~/utils/schemas/custom-object";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Textarea } from "~/components/ui/textarea";

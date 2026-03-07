@@ -6,7 +6,7 @@ import { ServerRouter } from "react-router";
 import { isbot } from "isbot";
 import type { RenderToPipeableStreamOptions } from "react-dom/server";
 import { renderToPipeableStream } from "react-dom/server";
-import { NonceProvider } from "./lib/nonce-provider";
+import { NonceProvider } from "./utils/nonce-provider";
 
 export const streamTimeout = 5_000;
 

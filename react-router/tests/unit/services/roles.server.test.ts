@@ -9,7 +9,7 @@ const mockRolePermissionDeleteMany = vi.fn();
 const mockRolePermissionCreateMany = vi.fn();
 const mockAuditLogCreate = vi.fn();
 
-vi.mock("~/lib/db/db.server", () => ({
+vi.mock("~/utils/db/db.server", () => ({
   prisma: {
     role: {
       create: (...args: unknown[]) => mockRoleCreate(...args),
@@ -28,7 +28,7 @@ vi.mock("~/lib/db/db.server", () => ({
   },
 }));
 
-vi.mock("~/lib/monitoring/logger.server", () => ({
+vi.mock("~/utils/monitoring/logger.server", () => ({
   logger: { info: vi.fn(), warn: vi.fn(), error: vi.fn() },
 }));
 
@@ -658,7 +658,7 @@ describe("roles.server", () => {
   describe("RoleError", () => {
     it("is an instance of ServiceError", async () => {
       const { RoleError } = await import("~/services/roles.server");
-      const { ServiceError } = await import("~/lib/errors/service-error.server");
+      const { ServiceError } = await import("~/utils/errors/service-error.server");
 
       const error = new RoleError("test", 400);
 

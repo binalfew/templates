@@ -14,12 +14,12 @@ import { invariantResponse } from "@epic-web/invariant";
 export const handle = { breadcrumb: "Edit User" };
 
 import { ShieldCheck, ShieldOff } from "lucide-react";
-import { requirePermission } from "~/lib/auth/require-auth.server";
-import { isFeatureEnabled, FEATURE_FLAG_KEYS } from "~/lib/config/feature-flags.server";
+import { requirePermission } from "~/utils/auth/require-auth.server";
+import { isFeatureEnabled, FEATURE_FLAG_KEYS } from "~/utils/config/feature-flags.server";
 import { getUser, updateUser, changePassword, UserError } from "~/services/users.server";
 import { hasUserSetUp2FA, resetUserTwoFA } from "~/services/2fa-enforcement.server";
-import { handleServiceError } from "~/lib/errors/handle-service-error.server";
-import { updateUserSchema, changePasswordSchema } from "~/lib/schemas/user";
+import { handleServiceError } from "~/utils/errors/handle-service-error.server";
+import { updateUserSchema, changePasswordSchema } from "~/utils/schemas/user";
 import { loadExtrasForEntity, parseExtrasForEntity } from "~/services/section-templates.server";
 import { FormRenderer } from "~/components/form-renderer/form-renderer";
 import { Badge } from "~/components/ui/badge";
@@ -30,7 +30,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { Separator } from "~/components/ui/separator";
 import { Field } from "~/components/ui/field";
 import { useBasePrefix } from "~/hooks/use-base-prefix";
-import { buildServiceContext } from "~/lib/request-context.server";
+import { buildServiceContext } from "~/utils/request-context.server";
 import type { Route } from "./+types/edit";
 
 export async function loader({ request, params }: Route.LoaderArgs) {

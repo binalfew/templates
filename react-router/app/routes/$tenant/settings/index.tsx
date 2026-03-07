@@ -4,12 +4,12 @@ import { Pencil, X, Check } from "lucide-react";
 
 export const handle = { breadcrumb: "General" };
 
-import { requireAnyRole } from "~/lib/auth/require-auth.server";
-import { ADMIN_OR_TENANT_ADMIN } from "~/lib/auth/roles";
-import { getAllSettings, setSetting, deleteSetting } from "~/lib/config/settings.server";
-import type { ResolvedSetting } from "~/lib/config/settings.server";
-import { upsertSettingSchema, SETTING_CATEGORIES } from "~/lib/schemas/settings";
-import { buildServiceContext } from "~/lib/request-context.server";
+import { requireAnyRole } from "~/utils/auth/require-auth.server";
+import { ADMIN_OR_TENANT_ADMIN } from "~/utils/auth/roles";
+import { getAllSettings, setSetting, deleteSetting } from "~/utils/config/settings.server";
+import type { ResolvedSetting } from "~/utils/config/settings.server";
+import { upsertSettingSchema, SETTING_CATEGORIES } from "~/utils/schemas/settings";
+import { buildServiceContext } from "~/utils/request-context.server";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";

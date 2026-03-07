@@ -4,7 +4,7 @@ import { Shield, Plus, Pencil, Trash2, KeyRound } from "lucide-react";
 
 export const handle = { breadcrumb: "Roles" };
 
-import { requirePermission } from "~/lib/auth/require-auth.server";
+import { requirePermission } from "~/utils/auth/require-auth.server";
 import { listRolesPaginated } from "~/services/roles.server";
 import { resolveViewContext } from "~/services/view-filters.server";
 import { useBasePrefix } from "~/hooks/use-base-prefix";

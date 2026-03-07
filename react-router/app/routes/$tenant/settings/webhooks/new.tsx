@@ -3,13 +3,13 @@ import { useState } from "react";
 
 export const handle = { breadcrumb: "New Webhook" };
 
-import { requireRoleAndFeature } from "~/lib/auth/require-auth.server";
-import { ADMIN_OR_TENANT_ADMIN } from "~/lib/auth/roles";
-import { FEATURE_FLAG_KEYS } from "~/lib/config/feature-flags.server";
+import { requireRoleAndFeature } from "~/utils/auth/require-auth.server";
+import { ADMIN_OR_TENANT_ADMIN } from "~/utils/auth/roles";
+import { FEATURE_FLAG_KEYS } from "~/utils/config/feature-flags.server";
 import { createWebhookSubscription } from "~/services/webhooks.server";
-import { handleServiceError } from "~/lib/errors/handle-service-error.server";
-import { getEventsByDomain } from "~/lib/events/webhook-events";
-import { buildServiceContext } from "~/lib/request-context.server";
+import { handleServiceError } from "~/utils/errors/handle-service-error.server";
+import { getEventsByDomain } from "~/utils/events/webhook-events";
+import { buildServiceContext } from "~/utils/request-context.server";
 import { useBasePrefix } from "~/hooks/use-base-prefix";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";

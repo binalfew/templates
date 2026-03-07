@@ -1,8 +1,8 @@
-import { prisma } from "~/lib/db/db.server";
-import { logger } from "~/lib/monitoring/logger.server";
-import type { CreateBroadcastInput, UpdateBroadcastInput, AudienceFilter } from "~/lib/schemas/broadcast";
-import type { PaginatedQueryOptions, TenantServiceContext } from "~/lib/types.server";
-import { ServiceError } from "~/lib/errors/service-error.server";
+import { prisma } from "~/utils/db/db.server";
+import { logger } from "~/utils/monitoring/logger.server";
+import type { CreateBroadcastInput, UpdateBroadcastInput, AudienceFilter } from "~/utils/schemas/broadcast";
+import type { PaginatedQueryOptions, TenantServiceContext } from "~/utils/types.server";
+import { ServiceError } from "~/utils/errors/service-error.server";
 
 // ─── Types ────────────────────────────────────────────────
 

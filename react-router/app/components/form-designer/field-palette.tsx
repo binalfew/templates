@@ -5,7 +5,7 @@ import { Input } from "~/components/ui/input";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "~/components/ui/tabs";
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "~/components/ui/collapsible";
 import { ChevronRight } from "lucide-react";
-import { cn } from "~/lib/utils";
+import { cn } from "~/utils/utils";
 import { getFieldTypeIcon, getFieldTypeLabel, fieldCategories } from "./field-type-icons";
 import { makePaletteDndId } from "./dnd-designer-context";
 import type { FormSection } from "~/types/form-designer";

@@ -11,7 +11,7 @@ const mockAuditLogCreate = vi.fn();
 const mockQueryRawUnsafe = vi.fn();
 const mockTransaction = vi.fn();
 
-vi.mock("~/lib/db/db.server", () => ({
+vi.mock("~/utils/db/db.server", () => ({
   prisma: {
     fieldDefinition: {
       findMany: (...args: unknown[]) => mockFieldFindMany(...args),
@@ -29,7 +29,7 @@ vi.mock("~/lib/db/db.server", () => ({
   },
 }));
 
-vi.mock("~/lib/monitoring/logger.server", () => ({
+vi.mock("~/utils/monitoring/logger.server", () => ({
   logger: { info: vi.fn(), warn: vi.fn(), error: vi.fn() },
 }));
 
@@ -758,7 +758,7 @@ describe("fields.server", () => {
   describe("FieldError", () => {
     it("extends ServiceError with correct name and status", async () => {
       const { FieldError } = await import("~/services/fields.server");
-      const { ServiceError } = await import("~/lib/errors/service-error.server");
+      const { ServiceError } = await import("~/utils/errors/service-error.server");
 
       const err = new FieldError("Something went wrong", 422);
 

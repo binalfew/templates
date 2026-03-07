@@ -5,17 +5,17 @@ import { invariantResponse } from "@epic-web/invariant";
 
 export const handle = { breadcrumb: "Edit Document Type" };
 
-import { requireAnyRole } from "~/lib/auth/require-auth.server";
-import { ADMIN_ONLY } from "~/lib/auth/roles";
+import { requireAnyRole } from "~/utils/auth/require-auth.server";
+import { ADMIN_ONLY } from "~/utils/auth/roles";
 import { getDocumentType, updateDocumentType } from "~/services/reference-data.server";
-import { handleServiceError } from "~/lib/errors/handle-service-error.server";
-import { updateDocumentTypeSchema } from "~/lib/schemas/reference-data";
+import { handleServiceError } from "~/utils/errors/handle-service-error.server";
+import { updateDocumentTypeSchema } from "~/utils/schemas/reference-data";
 import { Input } from "~/components/ui/input";
 import { Textarea } from "~/components/ui/textarea";
 import { Field } from "~/components/ui/field";
 import { ReferenceDataForm } from "~/components/reference-data/reference-data-form";
 import { useBasePrefix } from "~/hooks/use-base-prefix";
-import { buildServiceContext } from "~/lib/request-context.server";
+import { buildServiceContext } from "~/utils/request-context.server";
 import type { Route } from "./+types/edit";
 
 export async function loader({ request, params }: Route.LoaderArgs) {

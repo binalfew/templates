@@ -1,5 +1,5 @@
 import type { Request, Response } from "express";
-import { prisma } from "~/lib/db/db.server";
+import { prisma } from "~/utils/db/db.server";
 
 export interface ViolationContext {
   userId: string | null;

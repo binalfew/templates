@@ -6,7 +6,7 @@ const mockRecoveryCodeFindMany = vi.fn();
 const mockRecoveryCodeUpdate = vi.fn();
 const mockRecoveryCodeCount = vi.fn();
 
-vi.mock("~/lib/db/db.server", () => ({
+vi.mock("~/utils/db/db.server", () => ({
   prisma: {
     recoveryCode: {
       deleteMany: (...args: unknown[]) => mockRecoveryCodeDeleteMany(...args),
@@ -18,7 +18,7 @@ vi.mock("~/lib/db/db.server", () => ({
   },
 }));
 
-vi.mock("~/lib/config/env.server", () => ({
+vi.mock("~/utils/config/env.server", () => ({
   env: { BCRYPT_ROUNDS: 4 },
 }));
 

@@ -15,7 +15,7 @@ const mockDeliveryGroupBy = vi.fn();
 const mockAuditLogCreate = vi.fn();
 const mockUserFindMany = vi.fn();
 
-vi.mock("~/lib/db/db.server", () => ({
+vi.mock("~/utils/db/db.server", () => ({
   prisma: {
     broadcastMessage: {
       create: (...args: unknown[]) => mockBroadcastCreate(...args),
@@ -42,7 +42,7 @@ vi.mock("~/lib/db/db.server", () => ({
   },
 }));
 
-vi.mock("~/lib/monitoring/logger.server", () => ({
+vi.mock("~/utils/monitoring/logger.server", () => ({
   logger: { info: vi.fn(), warn: vi.fn(), error: vi.fn() },
 }));
 
@@ -929,7 +929,7 @@ describe("broadcasts.server", () => {
 
     it("is an instance of ServiceError", async () => {
       const { BroadcastError } = await import("~/services/broadcasts.server");
-      const { ServiceError } = await import("~/lib/errors/service-error.server");
+      const { ServiceError } = await import("~/utils/errors/service-error.server");
 
       const error = new BroadcastError("test");
 

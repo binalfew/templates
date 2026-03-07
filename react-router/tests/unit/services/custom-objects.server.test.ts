@@ -12,7 +12,7 @@ const mockRecDelete = vi.fn();
 const mockRecFindFirst = vi.fn();
 const mockRecFindMany = vi.fn();
 
-vi.mock("~/lib/db/db.server", () => ({
+vi.mock("~/utils/db/db.server", () => ({
   prisma: {
     customObjectDefinition: {
       create: (...args: unknown[]) => mockDefCreate(...args),
@@ -32,7 +32,7 @@ vi.mock("~/lib/db/db.server", () => ({
   },
 }));
 
-vi.mock("~/lib/monitoring/logger.server", () => ({
+vi.mock("~/utils/monitoring/logger.server", () => ({
   logger: { info: vi.fn(), warn: vi.fn(), error: vi.fn() },
 }));
 

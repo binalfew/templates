@@ -1,6 +1,6 @@
 import { AsyncLocalStorage } from "node:async_hooks";
 import crypto from "node:crypto";
-import { logger } from "~/lib/monitoring/logger.server";
+import { logger } from "~/utils/monitoring/logger.server";
 
 export interface RequestContext {
   correlationId: string;

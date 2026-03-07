@@ -3,15 +3,15 @@ import { invariantResponse } from "@epic-web/invariant";
 
 export const handle = { breadcrumb: "Assign Roles" };
 
-import { requirePermission } from "~/lib/auth/require-auth.server";
+import { requirePermission } from "~/utils/auth/require-auth.server";
 import { getUser, assignRoles } from "~/services/users.server";
-import { handleServiceError } from "~/lib/errors/handle-service-error.server";
+import { handleServiceError } from "~/utils/errors/handle-service-error.server";
 import { listRoles } from "~/services/roles.server";
 import { Button } from "~/components/ui/button";
 import { Checkbox } from "~/components/ui/checkbox";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { useBasePrefix } from "~/hooks/use-base-prefix";
-import { buildServiceContext } from "~/lib/request-context.server";
+import { buildServiceContext } from "~/utils/request-context.server";
 import type { Route } from "./+types/roles";
 
 export async function loader({ request, params }: Route.LoaderArgs) {

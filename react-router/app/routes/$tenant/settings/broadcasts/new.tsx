@@ -4,14 +4,14 @@ import { parseWithZod } from "@conform-to/zod/v4";
 
 export const handle = { breadcrumb: "New Broadcast" };
 
-import { requireRoleAndFeature } from "~/lib/auth/require-auth.server";
-import { ADMIN_OR_TENANT_ADMIN } from "~/lib/auth/roles";
-import { FEATURE_FLAG_KEYS } from "~/lib/config/feature-flags.server";
+import { requireRoleAndFeature } from "~/utils/auth/require-auth.server";
+import { ADMIN_OR_TENANT_ADMIN } from "~/utils/auth/roles";
+import { FEATURE_FLAG_KEYS } from "~/utils/config/feature-flags.server";
 import { createBroadcast } from "~/services/broadcasts.server";
-import { handleServiceError } from "~/lib/errors/handle-service-error.server";
+import { handleServiceError } from "~/utils/errors/handle-service-error.server";
 import { listTemplates } from "~/services/message-templates.server";
-import { createBroadcastSchema } from "~/lib/schemas/broadcast";
-import { MESSAGE_CHANNELS } from "~/lib/schemas/message-template";
+import { createBroadcastSchema } from "~/utils/schemas/broadcast";
+import { MESSAGE_CHANNELS } from "~/utils/schemas/message-template";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Textarea } from "~/components/ui/textarea";
@@ -19,7 +19,7 @@ import { NativeSelect, NativeSelectOption } from "~/components/ui/native-select"
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { Field } from "~/components/ui/field";
 import { useBasePrefix } from "~/hooks/use-base-prefix";
-import { buildServiceContext } from "~/lib/request-context.server";
+import { buildServiceContext } from "~/utils/request-context.server";
 import type { Route } from "./+types/new";
 
 export async function loader({ request }: Route.LoaderArgs) {

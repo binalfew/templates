@@ -3,9 +3,9 @@ import { FileText, ArrowLeft, Pencil, Trash2, PenTool } from "lucide-react";
 
 export const handle = { breadcrumb: "Details" };
 
-import { requireRoleAndFeature } from "~/lib/auth/require-auth.server";
-import { ADMIN_ONLY } from "~/lib/auth/roles";
-import { FEATURE_FLAG_KEYS } from "~/lib/config/feature-flags.server";
+import { requireRoleAndFeature } from "~/utils/auth/require-auth.server";
+import { ADMIN_ONLY } from "~/utils/auth/roles";
+import { FEATURE_FLAG_KEYS } from "~/utils/config/feature-flags.server";
 import { getSectionTemplate } from "~/services/section-templates.server";
 import { Button } from "~/components/ui/button";
 import { Badge } from "~/components/ui/badge";

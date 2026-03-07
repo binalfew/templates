@@ -15,7 +15,7 @@ const mockAuditLogFindMany = vi.fn();
 const mockSessionCount = vi.fn();
 const mockSessionFindMany = vi.fn();
 
-vi.mock("~/lib/db/db.server", () => ({
+vi.mock("~/utils/db/db.server", () => ({
   prisma: {
     analyticsSnapshot: {
       create: (...args: unknown[]) => mockSnapshotCreate(...args),
@@ -45,7 +45,7 @@ vi.mock("~/lib/db/db.server", () => ({
   },
 }));
 
-vi.mock("~/lib/monitoring/logger.server", () => ({
+vi.mock("~/utils/monitoring/logger.server", () => ({
   logger: { info: vi.fn(), warn: vi.fn(), error: vi.fn() },
 }));
 

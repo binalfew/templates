@@ -10,7 +10,7 @@ import {
 } from "~/components/ui/table";
 import { Checkbox } from "~/components/ui/checkbox";
 import { EmptyState } from "~/components/ui/empty-state";
-import { cn } from "~/lib/utils";
+import { cn } from "~/utils/utils";
 import type { DataTableProps, ColumnDef } from "./data-table-types";
 import { DataTableColumnHeader } from "./data-table-column-header";
 import { DataTablePagination } from "./data-table-pagination";

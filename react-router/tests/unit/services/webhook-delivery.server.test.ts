@@ -5,7 +5,7 @@ const mockDeliveryFindMany = vi.fn();
 const mockDeliveryUpdate = vi.fn();
 const mockSubscriptionUpdate = vi.fn();
 
-vi.mock("~/lib/db/db.server", () => ({
+vi.mock("~/utils/db/db.server", () => ({
   prisma: {
     webhookDelivery: {
       findUnique: (...args: unknown[]) => mockDeliveryFindUnique(...args),
@@ -18,7 +18,7 @@ vi.mock("~/lib/db/db.server", () => ({
   },
 }));
 
-vi.mock("~/lib/monitoring/logger.server", () => ({
+vi.mock("~/utils/monitoring/logger.server", () => ({
   logger: { info: vi.fn(), warn: vi.fn(), error: vi.fn(), debug: vi.fn() },
 }));
 
@@ -99,7 +99,7 @@ describe("webhook-delivery.server", () => {
   describe("deliverWebhook", () => {
     it("returns error when delivery is not found", async () => {
       const { deliverWebhook } = await import("~/services/webhook-delivery.server");
-      const { logger } = await import("~/lib/monitoring/logger.server");
+      const { logger } = await import("~/utils/monitoring/logger.server");
       mockDeliveryFindUnique.mockResolvedValue(null);
 
       const result = await deliverWebhook("non-existent-id");
@@ -129,7 +129,7 @@ describe("webhook-delivery.server", () => {
 
     it("proceeds with probe attempt when circuit breaker reset time has passed", async () => {
       const { deliverWebhook } = await import("~/services/webhook-delivery.server");
-      const { logger } = await import("~/lib/monitoring/logger.server");
+      const { logger } = await import("~/utils/monitoring/logger.server");
       const pastDate = new Date(Date.now() - 1000);
       const delivery = makeDelivery({
         subscription: makeSubscription({
@@ -442,7 +442,7 @@ describe("webhook-delivery.server", () => {
 
     it("opens circuit breaker when consecutive failures reach threshold", async () => {
       const { deliverWebhook } = await import("~/services/webhook-delivery.server");
-      const { logger } = await import("~/lib/monitoring/logger.server");
+      const { logger } = await import("~/utils/monitoring/logger.server");
       // consecutiveFailures is 9, after this failure it will be 10 (= threshold)
       const delivery = makeDelivery({
         attempts: 0,
@@ -482,7 +482,7 @@ describe("webhook-delivery.server", () => {
 
     it("suspends subscription after max breaker trips", async () => {
       const { deliverWebhook } = await import("~/services/webhook-delivery.server");
-      const { logger } = await import("~/lib/monitoring/logger.server");
+      const { logger } = await import("~/utils/monitoring/logger.server");
       // breakerTrips is 2, after this it will be 3 (= MAX_BREAKER_TRIPS)
       const delivery = makeDelivery({
         attempts: 0,

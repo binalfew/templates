@@ -3,7 +3,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 const mockSubscriptionFindMany = vi.fn();
 const mockDeliveryCreate = vi.fn();
 
-vi.mock("~/lib/db/db.server", () => ({
+vi.mock("~/utils/db/db.server", () => ({
   prisma: {
     webhookSubscription: {
       findMany: (...args: unknown[]) => mockSubscriptionFindMany(...args),
@@ -14,7 +14,7 @@ vi.mock("~/lib/db/db.server", () => ({
   },
 }));
 
-vi.mock("~/lib/monitoring/logger.server", () => ({
+vi.mock("~/utils/monitoring/logger.server", () => ({
   logger: { info: vi.fn(), warn: vi.fn(), error: vi.fn(), debug: vi.fn() },
 }));
 
@@ -177,7 +177,7 @@ describe("webhook-dispatcher.server", () => {
 
     it("logs error and continues when delivery creation fails", async () => {
       const { dispatchWebhookEvent } = await import("~/services/webhook-dispatcher.server");
-      const { logger } = await import("~/lib/monitoring/logger.server");
+      const { logger } = await import("~/utils/monitoring/logger.server");
 
       const sub1 = makeSubscription({ id: "sub-fail" });
       const sub2 = makeSubscription({ id: "sub-ok" });
@@ -205,7 +205,7 @@ describe("webhook-dispatcher.server", () => {
 
     it("catches and logs async delivery errors without throwing", async () => {
       const { dispatchWebhookEvent } = await import("~/services/webhook-dispatcher.server");
-      const { logger } = await import("~/lib/monitoring/logger.server");
+      const { logger } = await import("~/utils/monitoring/logger.server");
 
       const sub = makeSubscription({ id: "sub-async-fail" });
       mockSubscriptionFindMany.mockResolvedValue([sub]);

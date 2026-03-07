@@ -6,7 +6,7 @@ const mockInvitationFindMany = vi.fn();
 const mockInvitationUpdate = vi.fn();
 const mockUserRoleCreate = vi.fn();
 
-vi.mock("~/lib/db/db.server", () => ({
+vi.mock("~/utils/db/db.server", () => ({
   prisma: {
     invitation: {
       create: (...args: unknown[]) => mockInvitationCreate(...args),
@@ -21,16 +21,16 @@ vi.mock("~/lib/db/db.server", () => ({
 }));
 
 const mockSendEmail = vi.fn();
-vi.mock("~/lib/email/email.server", () => ({
+vi.mock("~/utils/email/email.server", () => ({
   sendEmail: (...args: unknown[]) => mockSendEmail(...args),
 }));
 
 const mockInvitationEmail = vi.fn();
-vi.mock("~/lib/email/email-templates.server", () => ({
+vi.mock("~/utils/email/email-templates.server", () => ({
   invitationEmail: (...args: unknown[]) => mockInvitationEmail(...args),
 }));
 
-vi.mock("~/lib/monitoring/logger.server", () => ({
+vi.mock("~/utils/monitoring/logger.server", () => ({
   logger: { info: vi.fn(), warn: vi.fn(), error: vi.fn() },
 }));
 

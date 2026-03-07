@@ -3,8 +3,8 @@ import { Building2, Plus, Pencil, Trash2, ExternalLink, Eye } from "lucide-react
 
 export const handle = { breadcrumb: "Tenants" };
 
-import { requireAnyRole } from "~/lib/auth/require-auth.server";
-import { ADMIN_ONLY } from "~/lib/auth/roles";
+import { requireAnyRole } from "~/utils/auth/require-auth.server";
+import { ADMIN_ONLY } from "~/utils/auth/roles";
 import { listTenantsPaginated } from "~/services/tenants.server";
 import { resolveViewContext } from "~/services/view-filters.server";
 import { Badge } from "~/components/ui/badge";

@@ -16,7 +16,7 @@ const mockDocumentTypeCreate = vi.fn();
 const mockCustomObjectRecordCreate = vi.fn();
 const mockHashPassword = vi.fn();
 
-vi.mock("~/lib/db/db.server", () => ({
+vi.mock("~/utils/db/db.server", () => ({
   prisma: {
     user: {
       findFirst: (...args: unknown[]) => mockUserFindFirst(...args),
@@ -51,11 +51,11 @@ vi.mock("~/lib/db/db.server", () => ({
   },
 }));
 
-vi.mock("~/lib/auth/auth.server", () => ({
+vi.mock("~/utils/auth/auth.server", () => ({
   hashPassword: (...args: unknown[]) => mockHashPassword(...args),
 }));
 
-vi.mock("~/lib/monitoring/logger.server", () => ({
+vi.mock("~/utils/monitoring/logger.server", () => ({
   logger: { info: vi.fn(), warn: vi.fn(), error: vi.fn() },
 }));
 

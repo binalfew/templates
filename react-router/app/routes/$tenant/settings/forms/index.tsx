@@ -1,9 +1,9 @@
 import { Link, useLoaderData } from "react-router";
 import { FileText, Plus, Pencil, Trash2, PenTool } from "lucide-react";
 import { Badge } from "~/components/ui/badge";
-import { requireRoleAndFeature } from "~/lib/auth/require-auth.server";
-import { ADMIN_ONLY } from "~/lib/auth/roles";
-import { FEATURE_FLAG_KEYS } from "~/lib/config/feature-flags.server";
+import { requireRoleAndFeature } from "~/utils/auth/require-auth.server";
+import { ADMIN_ONLY } from "~/utils/auth/roles";
+import { FEATURE_FLAG_KEYS } from "~/utils/config/feature-flags.server";
 import { listSectionTemplatesPaginated } from "~/services/section-templates.server";
 import { resolveViewContext } from "~/services/view-filters.server";
 import { useBasePrefix } from "~/hooks/use-base-prefix";

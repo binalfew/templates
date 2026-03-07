@@ -1,16 +1,16 @@
 import { useForm, getFormProps, getInputProps } from "@conform-to/react";
 import { parseWithZod } from "@conform-to/zod/v4";
 import { data, Form, redirect } from "react-router";
-import { sendEmail } from "~/lib/email/email.server";
-import { otpEmail } from "~/lib/email/email-templates.server";
-import { logger } from "~/lib/monitoring/logger.server";
+import { sendEmail } from "~/utils/email/email.server";
+import { otpEmail } from "~/utils/email/email-templates.server";
+import { logger } from "~/utils/monitoring/logger.server";
 import {
   getVerifySession,
   commitVerifySession,
   isCodeValid,
   prepareVerification,
-} from "~/lib/auth/verification.server";
-import { verifyEmailSchema as verifySchema } from "~/lib/schemas/auth";
+} from "~/utils/auth/verification.server";
+import { verifyEmailSchema as verifySchema } from "~/utils/schemas/auth";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
 import { Input } from "~/components/ui/input";

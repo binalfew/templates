@@ -2,17 +2,17 @@ import { useForm, getFormProps, getInputProps } from "@conform-to/react";
 import { parseWithZod } from "@conform-to/zod/v4";
 import { data, Form, Link, redirect } from "react-router";
 import { useTranslation } from "react-i18next";
-import { prisma } from "~/lib/db/db.server";
-import { sendEmail } from "~/lib/email/email.server";
-import { otpEmail } from "~/lib/email/email-templates.server";
-import { logger } from "~/lib/monitoring/logger.server";
-import { requireAnonymous } from "~/lib/auth/session.server";
+import { prisma } from "~/utils/db/db.server";
+import { sendEmail } from "~/utils/email/email.server";
+import { otpEmail } from "~/utils/email/email-templates.server";
+import { logger } from "~/utils/monitoring/logger.server";
+import { requireAnonymous } from "~/utils/auth/session.server";
 import {
   prepareVerification,
   getVerifySession,
   commitVerifySession,
-} from "~/lib/auth/verification.server";
-import { signupSchema } from "~/lib/schemas/auth";
+} from "~/utils/auth/verification.server";
+import { signupSchema } from "~/utils/schemas/auth";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
 import { Input } from "~/components/ui/input";

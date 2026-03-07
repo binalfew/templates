@@ -23,7 +23,7 @@ import {
 import { ConfirmDialog } from "./confirm-dialog";
 import { SortableSection } from "./sortable-section";
 import { makeSectionDndId } from "./dnd-designer-context";
-import { cn } from "~/lib/utils";
+import { cn } from "~/utils/utils";
 import type { FormDefinition, FormPage, FormSection } from "~/types/form-designer";
 import type { SelectedElementType } from "~/types/designer-state";
 

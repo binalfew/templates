@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { BRAND_THEMES } from "~/lib/schemas/tenant";
+import { BRAND_THEMES } from "~/utils/schemas/tenant";
 
 // ─── Brand theme preview colors ─────────────────────────────
 // Representative colors for each brand theme to show in the picker grid

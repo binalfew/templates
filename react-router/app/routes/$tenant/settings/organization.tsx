@@ -1,19 +1,19 @@
 import { data, redirect, useActionData, useLoaderData, Form } from "react-router";
 import { useForm, getFormProps, getInputProps } from "@conform-to/react";
 import { parseWithZod } from "@conform-to/zod/v4";
-import { requireAnyRole } from "~/lib/auth/require-auth.server";
-import { ADMIN_OR_TENANT_ADMIN } from "~/lib/auth/roles";
-import { resolveTenant } from "~/lib/tenant.server";
+import { requireAnyRole } from "~/utils/auth/require-auth.server";
+import { ADMIN_OR_TENANT_ADMIN } from "~/utils/auth/roles";
+import { resolveTenant } from "~/utils/tenant.server";
 import { updateTenant } from "~/services/tenants.server";
-import { handleServiceError } from "~/lib/errors/handle-service-error.server";
-import { organizationSchema } from "~/lib/schemas/organization";
+import { handleServiceError } from "~/utils/errors/handle-service-error.server";
+import { organizationSchema } from "~/utils/schemas/organization";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
 import { Field } from "~/components/ui/field";
 import { BrandingColorSection } from "~/components/branding-color-picker";
 import { LogoUpload } from "~/components/logo-upload";
-import { buildServiceContext } from "~/lib/request-context.server";
+import { buildServiceContext } from "~/utils/request-context.server";
 import type { Route } from "./+types/organization";
 
 export const handle = { breadcrumb: "Organization" };

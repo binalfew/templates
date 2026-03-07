@@ -1,9 +1,9 @@
 import { useRouteLoaderData } from "react-router";
-import type { ClientUser } from "~/lib/auth/permissions";
+import type { ClientUser } from "~/utils/auth/permissions";
 
 /**
  * Access the client-safe user from the tenant layout loader.
- * Use with `userHasPermission`, `userHasRole`, `userIsGlobalAdmin` from `~/lib/auth/permissions`.
+ * Use with `userHasPermission`, `userHasRole`, `userIsGlobalAdmin` from `~/utils/auth/permissions`.
  */
 export function useClientUser(): ClientUser | null {
   const data = useRouteLoaderData("routes/$tenant/_layout") as

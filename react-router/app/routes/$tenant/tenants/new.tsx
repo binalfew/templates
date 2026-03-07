@@ -5,11 +5,11 @@ import { useState, useEffect, useRef } from "react";
 
 export const handle = { breadcrumb: "New Tenant" };
 
-import { requireAnyRole } from "~/lib/auth/require-auth.server";
-import { ADMIN_ONLY } from "~/lib/auth/roles";
+import { requireAnyRole } from "~/utils/auth/require-auth.server";
+import { ADMIN_ONLY } from "~/utils/auth/roles";
 import { createTenant } from "~/services/tenants.server";
-import { handleServiceError } from "~/lib/errors/handle-service-error.server";
-import { createTenantSchema } from "~/lib/schemas/tenant";
+import { handleServiceError } from "~/utils/errors/handle-service-error.server";
+import { createTenantSchema } from "~/utils/schemas/tenant";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { NativeSelect, NativeSelectOption } from "~/components/ui/native-select";
@@ -18,7 +18,7 @@ import { LogoUpload } from "~/components/logo-upload";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { Field } from "~/components/ui/field";
 import { useBasePrefix } from "~/hooks/use-base-prefix";
-import { buildServiceContext } from "~/lib/request-context.server";
+import { buildServiceContext } from "~/utils/request-context.server";
 import type { Route } from "./+types/new";
 
 export async function loader({ request }: Route.LoaderArgs) {

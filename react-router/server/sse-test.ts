@@ -8,7 +8,7 @@
  */
 import { Router } from "express";
 import type { Request, Response } from "express";
-import { eventBus } from "../app/lib/events/event-bus.server.js";
+import { eventBus } from "../app/utils/events/event-bus.server.js";
 import type { SSEEventType, SSEChannel } from "../app/types/sse-events.js";
 
 type GetUserIdFn = (request: globalThis.Request) => Promise<string | null>;

@@ -10,7 +10,7 @@ export function ErrorBoundary() {
   return <RouteErrorBoundary context="users list" />;
 }
 
-import { requirePermission } from "~/lib/auth/require-auth.server";
+import { requirePermission } from "~/utils/auth/require-auth.server";
 import { listUsersPaginated } from "~/services/users.server";
 import { resolveViewContext } from "~/services/view-filters.server";
 import { useBasePrefix } from "~/hooks/use-base-prefix";

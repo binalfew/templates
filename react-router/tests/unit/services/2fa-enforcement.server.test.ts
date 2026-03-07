@@ -6,7 +6,7 @@ const mockVerificationFindUnique = vi.fn();
 const mockVerificationDeleteMany = vi.fn();
 const mockAuditLogCreate = vi.fn();
 
-vi.mock("~/lib/db/db.server", () => ({
+vi.mock("~/utils/db/db.server", () => ({
   prisma: {
     systemSetting: {
       findUnique: (...args: unknown[]) => mockSystemSettingFindUnique(...args),
@@ -24,7 +24,7 @@ vi.mock("~/lib/db/db.server", () => ({
   },
 }));
 
-vi.mock("~/lib/monitoring/logger.server", () => ({
+vi.mock("~/utils/monitoring/logger.server", () => ({
   logger: { info: vi.fn(), warn: vi.fn(), error: vi.fn() },
 }));
 
@@ -303,7 +303,7 @@ describe("2fa-enforcement.server", () => {
     });
 
     it("logs the admin action when records are deleted", async () => {
-      const { logger } = await import("~/lib/monitoring/logger.server");
+      const { logger } = await import("~/utils/monitoring/logger.server");
       const { resetUserTwoFA } = await import("~/services/2fa-enforcement.server");
       mockVerificationDeleteMany.mockResolvedValue({ count: 2 });
       mockAuditLogCreate.mockResolvedValue({});
@@ -317,7 +317,7 @@ describe("2fa-enforcement.server", () => {
     });
 
     it("does not log when no records are deleted", async () => {
-      const { logger } = await import("~/lib/monitoring/logger.server");
+      const { logger } = await import("~/utils/monitoring/logger.server");
       const { resetUserTwoFA } = await import("~/services/2fa-enforcement.server");
       mockVerificationDeleteMany.mockResolvedValue({ count: 0 });
 

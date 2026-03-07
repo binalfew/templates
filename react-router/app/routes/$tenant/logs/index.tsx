@@ -1,7 +1,7 @@
 import { useLoaderData } from "react-router";
 import { ClipboardList } from "lucide-react";
-import { prisma } from "~/lib/db/db.server";
-import { requireRole } from "~/lib/auth/require-auth.server";
+import { prisma } from "~/utils/db/db.server";
+import { requireRole } from "~/utils/auth/require-auth.server";
 import { Badge } from "~/components/ui/badge";
 import { DataTable } from "~/components/data-table/data-table";
 import type { ColumnDef, PaginationMeta, FilterDef } from "~/components/data-table/data-table-types";

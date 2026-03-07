@@ -1,10 +1,10 @@
 import crypto from "node:crypto";
 import { hash, compare } from "bcryptjs";
-import { prisma } from "~/lib/db/db.server";
-import { logger } from "~/lib/monitoring/logger.server";
-import { ServiceError } from "~/lib/errors/service-error.server";
-import { env } from "~/lib/config/env.server";
-import type { TenantServiceContext } from "~/lib/types.server";
+import { prisma } from "~/utils/db/db.server";
+import { logger } from "~/utils/monitoring/logger.server";
+import { ServiceError } from "~/utils/errors/service-error.server";
+import { env } from "~/utils/config/env.server";
+import type { TenantServiceContext } from "~/utils/types.server";
 
 // ─── Types ────────────────────────────────────────────────
 

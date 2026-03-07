@@ -1,15 +1,15 @@
 import { data, useLoaderData, Link } from "react-router";
 import { Plus, Pencil, Trash2, Database, ArrowLeft, Settings } from "lucide-react";
-import { requireRoleAndFeature } from "~/lib/auth/require-auth.server";
-import { ADMIN_ONLY } from "~/lib/auth/roles";
-import { FEATURE_FLAG_KEYS } from "~/lib/config/feature-flags.server";
+import { requireRoleAndFeature } from "~/utils/auth/require-auth.server";
+import { ADMIN_ONLY } from "~/utils/auth/roles";
+import { FEATURE_FLAG_KEYS } from "~/utils/config/feature-flags.server";
 import {
   getDefinitionBySlug,
   listRecordsPaginated,
   deleteRecord,
   type CustomFieldDefinition,
 } from "~/services/custom-objects.server";
-import { handleServiceError } from "~/lib/errors/handle-service-error.server";
+import { handleServiceError } from "~/utils/errors/handle-service-error.server";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import { Separator } from "~/components/ui/separator";

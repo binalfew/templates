@@ -11,7 +11,7 @@ import {
 import { InstallPrompt } from "~/components/pwa/install-prompt";
 import { SwUpdatePrompt } from "~/components/pwa/sw-update-prompt";
 import { LogoutTimer } from "~/components/logout-timer";
-import type { Theme } from "~/lib/theme.server";
+import type { Theme } from "~/utils/theme.server";
 
 type TenantInfo = {
   name: string;

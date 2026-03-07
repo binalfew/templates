@@ -1,6 +1,6 @@
 import type { Prisma } from "~/generated/prisma/client.js";
-import { prisma } from "~/lib/db/db.server";
-import { logger } from "~/lib/monitoring/logger.server";
+import { prisma } from "~/utils/db/db.server";
+import { logger } from "~/utils/monitoring/logger.server";
 import { deliverWebhook } from "~/services/webhook-delivery.server";
 
 export async function dispatchWebhookEvent(

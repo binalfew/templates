@@ -1,13 +1,13 @@
 import { data, redirect, useActionData, useLoaderData, Form, Link } from "react-router";
-import { requireRoleAndFeature } from "~/lib/auth/require-auth.server";
-import { ADMIN_ONLY } from "~/lib/auth/roles";
-import { FEATURE_FLAG_KEYS } from "~/lib/config/feature-flags.server";
+import { requireRoleAndFeature } from "~/utils/auth/require-auth.server";
+import { ADMIN_ONLY } from "~/utils/auth/roles";
+import { FEATURE_FLAG_KEYS } from "~/utils/config/feature-flags.server";
 import {
   getDefinitionBySlug,
   createRecord,
   type CustomFieldDefinition,
 } from "~/services/custom-objects.server";
-import { handleServiceError } from "~/lib/errors/handle-service-error.server";
+import { handleServiceError } from "~/utils/errors/handle-service-error.server";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Checkbox } from "~/components/ui/checkbox";

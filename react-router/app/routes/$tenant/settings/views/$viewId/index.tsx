@@ -11,9 +11,9 @@ import {
 } from "lucide-react";
 export const handle = { breadcrumb: "Details" };
 
-import { requireRoleAndFeature } from "~/lib/auth/require-auth.server";
-import { ADMIN_OR_TENANT_ADMIN } from "~/lib/auth/roles";
-import { FEATURE_FLAG_KEYS } from "~/lib/config/feature-flags.server";
+import { requireRoleAndFeature } from "~/utils/auth/require-auth.server";
+import { ADMIN_OR_TENANT_ADMIN } from "~/utils/auth/roles";
+import { FEATURE_FLAG_KEYS } from "~/utils/config/feature-flags.server";
 import { getView } from "~/services/saved-views.server";
 import { Button } from "~/components/ui/button";
 import { Badge } from "~/components/ui/badge";

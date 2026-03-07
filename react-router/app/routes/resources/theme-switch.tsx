@@ -1,7 +1,7 @@
 import { data, useFetcher, useFetchers, useRouteLoaderData } from "react-router";
 import { z } from "zod";
 import { Moon, Sun, Monitor } from "lucide-react";
-import { type Theme, setTheme } from "~/lib/theme.server";
+import { type Theme, setTheme } from "~/utils/theme.server";
 import { Button } from "~/components/ui/button";
 import type { Route } from "./+types/theme-switch";
 

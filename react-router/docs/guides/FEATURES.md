@@ -198,7 +198,7 @@ All limiters skip the `/up` health check endpoint. Rate limit keys are user-awar
 - Path traversal pattern blocking (`../`, `..%2f`)
 - XSS and SQL injection pattern detection in URL
 
-### Logger (`app/lib/logger.server.ts`)
+### Logger (`app/utils/logger.server.ts`)
 
 Pino-based structured JSON logger with automatic sensitive field redaction.
 
@@ -216,7 +216,7 @@ logger.error({ error, context }, "Something failed");
 - Automatic redaction of: `password`, `passwordHash`, `token`, `authorization`, `cookie`, `sessionId`
 - Base fields: `service`, `version`, `environment`
 
-### Environment Variables (`app/lib/env.server.ts`)
+### Environment Variables (`app/utils/env.server.ts`)
 
 All environment variables are validated at startup using Zod. If any required variable is missing or invalid, the server exits with a clear error message. See [Appendix A](#appendix-a-environment-variables) for the complete list.
 
@@ -254,7 +254,7 @@ The Prisma schema (`prisma/schema.prisma`) defines models organized by domain. T
 | `MessageChannel` | EMAIL, SMS, PUSH, IN_APP |
 | `BroadcastStatus` | DRAFT, SCHEDULED, SENDING, SENT, FAILED, CANCELLED |
 
-### Soft-Delete Extension (`app/lib/db.server.ts`)
+### Soft-Delete Extension (`app/utils/db.server.ts`)
 
 Four models support soft delete via a `deletedAt` timestamp: **User**, **Role**, **WebhookSubscription**, **CustomObjectDefinition**.
 
@@ -313,7 +313,7 @@ See [Appendix C](#appendix-c-prisma-models-quick-reference) for the complete lis
 
 ## 5. Authentication
 
-### Cookie-Based Sessions (`app/lib/session.server.ts`)
+### Cookie-Based Sessions (`app/utils/session.server.ts`)
 
 Sessions are backed by the database. A cookie (`__session`) stores a `sessionId` that references a `Session` record in the database.
 
@@ -448,7 +448,7 @@ When the `FF_TWO_FACTOR` feature flag is enabled, users who haven't set up 2FA a
 
 **UserRole:** Join table linking users to roles. Includes optional `eventId` and `stepId` for event-scoped assignments.
 
-### Role Constants (`app/lib/auth/roles.ts`)
+### Role Constants (`app/utils/auth/roles.ts`)
 
 Predefined role arrays for route guards:
 
@@ -466,7 +466,7 @@ await requireAnyRole(request, [...ADMIN_ONLY]);
 await requireAnyRole(request, [...ADMIN_OR_TENANT_ADMIN]);
 ```
 
-### Auth Helpers (`app/lib/auth/require-auth.server.ts`)
+### Auth Helpers (`app/utils/auth/require-auth.server.ts`)
 
 ```typescript
 import {
@@ -716,7 +716,7 @@ Invitation {
 
 ## 10. Email Service
 
-### Provider Abstraction (`app/lib/email.server.ts`)
+### Provider Abstraction (`app/utils/email.server.ts`)
 
 The email service supports two providers with automatic selection:
 
@@ -736,7 +736,7 @@ await sendEmail({
 });
 ```
 
-### Email Templates (`app/lib/email-templates.server.ts`)
+### Email Templates (`app/utils/email-templates.server.ts`)
 
 Four built-in templates with consistent HTML layout:
 
@@ -757,7 +757,7 @@ In development, Docker Compose starts Mailpit to catch all SMTP emails:
 
 ## 11. Background Job Queue
 
-### DB-Backed Queue (`app/lib/job-queue.server.ts`)
+### DB-Backed Queue (`app/utils/job-queue.server.ts`)
 
 The job queue uses the `Job` database model for persistence. No external services (Redis, RabbitMQ) required.
 
@@ -794,7 +794,7 @@ Job {
 - **Exponential backoff** on failure: `2^attempts * 30 seconds`
 - Starts automatically on server boot (`server/app.ts`)
 
-### Handler Registry (`app/lib/job-handlers.server.ts`)
+### Handler Registry (`app/utils/job-handlers.server.ts`)
 
 Register handlers for job types:
 
@@ -842,7 +842,7 @@ API keys are created and managed via the UI or the `app/services/api-keys.server
 - **IP/Origin allowlists** — optional restrictions
 - **Key rotation** — atomic rotation with configurable grace period
 
-### Auth Middleware (`app/lib/api-auth.server.ts`)
+### Auth Middleware (`app/utils/api-auth.server.ts`)
 
 ```typescript
 import { apiAuth, requireApiPermission } from "~/lib/auth/api-auth.server";
@@ -855,7 +855,7 @@ requireApiPermission(auth, "user:read");
 // Throws 403 if missing permission (unless permissions includes "*")
 ```
 
-### Response Helpers (`app/lib/api-response.server.ts`)
+### Response Helpers (`app/utils/api-response.server.ts`)
 
 ```typescript
 import { jsonSuccess, jsonError, jsonPaginated, parsePagination } from "~/lib/api-response.server";
@@ -952,7 +952,7 @@ import {
 } from "~/services/webhooks.server";
 ```
 
-### Event Types (`app/lib/webhook-events.ts`)
+### Event Types (`app/utils/webhook-events.ts`)
 
 | Event | Description |
 |-------|-------------|
@@ -1809,7 +1809,7 @@ export async function action({ request }: ActionFunctionArgs) {
 }
 ```
 
-### Existing Schemas (`app/lib/schemas/`)
+### Existing Schemas (`app/utils/schemas/`)
 
 - User schemas (create, update)
 - Role schemas
@@ -1824,7 +1824,7 @@ export async function action({ request }: ActionFunctionArgs) {
 
 ## 27. Error Handling
 
-### ServiceError Base Class (`app/lib/errors/service-error.server.ts`)
+### ServiceError Base Class (`app/utils/errors/service-error.server.ts`)
 
 All domain errors extend a common base class:
 
@@ -1846,7 +1846,7 @@ throw new UserError("Cannot delete admin user", 403, "FORBIDDEN");
 
 Every service module defines its own error class (e.g., `RoleError`, `PermissionError`, `BroadcastError`, `CustomObjectError`, `SavedViewError`, `FieldError`, `TemplateError`, `ReferenceDataError`, `SectionTemplateError`). All inherit `status` and optional `code` from `ServiceError`.
 
-### handleServiceError (`app/lib/errors/handle-service-error.server.ts`)
+### handleServiceError (`app/utils/errors/handle-service-error.server.ts`)
 
 A unified handler for route action catch blocks. Replaces repetitive 5-line `instanceof` patterns:
 
@@ -1910,7 +1910,7 @@ Export `ErrorBoundary` from any route module to catch errors within that route's
 
 **Feature flag:** `FF_I18N`
 
-### Configuration (`app/lib/i18n.ts`)
+### Configuration (`app/utils/i18n.ts`)
 
 Uses i18next with `react-i18next` and browser language detection.
 
@@ -1960,7 +1960,7 @@ Detection order: cookie (`i18n_lang`) → browser navigator. Cookie persists for
 ### Adding a New Language
 
 1. Create JSON files in `app/locales/{lang}/` for all 8 namespaces
-2. Import the files in `app/lib/i18n.ts`
+2. Import the files in `app/utils/i18n.ts`
 3. Add to the `resources` object
 4. Add to the `supportedLanguages` array
 
@@ -1988,7 +1988,7 @@ Detection order: cookie (`i18n_lang`) → browser navigator. Cookie persists for
 
 ## 31. HTTP Caching
 
-### Cache Utility (`app/lib/cache.server.ts`)
+### Cache Utility (`app/utils/cache.server.ts`)
 
 ```typescript
 import { generateETag, handleConditionalRequest, CACHE_HEADERS } from "~/lib/db/cache.server";

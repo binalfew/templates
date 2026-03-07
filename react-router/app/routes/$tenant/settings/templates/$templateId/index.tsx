@@ -3,11 +3,11 @@ import { FileText, ArrowLeft, Pencil, Trash2 } from "lucide-react";
 
 export const handle = { breadcrumb: "Details" };
 
-import { requireRoleAndFeature } from "~/lib/auth/require-auth.server";
-import { ADMIN_OR_TENANT_ADMIN } from "~/lib/auth/roles";
-import { FEATURE_FLAG_KEYS } from "~/lib/config/feature-flags.server";
+import { requireRoleAndFeature } from "~/utils/auth/require-auth.server";
+import { ADMIN_OR_TENANT_ADMIN } from "~/utils/auth/roles";
+import { FEATURE_FLAG_KEYS } from "~/utils/config/feature-flags.server";
 import { getTemplate } from "~/services/message-templates.server";
-import { CHANNEL_COLORS } from "~/lib/email/messaging-constants";
+import { CHANNEL_COLORS } from "~/utils/email/messaging-constants";
 import { Button } from "~/components/ui/button";
 import { Badge } from "~/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";

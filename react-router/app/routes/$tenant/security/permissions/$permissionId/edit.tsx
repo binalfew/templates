@@ -5,16 +5,16 @@ import { invariantResponse } from "@epic-web/invariant";
 
 export const handle = { breadcrumb: "Edit Permission" };
 
-import { requirePermission } from "~/lib/auth/require-auth.server";
+import { requirePermission } from "~/utils/auth/require-auth.server";
 import { getPermission, updatePermission } from "~/services/permissions.server";
-import { handleServiceError } from "~/lib/errors/handle-service-error.server";
-import { updatePermissionSchema } from "~/lib/schemas/permission";
+import { handleServiceError } from "~/utils/errors/handle-service-error.server";
+import { updatePermissionSchema } from "~/utils/schemas/permission";
 import { Button } from "~/components/ui/button";
 import { Textarea } from "~/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { Field } from "~/components/ui/field";
 import { useBasePrefix } from "~/hooks/use-base-prefix";
-import { buildServiceContext } from "~/lib/request-context.server";
+import { buildServiceContext } from "~/utils/request-context.server";
 import type { Route } from "./+types/edit";
 
 export async function loader({ request, params }: Route.LoaderArgs) {

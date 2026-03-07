@@ -5,7 +5,7 @@ const mockCreate = vi.fn().mockReturnValue({
   catch: vi.fn(),
 });
 
-vi.mock("~/lib/db/db.server", () => ({
+vi.mock("~/utils/db/db.server", () => ({
   prisma: {
     auditLog: {
       create: mockCreate,

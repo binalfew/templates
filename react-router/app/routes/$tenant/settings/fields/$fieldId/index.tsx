@@ -3,9 +3,9 @@ import { Columns3, ArrowLeft, Pencil, Trash2 } from "lucide-react";
 
 export const handle = { breadcrumb: "Details" };
 
-import { requireRoleAndFeature } from "~/lib/auth/require-auth.server";
-import { ADMIN_ONLY } from "~/lib/auth/roles";
-import { FEATURE_FLAG_KEYS } from "~/lib/config/feature-flags.server";
+import { requireRoleAndFeature } from "~/utils/auth/require-auth.server";
+import { ADMIN_ONLY } from "~/utils/auth/roles";
+import { FEATURE_FLAG_KEYS } from "~/utils/config/feature-flags.server";
 import { getField, getFieldDataCount } from "~/services/fields.server";
 import { formatDataType } from "~/components/fields/+utils";
 import { Button } from "~/components/ui/button";

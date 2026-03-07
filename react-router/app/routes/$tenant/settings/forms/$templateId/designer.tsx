@@ -10,11 +10,11 @@ import {
   Columns2,
   Eye,
 } from "lucide-react";
-import { requireRoleAndFeature } from "~/lib/auth/require-auth.server";
-import { ADMIN_ONLY } from "~/lib/auth/roles";
-import { FEATURE_FLAG_KEYS } from "~/lib/config/feature-flags.server";
-import { buildServiceContext } from "~/lib/request-context.server";
-import { prisma } from "~/lib/db/db.server";
+import { requireRoleAndFeature } from "~/utils/auth/require-auth.server";
+import { ADMIN_ONLY } from "~/utils/auth/roles";
+import { FEATURE_FLAG_KEYS } from "~/utils/config/feature-flags.server";
+import { buildServiceContext } from "~/utils/request-context.server";
+import { prisma } from "~/utils/db/db.server";
 import { listFields } from "~/services/fields.server";
 import {
   getSectionTemplate,
@@ -38,7 +38,7 @@ import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
 import { Separator } from "~/components/ui/separator";
 import { AutosaveIndicator } from "~/components/form-designer/autosave-indicator";
-import { cn } from "~/lib/utils";
+import { cn } from "~/utils/utils";
 import type { ViewMode } from "~/types/designer-state";
 import type { Route } from "./+types/designer";
 

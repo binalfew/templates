@@ -1,7 +1,7 @@
-import { prisma } from "~/lib/db/db.server";
-import { logger } from "~/lib/monitoring/logger.server";
-import { twoFAVerificationType } from "~/lib/auth/2fa-constants";
-import type { TenantServiceContext } from "~/lib/types.server";
+import { prisma } from "~/utils/db/db.server";
+import { logger } from "~/utils/monitoring/logger.server";
+import { twoFAVerificationType } from "~/utils/auth/2fa-constants";
+import type { TenantServiceContext } from "~/utils/types.server";
 
 // ─── Types ────────────────────────────────────────────────
 
