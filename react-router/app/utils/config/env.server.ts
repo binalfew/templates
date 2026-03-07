@@ -54,7 +54,6 @@ const envSchema = z.object({
   // Feature flags
   ENABLE_2FA: booleanString.default(false),
   ENABLE_OFFLINE_MODE: booleanString.default(false),
-  ENABLE_SSE: booleanString.default(true),
 });
 
 export type Env = z.infer<typeof envSchema>;

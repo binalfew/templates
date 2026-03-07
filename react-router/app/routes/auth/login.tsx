@@ -10,7 +10,7 @@ import { isFeatureEnabled, FEATURE_FLAG_KEYS } from "~/utils/config/feature-flag
 import { logger } from "~/utils/monitoring/logger.server";
 import { getUserId, getDefaultRedirect, createUserSession, generateFingerprint } from "~/utils/auth/session.server";
 import { verifySessionStorage } from "~/utils/auth/verification.server";
-import { isUserRequired2FA, hasUserSetUp2FA } from "~/services/2fa-enforcement.server";
+import { isUserRequired2FA, hasUserSetUp2FA } from "~/services/two-factor.server";
 import { loginSchema } from "~/utils/schemas/auth";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";

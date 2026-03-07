@@ -12,7 +12,6 @@ import {
   ChevronRight,
 } from "lucide-react";
 import { requireAuth } from "~/utils/auth/require-auth.server";
-import { isFeatureEnabled, FEATURE_FLAG_KEYS } from "~/utils/config/feature-flags.server";
 import { listNotifications, markAllAsRead } from "~/services/notifications.server";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardHeader } from "~/components/ui/card";
@@ -24,17 +23,7 @@ import type { Route } from "./+types/notifications";
 export const handle = { breadcrumb: "Notifications" };
 
 export async function loader({ request }: Route.LoaderArgs) {
-  const { user, roles } = await requireAuth(request);
-
-  const enabled = await isFeatureEnabled(FEATURE_FLAG_KEYS.NOTIFICATIONS, {
-    tenantId: user.tenantId ?? undefined,
-    roles,
-    userId: user.id,
-  });
-
-  if (!enabled) {
-    throw data({ error: "Notifications are not enabled" }, { status: 404 });
-  }
+  const { user } = await requireAuth(request);
 
   const url = new URL(request.url);
   const page = Math.max(1, Number(url.searchParams.get("page")) || 1);

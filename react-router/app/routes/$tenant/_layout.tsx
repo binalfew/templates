@@ -5,7 +5,7 @@ import { resolveTenant } from "~/utils/tenant.server";
 import { getSidebarState, getSidebarGroupState } from "~/utils/sidebar.server";
 import { getTheme } from "~/utils/theme.server";
 import { isFeatureEnabled, FEATURE_FLAG_KEYS } from "~/utils/config/feature-flags.server";
-import { env } from "~/utils/config/env.server";
+import { getUnreadCount, listNotifications } from "~/services/notifications.server";
 import { DashboardLayout } from "~/components/layout/dashboard-layout";
 import type { Route } from "./+types/_layout";
 
@@ -23,30 +23,18 @@ export async function loader({ request, params }: Route.LoaderArgs) {
     userId: user.id,
   };
 
-  const sseEnabled = env.ENABLE_SSE && (await isFeatureEnabled("FF_SSE_UPDATES", flagContext));
-  const notificationsEnabled = await isFeatureEnabled(FEATURE_FLAG_KEYS.NOTIFICATIONS, flagContext);
-  const shortcutsEnabled = await isFeatureEnabled(
-    FEATURE_FLAG_KEYS.KEYBOARD_SHORTCUTS,
-    flagContext,
-  );
   const i18nEnabled = await isFeatureEnabled(FEATURE_FLAG_KEYS.I18N, flagContext);
   const pwaEnabled = await isFeatureEnabled(FEATURE_FLAG_KEYS.PWA, flagContext);
   const offlineEnabled = await isFeatureEnabled(FEATURE_FLAG_KEYS.OFFLINE_MODE, flagContext);
   const restApiEnabled = await isFeatureEnabled(FEATURE_FLAG_KEYS.REST_API, flagContext);
   const webhooksEnabled = await isFeatureEnabled(FEATURE_FLAG_KEYS.WEBHOOKS, flagContext);
   const savedViewsEnabled = await isFeatureEnabled(FEATURE_FLAG_KEYS.SAVED_VIEWS, flagContext);
-  const globalSearchEnabled = await isFeatureEnabled(FEATURE_FLAG_KEYS.GLOBAL_SEARCH, flagContext);
   const twoFactorEnabled = await isFeatureEnabled(FEATURE_FLAG_KEYS.TWO_FACTOR, flagContext);
-  const invitationsEnabled = await isFeatureEnabled(FEATURE_FLAG_KEYS.INVITATIONS, flagContext);
-
   const enabledFeatures: Record<string, boolean> = {
-    FF_NOTIFICATIONS: notificationsEnabled,
     FF_REST_API: restApiEnabled,
     FF_WEBHOOKS: webhooksEnabled,
     FF_SAVED_VIEWS: savedViewsEnabled,
-    FF_GLOBAL_SEARCH: globalSearchEnabled,
     FF_TWO_FACTOR: twoFactorEnabled,
-    FF_INVITATIONS: invitationsEnabled,
   };
 
   return {
@@ -64,22 +52,20 @@ export async function loader({ request, params }: Route.LoaderArgs) {
     sidebarOpen: getSidebarState(request),
     sidebarGroups: getSidebarGroupState(request),
     theme: getTheme(request),
-    sseEnabled,
-    notificationsEnabled,
-    searchEnabled: globalSearchEnabled,
-    shortcutsEnabled,
     i18nEnabled,
     pwaEnabled,
     offlineEnabled,
-    unreadCount: 0,
-    recentNotifications: [] as Array<{
-      id: string;
-      type: string;
-      title: string;
-      message: string;
-      read: boolean;
-      createdAt: string;
-    }>,
+    unreadCount: await getUnreadCount(user.id),
+    recentNotifications: (await listNotifications(user.id, { perPage: 5 })).notifications.map(
+      (n: any) => ({
+        id: n.id,
+        type: n.type,
+        title: n.title,
+        message: n.message,
+        read: n.read,
+        createdAt: n.createdAt.toISOString(),
+      }),
+    ),
     enabledFeatures,
     inactivityTimeoutMinutes: 60,
   };
@@ -107,10 +93,6 @@ export default function TenantLayout() {
       sidebarOpen={loaderData.sidebarOpen}
       sidebarGroups={loaderData.sidebarGroups}
       theme={loaderData.theme}
-      sseEnabled={loaderData.sseEnabled}
-      notificationsEnabled={loaderData.notificationsEnabled}
-      searchEnabled={loaderData.searchEnabled}
-      shortcutsEnabled={loaderData.shortcutsEnabled}
       i18nEnabled={loaderData.i18nEnabled}
       pwaEnabled={loaderData.pwaEnabled}
       offlineEnabled={loaderData.offlineEnabled}

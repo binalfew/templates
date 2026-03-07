@@ -50,11 +50,8 @@ type TopNavbarProps = {
   user: { id: string; name: string | null; email: string; photoUrl?: string | null };
   basePrefix?: string;
   theme?: Theme | null;
-  notificationsEnabled?: boolean;
   unreadCount?: number;
   notifications?: NotificationItem[];
-  searchEnabled?: boolean;
-  shortcutsEnabled?: boolean;
   i18nEnabled?: boolean;
   offlineEnabled?: boolean;
   settingsChildren?: NavChild[];
@@ -113,11 +110,8 @@ export function TopNavbar({
   user,
   basePrefix = "/admin",
   theme,
-  notificationsEnabled = false,
   unreadCount = 0,
   notifications = [],
-  searchEnabled = false,
-  shortcutsEnabled = false,
   i18nEnabled = false,
   offlineEnabled = false,
   settingsChildren = [],
@@ -136,17 +130,15 @@ export function TopNavbar({
   const shortcuts = useMemo<ShortcutDefinition[]>(() => {
     const defs: ShortcutDefinition[] = [];
 
-    if (searchEnabled) {
-      defs.push({
-        id: "search",
-        keys: "⌘ K",
-        description: "Open command palette",
-        group: "global",
-        key: "k",
-        mod: true,
-        handler: () => setSearchOpen((o) => !o),
-      });
-    }
+    defs.push({
+      id: "search",
+      keys: "⌘ K",
+      description: "Open command palette",
+      group: "global",
+      key: "k",
+      mod: true,
+      handler: () => setSearchOpen((o) => !o),
+    });
 
     defs.push({
       id: "help",
@@ -185,10 +177,10 @@ export function TopNavbar({
     );
 
     return defs;
-  }, [searchEnabled, navigate, basePrefix]);
+  }, [navigate, basePrefix]);
 
   useKeyboardShortcuts(shortcuts, {
-    enabled: searchEnabled || shortcutsEnabled,
+    enabled: true,
   });
 
   const shortcutInfoList = useMemo(() => getShortcutInfo(shortcuts), [shortcuts]);
@@ -239,38 +231,26 @@ export function TopNavbar({
       </div>
 
       <div className="flex items-center gap-1 px-2 sm:gap-2 sm:px-4 [&_button]:text-primary-foreground [&_button:hover]:bg-primary-foreground/10 [&_button:hover]:text-primary-foreground">
-        {searchEnabled ? (
-          <>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="size-8 text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground md:hidden"
-              onClick={() => setSearchOpen(true)}
-              aria-label="Search"
-            >
-              <Search className="size-4" />
-            </Button>
-            <button
-              type="button"
-              onClick={() => setSearchOpen(true)}
-              className="hidden cursor-pointer items-center gap-2 rounded-md border border-primary-foreground/20 bg-primary-foreground/10 px-3 py-1.5 text-sm text-primary-foreground/70 transition-colors hover:bg-primary-foreground/20 md:flex"
-            >
-              <Search className="size-4" />
-              <span>{t("search")}</span>
-              <kbd className="pointer-events-none ml-2 inline-flex h-5 select-none items-center gap-1 rounded border border-primary-foreground/20 bg-primary-foreground/10 px-1.5 font-mono text-[10px] font-medium text-primary-foreground/70">
-                <span className="text-xs">&#8984;</span>K
-              </kbd>
-            </button>
-          </>
-        ) : (
-          <div className="hidden items-center gap-2 rounded-md border border-primary-foreground/20 bg-primary-foreground/10 px-3 py-1.5 text-sm text-primary-foreground/70 md:flex">
-            <Search className="size-4" />
-            <span>Search...</span>
-            <kbd className="pointer-events-none ml-2 inline-flex h-5 select-none items-center gap-1 rounded border border-primary-foreground/20 bg-primary-foreground/10 px-1.5 font-mono text-[10px] font-medium text-primary-foreground/70">
-              <span className="text-xs">&#8984;</span>K
-            </kbd>
-          </div>
-        )}
+        <Button
+          variant="ghost"
+          size="icon"
+          className="size-8 text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground md:hidden"
+          onClick={() => setSearchOpen(true)}
+          aria-label="Search"
+        >
+          <Search className="size-4" />
+        </Button>
+        <button
+          type="button"
+          onClick={() => setSearchOpen(true)}
+          className="hidden cursor-pointer items-center gap-2 rounded-md border border-primary-foreground/20 bg-primary-foreground/10 px-3 py-1.5 text-sm text-primary-foreground/70 transition-colors hover:bg-primary-foreground/20 md:flex"
+        >
+          <Search className="size-4" />
+          <span>{t("search")}</span>
+          <kbd className="pointer-events-none ml-2 inline-flex h-5 select-none items-center gap-1 rounded border border-primary-foreground/20 bg-primary-foreground/10 px-1.5 font-mono text-[10px] font-medium text-primary-foreground/70">
+            <span className="text-xs">&#8984;</span>K
+          </kbd>
+        </button>
 
         {i18nEnabled && (
           <div className="hidden sm:flex">
@@ -287,7 +267,7 @@ export function TopNavbar({
         <NotificationBell
           unreadCount={unreadCount}
           notifications={notifications}
-          enabled={notificationsEnabled}
+          enabled={true}
           basePrefix={basePrefix}
         />
 
@@ -334,9 +314,7 @@ export function TopNavbar({
         </DropdownMenu>
       </div>
 
-      {searchEnabled && (
-        <CommandPalette open={searchOpen} onOpenChange={setSearchOpen} basePrefix={basePrefix} />
-      )}
+      <CommandPalette open={searchOpen} onOpenChange={setSearchOpen} basePrefix={basePrefix} />
       <ShortcutHelp
         open={shortcutHelpOpen}
         onOpenChange={setShortcutHelpOpen}

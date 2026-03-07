@@ -17,7 +17,7 @@ import { ShieldCheck, ShieldOff } from "lucide-react";
 import { requirePermission } from "~/utils/auth/require-auth.server";
 import { isFeatureEnabled, FEATURE_FLAG_KEYS } from "~/utils/config/feature-flags.server";
 import { getUser, updateUser, changePassword, UserError } from "~/services/users.server";
-import { hasUserSetUp2FA, resetUserTwoFA } from "~/services/2fa-enforcement.server";
+import { hasUserSetUp2FA, resetUserTwoFA } from "~/services/two-factor.server";
 import { handleServiceError } from "~/utils/errors/handle-service-error.server";
 import { updateUserSchema, changePasswordSchema } from "~/utils/schemas/user";
 import { Badge } from "~/components/ui/badge";

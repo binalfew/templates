@@ -5,7 +5,7 @@ import { isFeatureEnabled, FEATURE_FLAG_KEYS } from "~/utils/config/feature-flag
 import { requireAnyRole } from "~/utils/auth/require-auth.server";
 import { ADMIN_OR_TENANT_ADMIN } from "~/utils/auth/roles";
 import { listRoles } from "~/services/roles.server";
-import { getTwoFAPolicy } from "~/services/2fa-enforcement.server";
+import { getTwoFAPolicy } from "~/services/two-factor.server";
 import { setSetting } from "~/utils/config/settings.server";
 import { Button } from "~/components/ui/button";
 import { Checkbox } from "~/components/ui/checkbox";

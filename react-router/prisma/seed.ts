@@ -137,18 +137,13 @@ async function main() {
 
   // ─── Feature Flags ──────────────────────────────────────
   const defaultFlags = [
-    { key: "FF_SSE_UPDATES", description: "Real-time SSE updates" },
-    { key: "FF_KEYBOARD_SHORTCUTS", description: "Keyboard shortcut support" },
-    { key: "FF_NOTIFICATIONS", description: "Notification system" },
     { key: "FF_I18N", description: "Internationalization and multi-language support" },
     { key: "FF_PWA", description: "Progressive Web App shell and service worker" },
     { key: "FF_OFFLINE_MODE", description: "Offline mode with IndexedDB" },
     { key: "FF_REST_API", description: "REST API with API key authentication" },
     { key: "FF_WEBHOOKS", description: "Webhook subscriptions and event delivery" },
     { key: "FF_SAVED_VIEWS", description: "Saved table/grid/kanban views" },
-    { key: "FF_GLOBAL_SEARCH", description: "Global cross-entity search" },
     { key: "FF_TWO_FACTOR", description: "Two-factor authentication (TOTP)" },
-    { key: "FF_INVITATIONS", description: "User invitations via email" },
   ];
 
   for (const flag of defaultFlags) {

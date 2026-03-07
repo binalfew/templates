@@ -1,7 +1,7 @@
 import "react-router";
 import { createRequestHandler } from "@react-router/express";
 import express from "express";
-import { getSession, getUserId } from "~/utils/auth/session.server";
+import { getSession } from "~/utils/auth/session.server";
 import {
   nonceMiddleware,
   helmetMiddleware,
@@ -13,9 +13,6 @@ import {
   permissionsPolicy,
   extractSessionUser,
 } from "./security.js";
-import { createSSERouter } from "./sse.js";
-import { createSSETestRouter } from "./sse-test.js";
-
 declare module "react-router" {
   interface AppLoadContext {
     cspNonce: string;
@@ -42,42 +39,6 @@ app.use(suspiciousRequestBlocker);
 
 // 6. Extract session user for user-aware rate limiting
 app.use(extractSessionUser(getSession));
-
-// 6b. SSE endpoint (before rate limiter — long-lived connections)
-app.use(
-  createSSERouter(
-    getUserId,
-    async (key, context) => {
-      const { isFeatureEnabled } = await import("~/utils/config/feature-flags.server");
-      return isFeatureEnabled(key, context);
-    },
-    async (userId) => {
-      const { prisma } = await import("~/utils/db/db.server");
-      const user = await prisma.user.findFirst({
-        where: { id: userId },
-        include: { userRoles: { include: { role: true } } },
-      });
-      if (!user || !user.tenantId) return null;
-      return {
-        tenantId: user.tenantId,
-        roles: user.userRoles.map((ur) => ur.role.name),
-      };
-    },
-  ),
-);
-
-// 6c. SSE test route (dev only — publishes fake events for testing)
-if (process.env.NODE_ENV === "development") {
-  app.use(
-    createSSETestRouter(getUserId, async (userId) => {
-      const { prisma } = await import("~/utils/db/db.server");
-      const user = await prisma.user.findFirst({
-        where: { id: userId },
-      });
-      return user?.tenantId ?? null;
-    }),
-  );
-}
 
 // ─── Static asset cache headers ──────────────────────────────
 app.use("/assets", (_req, res, next) => {

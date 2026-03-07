@@ -1,7 +1,5 @@
 import type { Prisma } from "~/generated/prisma/client.js";
 import { prisma } from "~/utils/db/db.server";
-import { eventBus } from "~/utils/events/event-bus.server";
-
 // ─── Types ───────────────────────────────────────────────
 
 interface CreateNotificationInput {
@@ -18,6 +16,7 @@ interface ListNotificationsOptions {
   perPage?: number;
   type?: string;
   read?: boolean;
+  search?: string;
 }
 
 // ─── Service Functions ───────────────────────────────────
@@ -33,16 +32,6 @@ export async function createNotification(input: CreateNotificationInput) {
       ...(input.data != null && { data: input.data }),
     },
   });
-
-  try {
-    eventBus.publish("notifications", input.tenantId, "notification:new", {
-      notificationId: notification.id,
-      title: input.title,
-      message: input.message,
-    });
-  } catch {
-    // SSE failure should never break notification creation
-  }
 
   return notification;
 }
@@ -61,6 +50,12 @@ export async function listNotifications(userId: string, options: ListNotificatio
   const where: Record<string, unknown> = { userId };
   if (options.type) where.type = options.type;
   if (options.read !== undefined) where.read = options.read;
+  if (options.search) {
+    where.OR = [
+      { title: { contains: options.search, mode: "insensitive" } },
+      { message: { contains: options.search, mode: "insensitive" } },
+    ];
+  }
 
   const [notifications, total] = await Promise.all([
     prisma.notification.findMany({

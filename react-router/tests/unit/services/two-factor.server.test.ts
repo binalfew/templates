@@ -35,7 +35,7 @@ const CTX = {
   userAgent: "test-agent",
 };
 
-describe("2fa-enforcement.server", () => {
+describe("two-factor.server", () => {
   beforeEach(() => {
     vi.resetAllMocks();
   });
@@ -44,7 +44,7 @@ describe("2fa-enforcement.server", () => {
 
   describe("getTwoFAPolicy", () => {
     it("returns mode 'off' when no setting exists", async () => {
-      const { getTwoFAPolicy } = await import("~/services/2fa-enforcement.server");
+      const { getTwoFAPolicy } = await import("~/services/two-factor.server");
       mockSystemSettingFindUnique.mockResolvedValue(null);
 
       const policy = await getTwoFAPolicy("tenant-1");
@@ -62,7 +62,7 @@ describe("2fa-enforcement.server", () => {
     });
 
     it("returns mode 'all' when setting value is 'all'", async () => {
-      const { getTwoFAPolicy } = await import("~/services/2fa-enforcement.server");
+      const { getTwoFAPolicy } = await import("~/services/two-factor.server");
       mockSystemSettingFindUnique.mockResolvedValue({
         key: "security.require2fa",
         value: "all",
@@ -76,7 +76,7 @@ describe("2fa-enforcement.server", () => {
     });
 
     it("returns mode 'roles' with parsed role IDs when value starts with 'roles:'", async () => {
-      const { getTwoFAPolicy } = await import("~/services/2fa-enforcement.server");
+      const { getTwoFAPolicy } = await import("~/services/two-factor.server");
       mockSystemSettingFindUnique.mockResolvedValue({
         key: "security.require2fa",
         value: "roles:role-1,role-2,role-3",
@@ -93,7 +93,7 @@ describe("2fa-enforcement.server", () => {
     });
 
     it("trims whitespace from role IDs", async () => {
-      const { getTwoFAPolicy } = await import("~/services/2fa-enforcement.server");
+      const { getTwoFAPolicy } = await import("~/services/two-factor.server");
       mockSystemSettingFindUnique.mockResolvedValue({
         key: "security.require2fa",
         value: "roles: role-1 , role-2 , role-3 ",
@@ -107,7 +107,7 @@ describe("2fa-enforcement.server", () => {
     });
 
     it("filters out empty role IDs from trailing commas", async () => {
-      const { getTwoFAPolicy } = await import("~/services/2fa-enforcement.server");
+      const { getTwoFAPolicy } = await import("~/services/two-factor.server");
       mockSystemSettingFindUnique.mockResolvedValue({
         key: "security.require2fa",
         value: "roles:role-1,,role-2,",
@@ -121,7 +121,7 @@ describe("2fa-enforcement.server", () => {
     });
 
     it("returns mode 'off' for unrecognized setting value", async () => {
-      const { getTwoFAPolicy } = await import("~/services/2fa-enforcement.server");
+      const { getTwoFAPolicy } = await import("~/services/two-factor.server");
       mockSystemSettingFindUnique.mockResolvedValue({
         key: "security.require2fa",
         value: "something-unknown",
@@ -135,7 +135,7 @@ describe("2fa-enforcement.server", () => {
     });
 
     it("returns mode 'roles' with empty array for 'roles:' with no IDs", async () => {
-      const { getTwoFAPolicy } = await import("~/services/2fa-enforcement.server");
+      const { getTwoFAPolicy } = await import("~/services/two-factor.server");
       mockSystemSettingFindUnique.mockResolvedValue({
         key: "security.require2fa",
         value: "roles:",
@@ -153,7 +153,7 @@ describe("2fa-enforcement.server", () => {
 
   describe("isUserRequired2FA", () => {
     it("returns false when policy mode is 'off'", async () => {
-      const { isUserRequired2FA } = await import("~/services/2fa-enforcement.server");
+      const { isUserRequired2FA } = await import("~/services/two-factor.server");
       mockSystemSettingFindUnique.mockResolvedValue(null);
 
       const result = await isUserRequired2FA("user-1", "tenant-1");
@@ -163,7 +163,7 @@ describe("2fa-enforcement.server", () => {
     });
 
     it("returns true when policy mode is 'all'", async () => {
-      const { isUserRequired2FA } = await import("~/services/2fa-enforcement.server");
+      const { isUserRequired2FA } = await import("~/services/two-factor.server");
       mockSystemSettingFindUnique.mockResolvedValue({
         key: "security.require2fa",
         value: "all",
@@ -178,7 +178,7 @@ describe("2fa-enforcement.server", () => {
     });
 
     it("returns true when user has a matching role in 'roles' mode", async () => {
-      const { isUserRequired2FA } = await import("~/services/2fa-enforcement.server");
+      const { isUserRequired2FA } = await import("~/services/two-factor.server");
       mockSystemSettingFindUnique.mockResolvedValue({
         key: "security.require2fa",
         value: "roles:role-admin,role-manager",
@@ -199,7 +199,7 @@ describe("2fa-enforcement.server", () => {
     });
 
     it("returns false when user has no matching roles in 'roles' mode", async () => {
-      const { isUserRequired2FA } = await import("~/services/2fa-enforcement.server");
+      const { isUserRequired2FA } = await import("~/services/two-factor.server");
       mockSystemSettingFindUnique.mockResolvedValue({
         key: "security.require2fa",
         value: "roles:role-admin,role-manager",
@@ -214,7 +214,7 @@ describe("2fa-enforcement.server", () => {
     });
 
     it("returns false when 'roles' mode has empty roleIds list", async () => {
-      const { isUserRequired2FA } = await import("~/services/2fa-enforcement.server");
+      const { isUserRequired2FA } = await import("~/services/two-factor.server");
       mockSystemSettingFindUnique.mockResolvedValue({
         key: "security.require2fa",
         value: "roles:",
@@ -234,7 +234,7 @@ describe("2fa-enforcement.server", () => {
 
   describe("hasUserSetUp2FA", () => {
     it("returns true when user has a 2FA verification record", async () => {
-      const { hasUserSetUp2FA } = await import("~/services/2fa-enforcement.server");
+      const { hasUserSetUp2FA } = await import("~/services/two-factor.server");
       mockVerificationFindUnique.mockResolvedValue({ id: "ver-1" });
 
       const result = await hasUserSetUp2FA("user-1");
@@ -252,7 +252,7 @@ describe("2fa-enforcement.server", () => {
     });
 
     it("returns false when user has no 2FA verification record", async () => {
-      const { hasUserSetUp2FA } = await import("~/services/2fa-enforcement.server");
+      const { hasUserSetUp2FA } = await import("~/services/two-factor.server");
       mockVerificationFindUnique.mockResolvedValue(null);
 
       const result = await hasUserSetUp2FA("user-1");
@@ -265,7 +265,7 @@ describe("2fa-enforcement.server", () => {
 
   describe("resetUserTwoFA", () => {
     it("deletes verification records and creates audit log when records exist", async () => {
-      const { resetUserTwoFA } = await import("~/services/2fa-enforcement.server");
+      const { resetUserTwoFA } = await import("~/services/two-factor.server");
       mockVerificationDeleteMany.mockResolvedValue({ count: 1 });
       mockAuditLogCreate.mockResolvedValue({});
 
@@ -293,7 +293,7 @@ describe("2fa-enforcement.server", () => {
     });
 
     it("does not create audit log when no verification records were deleted", async () => {
-      const { resetUserTwoFA } = await import("~/services/2fa-enforcement.server");
+      const { resetUserTwoFA } = await import("~/services/two-factor.server");
       mockVerificationDeleteMany.mockResolvedValue({ count: 0 });
 
       await resetUserTwoFA("user-target", CTX);
@@ -304,7 +304,7 @@ describe("2fa-enforcement.server", () => {
 
     it("logs the admin action when records are deleted", async () => {
       const { logger } = await import("~/utils/monitoring/logger.server");
-      const { resetUserTwoFA } = await import("~/services/2fa-enforcement.server");
+      const { resetUserTwoFA } = await import("~/services/two-factor.server");
       mockVerificationDeleteMany.mockResolvedValue({ count: 2 });
       mockAuditLogCreate.mockResolvedValue({});
 
@@ -318,7 +318,7 @@ describe("2fa-enforcement.server", () => {
 
     it("does not log when no records are deleted", async () => {
       const { logger } = await import("~/utils/monitoring/logger.server");
-      const { resetUserTwoFA } = await import("~/services/2fa-enforcement.server");
+      const { resetUserTwoFA } = await import("~/services/two-factor.server");
       mockVerificationDeleteMany.mockResolvedValue({ count: 0 });
 
       await resetUserTwoFA("user-target", CTX);
@@ -327,7 +327,7 @@ describe("2fa-enforcement.server", () => {
     });
 
     it("uses the correct service context fields in audit log", async () => {
-      const { resetUserTwoFA } = await import("~/services/2fa-enforcement.server");
+      const { resetUserTwoFA } = await import("~/services/two-factor.server");
       mockVerificationDeleteMany.mockResolvedValue({ count: 1 });
       mockAuditLogCreate.mockResolvedValue({});
 

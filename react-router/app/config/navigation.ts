@@ -63,7 +63,6 @@ export function buildNavigationGroups(basePrefix: string): NavGroup[] {
           tKey: "notifications",
           url: `${basePrefix}/notifications`,
           icon: Bell,
-          featureFlag: "FF_NOTIFICATIONS",
         },
       ],
     },

@@ -63,17 +63,12 @@ describe("feature-flags.server", () => {
     it("exports a frozen map of all expected feature flag keys", async () => {
       const { FEATURE_FLAG_KEYS } = await import("~/utils/config/feature-flags.server");
 
-      expect(FEATURE_FLAG_KEYS.SSE_UPDATES).toBe("FF_SSE_UPDATES");
       expect(FEATURE_FLAG_KEYS.PWA).toBe("FF_PWA");
       expect(FEATURE_FLAG_KEYS.WEBHOOKS).toBe("FF_WEBHOOKS");
       expect(FEATURE_FLAG_KEYS.SAVED_VIEWS).toBe("FF_SAVED_VIEWS");
-      expect(FEATURE_FLAG_KEYS.GLOBAL_SEARCH).toBe("FF_GLOBAL_SEARCH");
       expect(FEATURE_FLAG_KEYS.TWO_FACTOR).toBe("FF_TWO_FACTOR");
-      expect(FEATURE_FLAG_KEYS.INVITATIONS).toBe("FF_INVITATIONS");
       expect(FEATURE_FLAG_KEYS.I18N).toBe("FF_I18N");
       expect(FEATURE_FLAG_KEYS.OFFLINE_MODE).toBe("FF_OFFLINE_MODE");
-      expect(FEATURE_FLAG_KEYS.NOTIFICATIONS).toBe("FF_NOTIFICATIONS");
-      expect(FEATURE_FLAG_KEYS.KEYBOARD_SHORTCUTS).toBe("FF_KEYBOARD_SHORTCUTS");
       expect(FEATURE_FLAG_KEYS.REST_API).toBe("FF_REST_API");
     });
   });

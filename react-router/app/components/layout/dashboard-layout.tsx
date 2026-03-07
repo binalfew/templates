@@ -37,10 +37,6 @@ export type DashboardLayoutProps = {
   sidebarOpen: boolean;
   sidebarGroups: Record<string, boolean>;
   theme?: Theme | null;
-  sseEnabled: boolean;
-  notificationsEnabled: boolean;
-  searchEnabled: boolean;
-  shortcutsEnabled: boolean;
   i18nEnabled: boolean;
   pwaEnabled: boolean;
   offlineEnabled: boolean;
@@ -58,9 +54,6 @@ export function DashboardLayout({
   sidebarOpen,
   sidebarGroups,
   theme,
-  notificationsEnabled,
-  searchEnabled,
-  shortcutsEnabled,
   i18nEnabled,
   pwaEnabled,
   offlineEnabled,
@@ -94,9 +87,6 @@ export function DashboardLayout({
           user={user}
           basePrefix={basePrefix}
           theme={theme}
-          notificationsEnabled={notificationsEnabled}
-          searchEnabled={searchEnabled}
-          shortcutsEnabled={shortcutsEnabled}
           i18nEnabled={i18nEnabled}
           offlineEnabled={offlineEnabled}
           unreadCount={unreadCount}

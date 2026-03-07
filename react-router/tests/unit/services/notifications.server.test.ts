@@ -7,8 +7,6 @@ const mockUpdate = vi.fn();
 const mockUpdateMany = vi.fn();
 const mockDelete = vi.fn();
 
-const mockPublish = vi.fn();
-
 vi.mock("~/utils/db/db.server", () => ({
   prisma: {
     notification: {
@@ -19,12 +17,6 @@ vi.mock("~/utils/db/db.server", () => ({
       updateMany: (...args: unknown[]) => mockUpdateMany(...args),
       delete: (...args: unknown[]) => mockDelete(...args),
     },
-  },
-}));
-
-vi.mock("~/utils/events/event-bus.server", () => ({
-  eventBus: {
-    publish: (...args: unknown[]) => mockPublish(...args),
   },
 }));
 
@@ -69,11 +61,6 @@ describe("notifications.server", () => {
           title: "Welcome",
           message: "Welcome to the platform",
         },
-      });
-      expect(mockPublish).toHaveBeenCalledWith("notifications", "t-1", "notification:new", {
-        notificationId: "notif-1",
-        title: "Welcome",
-        message: "Welcome to the platform",
       });
     });
 
@@ -124,33 +111,7 @@ describe("notifications.server", () => {
       expect(callArgs.data).not.toHaveProperty("data");
     });
 
-    it("still returns the notification when eventBus.publish throws", async () => {
-      const { createNotification } = await import("~/services/notifications.server");
-      const mockNotification = {
-        id: "notif-4",
-        userId: "u-1",
-        tenantId: "t-1",
-        type: "WARN",
-        title: "Alert",
-        message: "Something happened",
-      };
-      mockCreate.mockResolvedValue(mockNotification);
-      mockPublish.mockImplementation(() => {
-        throw new Error("SSE connection broken");
-      });
-
-      const result = await createNotification({
-        userId: "u-1",
-        tenantId: "t-1",
-        type: "WARN",
-        title: "Alert",
-        message: "Something happened",
-      });
-
-      expect(result).toEqual(mockNotification);
-      expect(mockPublish).toHaveBeenCalled();
-    });
-  });
+});
 
   // ─── getUnreadCount ──────────────────────────────────────
 

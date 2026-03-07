@@ -12,6 +12,7 @@ const mockUserRoleFindMany = vi.fn();
 const mockUserRoleDeleteMany = vi.fn();
 const mockUserRoleCreateMany = vi.fn();
 const mockRoleCount = vi.fn();
+const mockRoleFindMany = vi.fn();
 const mockHashPassword = vi.fn();
 
 vi.mock("~/utils/db/db.server", () => ({
@@ -37,6 +38,7 @@ vi.mock("~/utils/db/db.server", () => ({
     },
     role: {
       count: (...args: unknown[]) => mockRoleCount(...args),
+      findMany: (...args: unknown[]) => mockRoleFindMany(...args),
     },
   },
 }));
@@ -47,6 +49,11 @@ vi.mock("~/utils/auth/auth.server", () => ({
 
 vi.mock("~/utils/monitoring/logger.server", () => ({
   logger: { info: vi.fn(), warn: vi.fn(), error: vi.fn() },
+}));
+
+const mockCreateNotification = vi.fn();
+vi.mock("~/services/notifications.server", () => ({
+  createNotification: (...args: unknown[]) => mockCreateNotification(...args),
 }));
 
 const baseTenantCtx = {
@@ -733,7 +740,9 @@ describe("users.server", () => {
       mockRoleCount.mockResolvedValue(2);
       mockUserRoleDeleteMany.mockResolvedValue({ count: 1 });
       mockUserRoleCreateMany.mockResolvedValue({ count: 2 });
+      mockRoleFindMany.mockResolvedValue([{ name: "Editor" }, { name: "Viewer" }]);
       mockAuditLogCreate.mockResolvedValue({});
+      mockCreateNotification.mockResolvedValue({});
 
       await assignRoles("u-1", ["role-1", "role-2"], baseTenantCtx);
 
@@ -768,6 +777,7 @@ describe("users.server", () => {
       });
       mockUserRoleDeleteMany.mockResolvedValue({ count: 1 });
       mockAuditLogCreate.mockResolvedValue({});
+      mockCreateNotification.mockResolvedValue({});
 
       await assignRoles("u-1", [], baseTenantCtx);
 
@@ -810,7 +820,9 @@ describe("users.server", () => {
       });
       mockUserRoleDeleteMany.mockResolvedValue({ count: 0 });
       mockUserRoleCreateMany.mockResolvedValue({ count: 1 });
+      mockRoleFindMany.mockResolvedValue([{ name: "Any" }]);
       mockAuditLogCreate.mockResolvedValue({});
+      mockCreateNotification.mockResolvedValue({});
 
       await assignRoles("u-1", ["any-role"], superAdminCtx);
 
@@ -826,7 +838,9 @@ describe("users.server", () => {
       });
       mockUserRoleDeleteMany.mockResolvedValue({ count: 0 });
       mockUserRoleCreateMany.mockResolvedValue({ count: 1 });
+      mockRoleFindMany.mockResolvedValue([{ name: "Editor" }]);
       mockAuditLogCreate.mockResolvedValue({});
+      mockCreateNotification.mockResolvedValue({});
 
       await assignRoles("u-1", ["role-1"], superAdminCtx);
 

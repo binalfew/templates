@@ -1,7 +1,6 @@
 import { useLoaderData, useRouteLoaderData } from "react-router";
 import { prisma } from "~/utils/db/db.server";
 import { requireAuth } from "~/utils/auth/require-auth.server";
-import { isFeatureEnabled, FEATURE_FLAG_KEYS } from "~/utils/config/feature-flags.server";
 import { getUnreadCount } from "~/services/notifications.server";
 import {
   Users,
@@ -19,10 +18,6 @@ export async function loader({ request }: Route.LoaderArgs) {
   const tenantId = user.tenantId;
   const tenantFilter = tenantId ? { tenantId } : {};
 
-  const notificationsEnabled = await isFeatureEnabled(FEATURE_FLAG_KEYS.NOTIFICATIONS, {
-    tenantId: tenantId ?? undefined,
-  });
-
   const [
     userCount,
     roleCount,
@@ -39,7 +34,7 @@ export async function loader({ request }: Route.LoaderArgs) {
         createdAt: { gte: new Date(Date.now() - 24 * 60 * 60 * 1000) },
       },
     }),
-    notificationsEnabled ? getUnreadCount(user.id) : Promise.resolve(0),
+    getUnreadCount(user.id),
   ]);
 
   return {
@@ -48,7 +43,6 @@ export async function loader({ request }: Route.LoaderArgs) {
     permissionCount,
     recentAuditCount,
     unreadNotifications,
-    notificationsEnabled,
   };
 }
 
@@ -78,7 +72,7 @@ export default function DashboardIndex() {
         <StatCard title="Audit Events (24h)" value={data.recentAuditCount} icon={ClipboardList} />
       </div>
 
-      {data.notificationsEnabled && data.unreadNotifications > 0 && (
+      {data.unreadNotifications > 0 && (
         <div className="flex items-center gap-3 rounded-lg border border-blue-200 bg-blue-50 p-4 dark:border-blue-800 dark:bg-blue-950">
           <Bell className="size-5 text-blue-600" />
           <div>

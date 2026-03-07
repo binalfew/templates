@@ -1,5 +1,6 @@
 import { prisma } from "~/utils/db/db.server";
 import { hashPassword } from "~/utils/auth/auth.server";
+import { createNotification } from "~/services/notifications.server";
 import type { PaginatedQueryOptions, TenantServiceContext } from "~/utils/types.server";
 import { ServiceError } from "~/utils/errors/service-error.server";
 
@@ -305,6 +306,11 @@ export async function assignRoles(userId: string, roleIds: string[], ctx: Tenant
     });
   }
 
+  const assignedRoles = roleIds.length > 0
+    ? await prisma.role.findMany({ where: { id: { in: roleIds } }, select: { name: true } })
+    : [];
+  const roleNames = assignedRoles.map((r) => r.name).join(", ");
+
   await prisma.auditLog.create({
     data: {
       tenantId: ctx.tenantId,
@@ -317,6 +323,16 @@ export async function assignRoles(userId: string, roleIds: string[], ctx: Tenant
       userAgent: ctx.userAgent,
       metadata: { roleIds },
     },
+  });
+
+  await createNotification({
+    userId,
+    tenantId: ctx.tenantId,
+    type: "role_assigned",
+    title: "Roles updated",
+    message: roleNames
+      ? `You have been assigned the following roles: ${roleNames}`
+      : "All your roles have been removed",
   });
 }
 
