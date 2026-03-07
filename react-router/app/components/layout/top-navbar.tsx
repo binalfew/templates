@@ -33,7 +33,7 @@ import { NotificationBell } from "~/components/notification-bell";
 import { OfflineIndicator } from "~/components/offline-indicator";
 import { LanguageSwitcher } from "~/components/layout/language-switcher";
 import { ThemeSwitch } from "~/routes/resources/theme-switch";
-import { cn } from "~/utils/utils";
+import { cn } from "~/utils/misc";
 import type { NavChild } from "~/config/navigation";
 import type { Theme } from "~/utils/theme.server";
 

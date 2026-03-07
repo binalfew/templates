@@ -8,7 +8,7 @@ import { Label } from "~/components/ui/label";
 import { NativeSelect, NativeSelectOption } from "~/components/ui/native-select";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "~/components/ui/collapsible";
 import { Separator } from "~/components/ui/separator";
-import { cn } from "~/utils/utils";
+import { cn } from "~/utils/misc";
 import { evaluateCondition } from "~/utils/condition-evaluator";
 import type { FormDefinition, FormSection, FormFieldPlacement } from "~/types/form-designer";
 

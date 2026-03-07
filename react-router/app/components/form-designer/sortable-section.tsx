@@ -22,7 +22,7 @@ import {
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "~/components/ui/collapsible";
-import { cn } from "~/utils/utils";
+import { cn } from "~/utils/misc";
 import { SortableField } from "./sortable-field";
 import { makeSectionDndId, makeFieldDndId } from "./dnd-designer-context";
 import type { FormSection } from "~/types/form-designer";

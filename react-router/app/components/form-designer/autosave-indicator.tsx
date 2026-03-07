@@ -1,5 +1,5 @@
 import type { AutosaveStatus } from "~/hooks/use-autosave";
-import { cn } from "~/utils/utils";
+import { cn } from "~/utils/misc";
 
 interface AutosaveIndicatorProps {
   status: AutosaveStatus;

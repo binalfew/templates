@@ -2,7 +2,7 @@ import { Settings2 } from "lucide-react";
 import { Checkbox } from "~/components/ui/checkbox";
 import { Input } from "~/components/ui/input";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "~/components/ui/tabs";
-import { cn } from "~/utils/utils";
+import { cn } from "~/utils/misc";
 import { ConditionBuilder } from "./condition-builder";
 import type {
   FormDefinition,

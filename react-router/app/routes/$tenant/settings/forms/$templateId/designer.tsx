@@ -38,7 +38,7 @@ import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
 import { Separator } from "~/components/ui/separator";
 import { AutosaveIndicator } from "~/components/form-designer/autosave-indicator";
-import { cn } from "~/utils/utils";
+import { cn } from "~/utils/misc";
 import type { ViewMode } from "~/types/designer-state";
 import type { Route } from "./+types/designer";
 

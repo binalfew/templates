@@ -1,5 +1,5 @@
 import type { LucideIcon } from "lucide-react";
-import { cn } from "~/utils/utils";
+import { cn } from "~/utils/misc";
 
 interface EmptyStateProps {
   icon?: LucideIcon;

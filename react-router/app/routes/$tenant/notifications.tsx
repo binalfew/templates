@@ -18,7 +18,7 @@ import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardHeader } from "~/components/ui/card";
 import { NativeSelect, NativeSelectOption } from "~/components/ui/native-select";
 import { EmptyState } from "~/components/ui/empty-state";
-import { cn } from "~/utils/utils";
+import { cn } from "~/utils/misc";
 import type { Route } from "./+types/notifications";
 
 export const handle = { breadcrumb: "Notifications" };

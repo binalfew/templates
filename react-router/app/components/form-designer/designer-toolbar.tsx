@@ -17,7 +17,7 @@ import { Separator } from "~/components/ui/separator";
 import { AutosaveIndicator } from "./autosave-indicator";
 import type { ViewMode } from "~/types/designer-state";
 import type { AutosaveStatus } from "~/hooks/use-autosave";
-import { cn } from "~/utils/utils";
+import { cn } from "~/utils/misc";
 
 interface DesignerToolbarProps {
   formName: string;

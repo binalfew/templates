@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { RefreshCw, X } from "lucide-react";
 import { Button } from "~/components/ui/button";
-import { cn } from "~/utils/utils";
+import { cn } from "~/utils/misc";
 
 const AUTO_DISMISS_MS = 30_000;
 

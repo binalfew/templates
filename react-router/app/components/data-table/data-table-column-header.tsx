@@ -1,7 +1,7 @@
 import { useSearchParams } from "react-router";
 import { ArrowDown, ArrowUp, ArrowUpDown } from "lucide-react";
 import { Button } from "~/components/ui/button";
-import { cn } from "~/utils/utils";
+import { cn } from "~/utils/misc";
 
 interface DataTableColumnHeaderProps {
   title: string;
