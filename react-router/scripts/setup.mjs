@@ -12,8 +12,7 @@
  *  3. Package + DB name — Replace template name with folder name
  *  4. Husky            — Init git hooks
  *  5. Prisma generate  — Generate Prisma client
- *  6. Docker           — Start containers if Docker is available
- *  7. DB push + seed   — Wait for DB, then push schema and seed
+ *  6. DB push + seed   — Push schema and seed (assumes Postgres at 5432)
  */
 
 import {
@@ -57,15 +56,6 @@ function generateSecret(length = 32) {
 function isGitRepo() {
   try {
     execSync("git rev-parse --is-inside-work-tree", { cwd: ROOT, stdio: "ignore" });
-    return true;
-  } catch {
-    return false;
-  }
-}
-
-function isDockerRunning() {
-  try {
-    execSync("docker info", { stdio: "ignore" });
     return true;
   } catch {
     return false;
@@ -209,65 +199,17 @@ try {
   warn(`Phase 5: Prisma generate failed — ${err.message}`);
 }
 
-// ─── Phase 6: Docker ────────────────────────────────────
-
-let dockerStarted = false;
+// ─── Phase 6: DB push + seed ────────────────────────────
 
 try {
-  if (isDockerRunning()) {
-    log("Phase 6: Starting Docker containers…");
-    execSync("docker compose up -d", { cwd: ROOT, stdio: "inherit" });
-    dockerStarted = true;
-    log("Phase 6: Docker containers started.");
-  } else {
-    warn("Phase 6: Docker not running — skipping. Start Docker and run:");
-    console.log("  npm run docker:up && npm run db:push && npm run db:seed");
-  }
+  log("Phase 6: Pushing database schema…");
+  execSync("npx prisma db push", { cwd: ROOT, stdio: "inherit" });
+  log("Phase 6: Schema pushed. Seeding database…");
+  execSync("npx prisma db seed", { cwd: ROOT, stdio: "inherit" });
+  log("Phase 6: Database seeded.");
 } catch (err) {
-  warn(`Phase 6: Docker start failed — ${err.message}`);
-  console.log("  Run manually: npm run docker:up && npm run db:push && npm run db:seed");
-}
-
-// ─── Phase 7: DB push + seed ────────────────────────────
-
-if (dockerStarted) {
-  try {
-    // Read the DB port from .env for pg_isready
-    let dbPort = 5432;
-    if (existsSync(ENV_FILE)) {
-      const env = readFileSync(ENV_FILE, "utf-8");
-      const match = env.match(/^DB_PORT=(\d+)/m);
-      if (match) dbPort = parseInt(match[1], 10);
-    }
-
-    log("Phase 7: Waiting for database to be ready…");
-    let ready = false;
-    for (let i = 0; i < 30; i++) {
-      try {
-        execSync(`pg_isready -h localhost -p ${dbPort}`, { stdio: "ignore" });
-        ready = true;
-        break;
-      } catch {
-        execSync("sleep 1", { stdio: "ignore" });
-      }
-    }
-
-    if (ready) {
-      log("Phase 7: Database is ready. Pushing schema…");
-      execSync("npx prisma db push", { cwd: ROOT, stdio: "inherit" });
-      log("Phase 7: Schema pushed. Seeding database…");
-      execSync("npx prisma db seed", { cwd: ROOT, stdio: "inherit" });
-      log("Phase 7: Database seeded.");
-    } else {
-      warn("Phase 7: Database not ready after 30s — run manually:");
-      console.log("  npm run db:push && npm run db:seed");
-    }
-  } catch (err) {
-    warn(`Phase 7: DB setup failed — ${err.message}`);
-    console.log("  Run manually: npm run db:push && npm run db:seed");
-  }
-} else {
-  log("Phase 7: Skipped (Docker not started).");
+  warn(`Phase 6: DB setup failed — ${err.message}`);
+  console.log("  Run manually: npm run db:push && npm run db:seed");
 }
 
 // ─── Write marker & finish ──────────────────────────────
@@ -288,10 +230,3 @@ if (existsSync(ENV_FILE)) {
   console.log(`\n  Open http://localhost:${port} in your browser.\n`);
 }
 
-if (!dockerStarted) {
-  console.log("  Docker was not running. To finish setup:");
-  console.log("  1. Start Docker Desktop");
-  console.log("  2. npm run docker:up");
-  console.log("  3. npm run db:push");
-  console.log("  4. npm run db:seed\n");
-}
