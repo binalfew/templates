@@ -176,7 +176,6 @@ export function buildSecurityChildren(basePrefix: string): NavChild[] {
       title: "Users",
       tKey: "users",
       url: `${basePrefix}/security/users`,
-      end: true,
       roles: [...ADMIN_OR_TENANT_ADMIN],
     },
     {
