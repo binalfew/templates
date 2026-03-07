@@ -44,15 +44,9 @@ const envSchema = z.object({
   RATE_LIMIT_MAX_REQUESTS: z.coerce.number().default(100),
   TRUSTED_PROXIES: z.coerce.number().default(1),
 
-  // SMTP
-  SMTP_HOST: z.string().default(""),
-  SMTP_PORT: z.coerce.number().default(587),
-  SMTP_USER: z.string().default(""),
-  SMTP_PASS: z.string().default(""),
-  SMTP_FROM: z.string().default("noreply@app.local"),
-
-  // Resend (optional — preferred over SMTP when set)
+  // Email (Resend)
   RESEND_API_KEY: z.string().default(""),
+  SMTP_FROM: z.string().default("noreply@app.local"),
 
   // App
   APP_URL: z.string().default("http://localhost:3000"),

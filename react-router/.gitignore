@@ -11,6 +11,7 @@
 
 # Testing
 tests/coverage/
+tests/fixtures/email/
 tests/playwright-report/
 tests/test-results/
 

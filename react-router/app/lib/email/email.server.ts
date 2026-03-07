@@ -1,6 +1,4 @@
-import nodemailer from "nodemailer";
-import { Resend } from "resend";
-import { env } from "~/lib/config/env.server";
+import { z } from "zod";
 import { logger } from "~/lib/monitoring/logger.server";
 
 // --- Types ---
@@ -14,99 +12,85 @@ export interface SendEmailOptions {
   replyTo?: string;
 }
 
-export interface SendEmailResult {
-  id: string;
-}
+// --- Resend API Schemas ---
 
-interface EmailProvider {
-  send(options: SendEmailOptions): Promise<SendEmailResult>;
-}
+const resendErrorSchema = z.union([
+  z.object({
+    name: z.string(),
+    message: z.string(),
+    statusCode: z.number(),
+  }),
+  z.object({
+    name: z.literal("UnknownError"),
+    message: z.literal("Unknown Error"),
+    statusCode: z.literal(500),
+    cause: z.any(),
+  }),
+]);
 
-// --- Resend Provider ---
+type ResendError = z.infer<typeof resendErrorSchema>;
 
-function createResendProvider(apiKey: string): EmailProvider {
-  const resend = new Resend(apiKey);
-  return {
-    async send(options) {
-      const { data, error } = await resend.emails.send({
-        from: options.from || env.SMTP_FROM,
-        to: Array.isArray(options.to) ? options.to : [options.to],
-        subject: options.subject,
-        html: options.html,
-        text: options.text,
-        replyTo: options.replyTo,
-      });
-      if (error) {
-        throw new Error(`Resend error: ${error.message}`);
-      }
-      return { id: data?.id ?? "unknown" };
-    },
-  };
-}
-
-// --- SMTP Provider ---
-
-function createSMTPProvider(): EmailProvider {
-  const transporter = nodemailer.createTransport({
-    host: env.SMTP_HOST || "localhost",
-    port: env.SMTP_PORT,
-    secure: env.SMTP_PORT === 465,
-    ...(env.SMTP_USER && {
-      auth: { user: env.SMTP_USER, pass: env.SMTP_PASS },
-    }),
-  });
-
-  return {
-    async send(options) {
-      const info = await transporter.sendMail({
-        from: options.from || env.SMTP_FROM,
-        to: Array.isArray(options.to) ? options.to.join(", ") : options.to,
-        subject: options.subject,
-        html: options.html,
-        text: options.text,
-        replyTo: options.replyTo,
-      });
-      return { id: info.messageId };
-    },
-  };
-}
-
-// --- Provider Selection ---
-
-function getEmailProvider(): EmailProvider {
-  if (env.RESEND_API_KEY) {
-    logger.debug("Using Resend email provider");
-    return createResendProvider(env.RESEND_API_KEY);
-  }
-  logger.debug("Using SMTP email provider");
-  return createSMTPProvider();
-}
-
-let provider: EmailProvider | null = null;
-
-function getProvider(): EmailProvider {
-  if (!provider) {
-    provider = getEmailProvider();
-  }
-  return provider;
-}
+const resendSuccessSchema = z.object({
+  id: z.string(),
+});
 
 // --- Public API ---
 
-export async function sendEmail(options: SendEmailOptions): Promise<SendEmailResult> {
-  const p = getProvider();
-  try {
-    const result = await p.send(options);
+export async function sendEmail(options: SendEmailOptions) {
+  const from = options.from || process.env.SMTP_FROM || "noreply@app.local";
+
+  const email = {
+    from,
+    to: Array.isArray(options.to) ? options.to.join(", ") : options.to,
+    subject: options.subject,
+    html: options.html,
+    ...(options.text && { text: options.text }),
+    ...(options.replyTo && { replyTo: options.replyTo }),
+  };
+
+  if (!process.env.RESEND_API_KEY && !process.env.MOCKS) {
+    logger.warn(
+      { to: email.to, subject: email.subject },
+      "RESEND_API_KEY not set and not in mocks mode — email logged to console",
+    );
+    console.error("Would have sent the following email:", JSON.stringify(email, null, 2));
+    return { status: "success", data: { id: "mocked" } } as const;
+  }
+
+  const response = await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    body: JSON.stringify(email),
+    headers: {
+      Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
+      "Content-Type": "application/json",
+    },
+  });
+
+  const data = await response.json();
+  const parsedData = resendSuccessSchema.safeParse(data);
+
+  if (response.ok && parsedData.success) {
     logger.info(
-      { to: options.to, subject: options.subject, messageId: result.id },
+      { to: email.to, subject: email.subject, messageId: parsedData.data.id },
       "Email sent successfully",
     );
-    return result;
-  } catch (error) {
-    logger.error(
-      { to: options.to, subject: options.subject, error },
-      "Failed to send email",
-    );
-    throw error;
+    return { status: "success", data: parsedData.data } as const;
   }
+
+  const parseResult = resendErrorSchema.safeParse(data);
+  if (parseResult.success) {
+    logger.error({ to: email.to, error: parseResult.data }, "Resend API error");
+    return { status: "error", error: parseResult.data } as const;
+  }
+
+  logger.error({ to: email.to, data }, "Unknown Resend API error");
+  return {
+    status: "error",
+    error: {
+      name: "UnknownError",
+      message: "Unknown Error",
+      statusCode: 500,
+      cause: data,
+    } satisfies ResendError,
+  } as const;
 }
