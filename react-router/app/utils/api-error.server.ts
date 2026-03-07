@@ -1,35 +1,24 @@
 import { Prisma } from "~/generated/prisma/client.js";
+import { ServiceError } from "~/utils/errors/service-error.server";
 
 /**
- * Generic application error with HTTP status code.
- * Extend this class for domain-specific errors.
+ * API-specific error subclasses built on ServiceError.
  */
-export class AppError extends Error {
-  constructor(
-    message: string,
-    public status: number = 500,
-    public code: string = "APP_ERROR",
-  ) {
-    super(message);
-    this.name = "AppError";
-  }
-}
-
-export class NotFoundError extends AppError {
+export class NotFoundError extends ServiceError {
   constructor(message = "Resource not found") {
     super(message, 404, "NOT_FOUND");
     this.name = "NotFoundError";
   }
 }
 
-export class ConflictError extends AppError {
+export class ConflictError extends ServiceError {
   constructor(message = "Resource conflict") {
     super(message, 409, "CONFLICT");
     this.name = "ConflictError";
   }
 }
 
-export class ForbiddenError extends AppError {
+export class ForbiddenError extends ServiceError {
   constructor(message = "Forbidden") {
     super(message, 403, "FORBIDDEN");
     this.name = "ForbiddenError";
@@ -37,9 +26,9 @@ export class ForbiddenError extends AppError {
 }
 
 export function formatErrorResponse(error: unknown): Response {
-  if (error instanceof AppError) {
+  if (error instanceof ServiceError) {
     return Response.json(
-      { error: error.code, message: error.message },
+      { error: error.code ?? "APP_ERROR", message: error.message },
       { status: error.status },
     );
   }

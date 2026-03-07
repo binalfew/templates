@@ -14,7 +14,10 @@ import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
+import { buildMeta } from "~/utils/meta";
 import type { Route } from "./+types/forgot-password";
+
+export const meta: Route.MetaFunction = () => buildMeta("Forgot Password", "Reset your password");
 
 export async function loader({ request }: Route.LoaderArgs) {
   await requireAnonymous(request);

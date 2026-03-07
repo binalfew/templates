@@ -1,6 +1,6 @@
 {
   "extends": "./tsconfig.json",
-  "include": ["server.js", "server/*.js", "vite.config.ts"],
+  "include": ["server.js", "server/*.js", "server/shutdown.ts", "vite.config.ts"],
   "compilerOptions": {
     "composite": true,
     "strict": true,

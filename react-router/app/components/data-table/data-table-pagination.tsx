@@ -47,6 +47,7 @@ export function DataTablePagination({ pagination }: DataTablePaginationProps) {
             onChange={(e) => handlePageSizeChange(e.target.value)}
             size="sm"
             className="w-auto"
+            aria-label="Rows per page"
           >
             {sizeOptions.map((size) => (
               <NativeSelectOption key={size} value={String(size)}>

@@ -272,12 +272,13 @@ describe("job-queue.server", () => {
         }),
       );
 
-      // Exponential backoff: 2^1 * 30_000 = 60_000ms
+      // Exponential backoff with jitter: base = 2^1 * 30_000 = 60_000ms, up to 30% jitter
       const updateCall = mockJobUpdate.mock.calls[0][0];
       const nextRunAt: Date = updateCall.data.nextRunAt;
-      const expectedBackoffMs = Math.pow(2, 1) * 30_000;
-      expect(nextRunAt.getTime()).toBeGreaterThanOrEqual(now + expectedBackoffMs - 200);
-      expect(nextRunAt.getTime()).toBeLessThanOrEqual(now + expectedBackoffMs + 200);
+      const baseMs = Math.pow(2, 1) * 30_000;
+      const maxJitter = baseMs * 0.3;
+      expect(nextRunAt.getTime()).toBeGreaterThanOrEqual(now + baseMs - 200);
+      expect(nextRunAt.getTime()).toBeLessThanOrEqual(now + baseMs + maxJitter + 200);
     });
 
     it("should mark job as FAILED permanently when max attempts are reached", async () => {

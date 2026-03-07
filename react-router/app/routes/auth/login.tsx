@@ -16,7 +16,10 @@ import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
+import { buildMeta } from "~/utils/meta";
 import type { Route } from "./+types/login";
+
+export const meta: Route.MetaFunction = () => buildMeta("Log In", "Sign in to your account");
 
 export async function loader({ request }: Route.LoaderArgs) {
   const userId = await getUserId(request);

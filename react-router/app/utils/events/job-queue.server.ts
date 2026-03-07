@@ -25,7 +25,7 @@ export async function enqueueJob(type: string, payload: unknown, opts?: EnqueueO
   const job = await prisma.job.create({
     data: {
       type,
-      payload: payload as any,
+      payload: payload as import("~/generated/prisma/client.js").Prisma.InputJsonValue,
       maxAttempts: opts?.maxAttempts ?? 3,
       nextRunAt,
     },
@@ -83,8 +83,10 @@ async function processNextJob(): Promise<boolean> {
       });
       logger.error({ jobId, type: job.type, error: errMsg }, "Job failed permanently");
     } else {
-      // Exponential backoff: 2^attempts * 30s
-      const backoffMs = Math.pow(2, job.attempts) * 30_000;
+      // Exponential backoff with jitter: 2^attempts * 30s + up to 30% jitter, capped at 1h
+      const baseMs = Math.pow(2, job.attempts) * 30_000;
+      const jitterMs = Math.floor(Math.random() * baseMs * 0.3);
+      const backoffMs = Math.min(baseMs + jitterMs, 3_600_000);
       await prisma.job.update({
         where: { id: jobId },
         data: {

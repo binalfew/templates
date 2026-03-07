@@ -9,7 +9,10 @@ import {
   Bell,
   ClipboardList,
 } from "lucide-react";
+import { buildMeta } from "~/utils/meta";
 import type { Route } from "./+types/index";
+
+export const meta: Route.MetaFunction = () => buildMeta("Dashboard", "Your dashboard overview");
 
 export const handle = { breadcrumb: "Dashboard" };
 

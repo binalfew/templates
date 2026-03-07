@@ -24,7 +24,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/com
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
+import { buildMeta } from "~/utils/meta";
 import type { Route } from "./+types/2fa-setup";
+
+export const meta: Route.MetaFunction = () =>
+  buildMeta("Set Up 2FA", "Enable two-factor authentication");
 
 export async function loader({ request }: Route.LoaderArgs) {
   const verifySession = await getVerifySession(request);

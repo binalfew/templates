@@ -17,7 +17,12 @@ export function handleServiceError(
         { status: error.status },
       );
     }
-    return data({ error: error.message }, { status: error.status });
+    // Include currentResource for optimistic lock conflict errors
+    const response: Record<string, unknown> = { error: error.message };
+    if ("currentResource" in error && error.currentResource) {
+      response.currentResource = error.currentResource;
+    }
+    return data(response, { status: error.status });
   }
   throw error;
 }

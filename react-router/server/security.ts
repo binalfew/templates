@@ -56,7 +56,7 @@ export const corsMiddleware = cors({
   origin: allowedOrigins,
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
-  allowedHeaders: ["Content-Type", "X-CSRF-Token", "X-API-Key", "If-Match"],
+  allowedHeaders: ["Content-Type", "X-CSRF-Token", "X-API-Key", "If-Match", "Idempotency-Key"],
 });
 
 // ─── Session Extraction ────────────────────────────────────

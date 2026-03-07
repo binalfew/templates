@@ -1,7 +1,16 @@
+import { z } from "zod/v4";
 import { prisma } from "~/utils/db/db.server";
 import { apiAuth, requireApiPermission } from "~/utils/auth/api-auth.server";
 import { jsonPaginated, jsonSuccess, jsonError, parsePagination } from "~/utils/api-response.server";
+import { parseApiRequest } from "~/utils/api/middleware.server";
+import { checkIdempotencyKey, storeIdempotencyKey } from "~/utils/api/idempotency.server";
 import type { Route } from "./+types/roles";
+
+const createRoleBody = z.object({
+  name: z.string().min(1),
+  description: z.string().optional(),
+  scope: z.enum(["GLOBAL", "TENANT", "EVENT"]).optional().default("TENANT"),
+});
 
 export async function loader({ request }: Route.LoaderArgs) {
   const auth = await apiAuth(request);
@@ -10,7 +19,8 @@ export async function loader({ request }: Route.LoaderArgs) {
   const url = new URL(request.url);
   const { page, pageSize, skip } = parsePagination(url);
 
-  const where = { tenantId: auth.tenantId, deletedAt: null };
+  // Soft-delete extension auto-filters deletedAt: null on findMany/count
+  const where = { tenantId: auth.tenantId };
   const [roles, total] = await Promise.all([
     prisma.role.findMany({
       where,
@@ -33,32 +43,27 @@ export async function loader({ request }: Route.LoaderArgs) {
 }
 
 export async function action({ request }: Route.ActionArgs) {
-  if (request.method !== "POST") {
-    return jsonError("METHOD_NOT_ALLOWED", "Method not allowed", 405);
-  }
+  const { auth, body } = await parseApiRequest(request, {
+    permission: "role:write",
+    methods: ["POST"],
+    bodySchema: createRoleBody,
+  });
 
-  const auth = await apiAuth(request);
-  requireApiPermission(auth, "role:write");
-
-  let body: any;
-  try {
-    body = await request.json();
-  } catch {
-    return jsonError("BAD_REQUEST", "Invalid JSON body");
-  }
-
-  const { name, description, scope } = body;
-  if (!name) return jsonError("VALIDATION_ERROR", "name is required");
+  // Idempotency: return cached response for duplicate requests
+  const cached = await checkIdempotencyKey(request, auth.tenantId);
+  if (cached) return cached;
 
   const role = await prisma.role.create({
     data: {
       tenantId: auth.tenantId,
-      name,
-      description,
-      scope: scope || "TENANT",
+      name: body.name,
+      description: body.description,
+      scope: body.scope,
     },
     select: { id: true, name: true, description: true, scope: true, createdAt: true },
   });
 
-  return jsonSuccess(role, 201);
+  const response = jsonSuccess(role, 201);
+  await storeIdempotencyKey(request, auth.tenantId, response);
+  return response;
 }

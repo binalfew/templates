@@ -1,14 +1,14 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import type { Request, Response } from "express";
 
-const mockCreate = vi.fn().mockReturnValue({
+const mockCreateMany = vi.fn().mockReturnValue({
   catch: vi.fn(),
 });
 
 vi.mock("~/utils/db/db.server", () => ({
   prisma: {
     auditLog: {
-      create: mockCreate,
+      createMany: mockCreateMany,
     },
   },
 }));
@@ -82,8 +82,10 @@ describe("rate-limit-audit", () => {
   });
 
   describe("logRateLimitViolation", () => {
-    it("creates an auditLog entry with correct fields", async () => {
-      const { logRateLimitViolation } = await import("../../../server/rate-limit-audit.js");
+    it("buffers violations and flushes as a batch", async () => {
+      const { logRateLimitViolation, flushRateLimitBuffer } = await import(
+        "../../../server/rate-limit-audit.js"
+      );
 
       logRateLimitViolation({
         userId: "user-xyz",
@@ -95,28 +97,30 @@ describe("rate-limit-audit", () => {
         userAgent: "TestClient/1.0",
       });
 
-      expect(mockCreate).toHaveBeenCalledWith({
-        data: {
-          userId: "user-xyz",
-          tenantId: "system",
-          action: "RATE_LIMIT",
-          entityType: "RateLimit",
-          entityId: "auth",
-          metadata: {
-            ip: "10.0.0.1",
-            path: "/auth/login",
-            method: "POST",
-            tier: "auth",
-            limit: 10,
-          },
-          ipAddress: "10.0.0.1",
-          userAgent: "TestClient/1.0",
-        },
+      // Not flushed yet (buffer size < MAX_BUFFER_SIZE)
+      expect(mockCreateMany).not.toHaveBeenCalled();
+
+      // Manually flush
+      flushRateLimitBuffer();
+
+      expect(mockCreateMany).toHaveBeenCalledWith({
+        data: [
+          expect.objectContaining({
+            userId: "user-xyz",
+            action: "RATE_LIMIT",
+            entityType: "RateLimit",
+            entityId: "auth",
+            ipAddress: "10.0.0.1",
+            userAgent: "TestClient/1.0",
+          }),
+        ],
       });
     });
 
     it("handles null userId", async () => {
-      const { logRateLimitViolation } = await import("../../../server/rate-limit-audit.js");
+      const { logRateLimitViolation, flushRateLimitBuffer } = await import(
+        "../../../server/rate-limit-audit.js"
+      );
 
       logRateLimitViolation({
         userId: null,
@@ -128,36 +132,48 @@ describe("rate-limit-audit", () => {
         userAgent: "",
       });
 
-      expect(mockCreate).toHaveBeenCalledWith({
-        data: expect.objectContaining({
-          userId: null,
-          tenantId: "system",
-          action: "RATE_LIMIT",
-        }),
+      flushRateLimitBuffer();
+
+      expect(mockCreateMany).toHaveBeenCalledWith({
+        data: [
+          expect.objectContaining({
+            userId: null,
+            action: "RATE_LIMIT",
+          }),
+        ],
       });
     });
 
-    it("catches errors without crashing (fire-and-forget)", async () => {
-      const mockCreateThrowing = vi.fn().mockReturnValue({
+    it("does not flush when buffer is empty", async () => {
+      const { flushRateLimitBuffer } = await import("../../../server/rate-limit-audit.js");
+
+      flushRateLimitBuffer();
+
+      expect(mockCreateMany).not.toHaveBeenCalled();
+    });
+
+    it("catches errors without crashing", async () => {
+      mockCreateMany.mockReturnValue({
         catch: (handler: (err: Error) => void) => {
           handler(new Error("DB connection failed"));
         },
       });
-      mockCreate.mockImplementation(mockCreateThrowing);
 
-      const { logRateLimitViolation } = await import("../../../server/rate-limit-audit.js");
+      const { logRateLimitViolation, flushRateLimitBuffer } = await import(
+        "../../../server/rate-limit-audit.js"
+      );
 
-      expect(() =>
-        logRateLimitViolation({
-          userId: null,
-          ip: "127.0.0.1",
-          path: "/test",
-          method: "GET",
-          tier: "general",
-          limit: 100,
-          userAgent: "",
-        }),
-      ).not.toThrow();
+      logRateLimitViolation({
+        userId: null,
+        ip: "127.0.0.1",
+        path: "/test",
+        method: "GET",
+        tier: "general",
+        limit: 100,
+        userAgent: "",
+      });
+
+      expect(() => flushRateLimitBuffer()).not.toThrow();
     });
   });
 });

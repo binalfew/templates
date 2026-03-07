@@ -6,6 +6,7 @@ import express from "express";
 import { logger } from "./server/logger.js";
 import { correlationMiddleware, getCorrelationId } from "./server/correlation.js";
 import { requestLogger } from "./server/request-logger.js";
+import { runShutdownHooks } from "./server/shutdown.js";
 
 // Fail fast if required environment variables are missing
 const required = ["DATABASE_URL", "SESSION_SECRET"];
@@ -36,6 +37,7 @@ app.use(
   }),
 );
 app.disable("x-powered-by");
+app.set("trust proxy", Number(process.env.TRUSTED_PROXIES) || 1);
 
 // Correlation ID and structured request logging for all requests
 app.use(correlationMiddleware);
@@ -71,12 +73,35 @@ if (DEVELOPMENT) {
   app.use(await import(BUILD_PATH).then((mod) => mod.app));
 }
 
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
   logger.info({ port: PORT }, `Server is running on http://localhost:${PORT}`);
-
-  const shutdown = () => {
-    process.exit(0);
-  };
-  process.on("SIGTERM", shutdown);
-  process.on("SIGINT", shutdown);
 });
+
+let isShuttingDown = false;
+
+/** @param {string} signal */
+function shutdown(signal) {
+  if (isShuttingDown) return;
+  isShuttingDown = true;
+  logger.info({ signal }, "Graceful shutdown initiated");
+
+  // 1. Stop accepting new connections and drain in-flight requests
+  server.close(() => {
+    logger.info("HTTP server closed");
+  });
+
+  // 2. Run all registered shutdown hooks (flush buffers, stop processors)
+  runShutdownHooks();
+
+  // 3. Force exit after timeout to prevent hanging
+  const forceExit = setTimeout(() => {
+    logger.warn("Forced shutdown after timeout");
+    process.exit(1);
+  }, 10_000);
+  forceExit.unref();
+
+  process.exit(0);
+}
+
+process.on("SIGTERM", () => shutdown("SIGTERM"));
+process.on("SIGINT", () => shutdown("SIGINT"));

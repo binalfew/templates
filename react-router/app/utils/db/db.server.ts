@@ -1,3 +1,4 @@
+import pg from "pg";
 import { PrismaClient } from "../../generated/prisma/client.js";
 import { PrismaPg } from "@prisma/adapter-pg";
 
@@ -17,7 +18,15 @@ function addSoftDeleteFilter(args: { where?: Record<string, unknown> }, includeD
 }
 
 function createBasePrismaClient() {
-  const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL! });
+  const pool = new pg.Pool({
+    connectionString: process.env.DATABASE_URL!,
+    min: Number(process.env.DATABASE_POOL_MIN) || 2,
+    max: Number(process.env.DATABASE_POOL_MAX) || 10,
+    idleTimeoutMillis: 30_000,
+    connectionTimeoutMillis: Number(process.env.DATABASE_CONNECTION_TIMEOUT) || 10_000,
+    statement_timeout: Number(process.env.DATABASE_QUERY_TIMEOUT) || 5_000,
+  });
+  const adapter = new PrismaPg(pool);
   return new PrismaClient({
     adapter,
     log: process.env.NODE_ENV === "development" ? ["error", "warn"] : ["error"],

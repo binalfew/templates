@@ -28,27 +28,43 @@ export function extractViolationContext(
   };
 }
 
+const buffer: ViolationContext[] = [];
+const FLUSH_INTERVAL_MS = 5_000;
+const MAX_BUFFER_SIZE = 50;
+
 export function logRateLimitViolation(context: ViolationContext): void {
+  buffer.push(context);
+  if (buffer.length >= MAX_BUFFER_SIZE) {
+    flushRateLimitBuffer();
+  }
+}
+
+export function flushRateLimitBuffer(): void {
+  if (buffer.length === 0) return;
+  const batch = buffer.splice(0);
   prisma.auditLog
-    .create({
-      data: {
-        userId: context.userId,
-        tenantId: "system",
+    .createMany({
+      data: batch.map((ctx) => ({
+        userId: ctx.userId,
         action: "RATE_LIMIT",
         entityType: "RateLimit",
-        entityId: context.tier,
+        entityId: ctx.tier,
         metadata: {
-          ip: context.ip,
-          path: context.path,
-          method: context.method,
-          tier: context.tier,
-          limit: context.limit,
+          ip: ctx.ip,
+          path: ctx.path,
+          method: ctx.method,
+          tier: ctx.tier,
+          limit: ctx.limit,
         },
-        ipAddress: context.ip,
-        userAgent: context.userAgent,
-      },
+        ipAddress: ctx.ip,
+        userAgent: ctx.userAgent,
+      })),
     })
     .catch(() => {
-      // Fire-and-forget: swallow errors to avoid crashing the request
+      // Swallow errors to avoid crashing — audit logging is best-effort
     });
 }
+
+// Periodically flush any buffered violations
+const flushInterval = setInterval(flushRateLimitBuffer, FLUSH_INTERVAL_MS);
+flushInterval.unref();

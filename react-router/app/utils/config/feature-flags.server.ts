@@ -1,7 +1,16 @@
 import { prisma } from "~/utils/db/db.server";
 import { logger } from "~/utils/monitoring/logger.server";
+import { MemoryCache } from "~/utils/db/memory-cache.server";
 import type { UpdateFlagInput } from "~/utils/schemas/settings";
 import type { ServiceContext } from "~/utils/types.server";
+
+// Cache feature flag DB lookups for 60 seconds to reduce per-request DB queries
+const flagCache = new MemoryCache<{
+  enabled: boolean;
+  enabledForTenants: string[];
+  enabledForRoles: string[];
+  enabledForUsers: string[];
+} | null>(60_000);
 
 // --- Types ---
 
@@ -37,8 +46,24 @@ export const FEATURE_FLAG_KEYS = {
 
 // --- SDK Functions ---
 
+export function clearFlagCache() {
+  flagCache.clear();
+}
+
 export async function isFeatureEnabled(key: string, context?: FlagContext): Promise<boolean> {
-  const flag = await prisma.featureFlag.findUnique({ where: { key } });
+  let flag = flagCache.get(key);
+  if (flag === undefined) {
+    const dbFlag = await prisma.featureFlag.findUnique({ where: { key } });
+    flag = dbFlag
+      ? {
+          enabled: dbFlag.enabled,
+          enabledForTenants: dbFlag.enabledForTenants,
+          enabledForRoles: dbFlag.enabledForRoles,
+          enabledForUsers: dbFlag.enabledForUsers,
+        }
+      : null;
+    flagCache.set(key, flag);
+  }
   if (!flag) return false;
 
   return evaluateFlag(flag, context);
@@ -87,6 +112,9 @@ export async function setFlag(key: string, updates: UpdateFlagInput, ctx: Servic
       ...(updates.enabledForUsers !== undefined && { enabledForUsers: updates.enabledForUsers }),
     },
   });
+
+  // Invalidate cache so next read picks up the new value
+  flagCache.invalidate(key);
 
   logger.info({ flagId: flag.id, key, enabled: flag.enabled }, "Feature flag updated");
 

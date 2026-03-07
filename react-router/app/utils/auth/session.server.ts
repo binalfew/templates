@@ -117,12 +117,27 @@ async function fetchUser(request: Request) {
   const userId = await requireUserId(request);
   const user = await prisma.user.findFirst({
     where: { id: userId },
-    include: {
+    select: {
+      id: true,
+      email: true,
+      name: true,
+      photoUrl: true,
+      tenantId: true,
       userRoles: {
-        include: {
+        select: {
+          eventId: true,
+          stepId: true,
           role: {
-            include: {
-              rolePermissions: { include: { permission: true } },
+            select: {
+              id: true,
+              name: true,
+              scope: true,
+              rolePermissions: {
+                select: {
+                  access: true,
+                  permission: { select: { resource: true, action: true } },
+                },
+              },
             },
           },
         },
@@ -147,6 +162,16 @@ export function requireUser(request: Request) {
  * Create a new DB-backed session with fingerprint, store sessionId in cookie.
  */
 export async function createUserSession(request: Request, userId: string, redirectTo: string) {
+  // Invalidate the old cookie session to prevent session fixation
+  const oldSession = await getSession(request);
+  const oldSessionId = oldSession.get("sessionId");
+  if (oldSessionId && typeof oldSessionId === "string") {
+    await prisma.session.delete({ where: { id: oldSessionId } }).catch(() => {});
+  }
+
+  // Delete all other existing sessions for this user (single-session enforcement)
+  await prisma.session.deleteMany({ where: { userId } });
+
   const fingerprint = generateFingerprint(request);
   const dbSession = await prisma.session.create({
     data: {

@@ -158,40 +158,60 @@ export function DataTable<TData>({
                   />
                 </TableHead>
               )}
-              {visibleColumns.map((col) => (
-                <TableHead
-                  key={col.id}
-                  className={cn(
-                    col.hideOnMobile && "hidden md:table-cell",
-                    col.align === "center" && "text-center",
-                    col.align === "right" && "text-right",
-                    col.headerClassName,
-                  )}
-                >
-                  {col.sortable ? (
-                    <DataTableColumnHeader
-                      title={col.header}
-                      field={col.id}
-                      sortable
-                      align={col.align}
-                      fieldKey={fieldKey}
-                      directionKey={directionKey}
-                    />
-                  ) : (
-                    col.header
-                  )}
+              {visibleColumns.map((col) => {
+                const isSorted = col.sortable && currentSort === col.id;
+                const ariaSortValue = isSorted
+                  ? currentDir === "asc"
+                    ? ("ascending" as const)
+                    : ("descending" as const)
+                  : col.sortable
+                    ? ("none" as const)
+                    : undefined;
+
+                return (
+                  <TableHead
+                    key={col.id}
+                    aria-sort={ariaSortValue}
+                    className={cn(
+                      col.hideOnMobile && "hidden md:table-cell",
+                      col.align === "center" && "text-center",
+                      col.align === "right" && "text-right",
+                      col.headerClassName,
+                    )}
+                  >
+                    {col.sortable ? (
+                      <DataTableColumnHeader
+                        title={col.header}
+                        field={col.id}
+                        sortable
+                        align={col.align}
+                        fieldKey={fieldKey}
+                        directionKey={directionKey}
+                      />
+                    ) : (
+                      col.header
+                    )}
+                  </TableHead>
+                );
+              })}
+              {hasRowActions && (
+                <TableHead className="w-10">
+                  <span className="sr-only">Actions</span>
                 </TableHead>
-              ))}
-              {hasRowActions && <TableHead className="w-10">Actions</TableHead>}
+              )}
             </TableRow>
           </TableHeader>
-          <TableBody>
+          <TableBody aria-live="polite">
             {data.map((row) => {
               const key = getRowKey(row, rowKey);
               const isSelected = selectedKeys.has(key);
 
               return (
-                <TableRow key={key} data-state={isSelected ? "selected" : undefined}>
+                <TableRow
+                  key={key}
+                  data-state={isSelected ? "selected" : undefined}
+                  aria-selected={selectable ? isSelected : undefined}
+                >
                   {selectable && (
                     <TableCell>
                       <Checkbox

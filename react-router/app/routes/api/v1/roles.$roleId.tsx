@@ -1,14 +1,22 @@
+import { z } from "zod/v4";
 import { prisma } from "~/utils/db/db.server";
 import { apiAuth, requireApiPermission } from "~/utils/auth/api-auth.server";
 import { jsonSuccess, jsonError } from "~/utils/api-response.server";
+import { parseApiRequest } from "~/utils/api/middleware.server";
 import type { Route } from "./+types/roles.$roleId";
+
+const updateRoleBody = z.object({
+  name: z.string().min(1).optional(),
+  description: z.string().optional(),
+});
 
 export async function loader({ request, params }: Route.LoaderArgs) {
   const auth = await apiAuth(request);
   requireApiPermission(auth, "role:read");
 
+  // Soft-delete extension auto-filters deletedAt: null on findFirst
   const role = await prisma.role.findFirst({
-    where: { id: params.roleId, tenantId: auth.tenantId, deletedAt: null },
+    where: { id: params.roleId, tenantId: auth.tenantId },
     select: {
       id: true,
       name: true,
@@ -33,17 +41,13 @@ export async function action({ request, params }: Route.ActionArgs) {
   const auth = await apiAuth(request);
 
   if (request.method === "PUT") {
-    requireApiPermission(auth, "role:write");
-
-    let body: any;
-    try {
-      body = await request.json();
-    } catch {
-      return jsonError("BAD_REQUEST", "Invalid JSON body");
-    }
+    const { body } = await parseApiRequest(request, {
+      permission: "role:write",
+      bodySchema: updateRoleBody,
+    });
 
     const role = await prisma.role.findFirst({
-      where: { id: params.roleId, tenantId: auth.tenantId, deletedAt: null },
+      where: { id: params.roleId, tenantId: auth.tenantId },
     });
     if (!role) return jsonError("NOT_FOUND", "Role not found", 404);
 
@@ -63,10 +67,11 @@ export async function action({ request, params }: Route.ActionArgs) {
     requireApiPermission(auth, "role:delete");
 
     const role = await prisma.role.findFirst({
-      where: { id: params.roleId, tenantId: auth.tenantId, deletedAt: null },
+      where: { id: params.roleId, tenantId: auth.tenantId },
     });
     if (!role) return jsonError("NOT_FOUND", "Role not found", 404);
 
+    // Soft delete — set deletedAt manually (extension doesn't intercept update)
     await prisma.role.update({
       where: { id: params.roleId },
       data: { deletedAt: new Date() },

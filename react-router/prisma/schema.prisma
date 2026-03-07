@@ -266,6 +266,8 @@ model AuditLog {
   @@index([tenantId])
   @@index([userId])
   @@index([createdAt])
+  @@index([tenantId, action, createdAt])
+  @@index([entityType, entityId])
 }
 
 model Notification {
@@ -286,6 +288,7 @@ model Notification {
   @@index([userId, read])
   @@index([userId, createdAt])
   @@index([tenantId])
+  @@index([tenantId, createdAt])
 }
 
 model Verification {
@@ -337,8 +340,10 @@ model ApiKey {
   revokedAt        DateTime?
 
   @@index([tenantId, status])
+  @@index([tenantId, createdAt])
   @@index([keyHash])
   @@index([keyPrefix])
+  @@index([expiresAt])
 }
 
 model WebhookSubscription {
@@ -396,6 +401,7 @@ model WebhookDelivery {
   @@index([tenantId, eventType, createdAt])
   @@index([status, nextRetryAt])
   @@index([eventId])
+  @@index([createdAt])
 }
 
 // ─── Reference Data ───────────────────────────────────
@@ -531,6 +537,23 @@ model Job {
   completedAt DateTime?
 
   @@index([status, nextRunAt])
+}
+
+// ─── API Idempotency ──────────────────────────────────
+
+model IdempotencyKey {
+  id           String   @id @default(cuid())
+  key          String
+  tenantId     String
+  method       String
+  path         String
+  statusCode   Int
+  responseBody String
+  createdAt    DateTime @default(now())
+  expiresAt    DateTime
+
+  @@unique([key, tenantId])
+  @@index([expiresAt])
 }
 
 // ─── 2FA Recovery Codes ────────────────────────────────

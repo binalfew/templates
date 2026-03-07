@@ -32,7 +32,7 @@ describe("optimistic-lock.server", () => {
         checkOptimisticLock(resource, oldVersion, "Resource");
       } catch (error) {
         expect(error).toBeInstanceOf(ConflictError);
-        expect((error as ConflictError).statusCode).toBe(409);
+        expect((error as ConflictError).status).toBe(409);
         expect((error as ConflictError).currentResource).toEqual(resource);
       }
     });
@@ -50,7 +50,7 @@ describe("optimistic-lock.server", () => {
       try {
         checkOptimisticLock(null, now.toISOString(), "Resource");
       } catch (error) {
-        expect((error as NotFoundError).statusCode).toBe(404);
+        expect((error as NotFoundError).status).toBe(404);
       }
     });
   });

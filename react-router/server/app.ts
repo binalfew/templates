@@ -103,7 +103,16 @@ app.get("/resources/export-download", async (req, res) => {
 
 // ─── Background Job Processor ────────────────────────────────
 import("~/utils/events/job-handlers.server").then(() =>
-  import("~/utils/events/job-queue.server").then(({ startJobProcessor }) => startJobProcessor()),
+  import("~/utils/events/job-queue.server").then(({ startJobProcessor, stopJobProcessor }) => {
+    startJobProcessor();
+    // Register shutdown hooks via shared registry
+    import("./shutdown.js").then(({ onShutdown }) => {
+      onShutdown(stopJobProcessor);
+      import("./rate-limit-audit.js").then(({ flushRateLimitBuffer }) => {
+        onShutdown(flushRateLimitBuffer);
+      });
+    }).catch(() => {});
+  }),
 );
 
 // ─── React Router handler ──────────────────────────────────

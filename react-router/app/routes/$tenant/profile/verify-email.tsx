@@ -4,6 +4,8 @@ import { data, Form, Link, redirect, useParams } from "react-router";
 import { ShieldCheck, ArrowLeft } from "lucide-react";
 import { prisma } from "~/utils/db/db.server";
 import { logger } from "~/utils/monitoring/logger.server";
+import { sendEmail } from "~/utils/email/email.server";
+import { otpEmail } from "~/utils/email/email-templates.server";
 import {
   isCodeValid,
   getVerifySession,
@@ -47,8 +49,9 @@ export async function action({ request, params }: Route.ActionArgs) {
       userId,
     });
 
-    // TODO: integrate email provider to send OTP
-    logger.info({ newEmail, otp }, "Email change verification code resent (dev: check logs)");
+    const emailTemplate = otpEmail(otp, newEmail);
+    await sendEmail({ to: newEmail, subject: emailTemplate.subject, html: emailTemplate.html, text: emailTemplate.text });
+    logger.debug({ newEmail }, "Email change verification code resent");
 
     return data({ status: "resent" as const });
   }
@@ -101,8 +104,8 @@ export async function action({ request, params }: Route.ActionArgs) {
       where: { id: userId },
       data: { email: newEmail },
     });
-  } catch (error: any) {
-    if (error?.code === "P2002") {
+  } catch (error: unknown) {
+    if (error instanceof Error && "code" in error && (error as { code: string }).code === "P2002") {
       return data(
         submission.reply({
           fieldErrors: {
@@ -151,7 +154,7 @@ export default function VerifyEmailPage({ loaderData, actionData }: Route.Compon
   const wasResent = actionData && "status" in actionData && actionData.status === "resent";
 
   const [form, fields] = useForm({
-    lastResult: wasResent ? undefined : (actionData as any),
+    lastResult: wasResent ? undefined : (actionData as Record<string, unknown> | undefined),
     onValidate({ formData }) {
       return parseWithZod(formData, { schema: verifySchema });
     },

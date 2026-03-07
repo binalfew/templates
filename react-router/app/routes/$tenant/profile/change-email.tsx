@@ -5,6 +5,8 @@ import { Mail, ArrowLeft } from "lucide-react";
 import { prisma } from "~/utils/db/db.server";
 import { requireUserId } from "~/utils/auth/session.server";
 import { logger } from "~/utils/monitoring/logger.server";
+import { sendEmail } from "~/utils/email/email.server";
+import { otpEmail } from "~/utils/email/email-templates.server";
 import {
   prepareVerification,
   getVerifySession,
@@ -79,8 +81,9 @@ export async function action({ request, params }: Route.ActionArgs) {
     userId,
   });
 
-  // TODO: integrate email provider to send OTP
-  logger.info({ userId, newEmail, otp }, "Email change verification code (dev: check logs)");
+  const emailTemplate = otpEmail(otp, newEmail);
+  await sendEmail({ to: newEmail, subject: emailTemplate.subject, html: emailTemplate.html, text: emailTemplate.text });
+  logger.debug({ userId, newEmail }, "Email change verification code sent");
 
   // Store new email in verify session for the verify page
   const verifySession = await getVerifySession(request);

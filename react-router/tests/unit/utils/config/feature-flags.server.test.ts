@@ -22,6 +22,20 @@ vi.mock("~/utils/monitoring/logger.server", () => ({
   logger: { info: vi.fn(), warn: vi.fn(), error: vi.fn() },
 }));
 
+vi.mock("~/utils/db/memory-cache.server", () => {
+  // Use a real MemoryCache but with 0 TTL so it never caches during tests
+  return {
+    MemoryCache: class {
+      get() {
+        return undefined;
+      }
+      set() {}
+      invalidate() {}
+      clear() {}
+    },
+  };
+});
+
 const CTX = {
   userId: "user-1",
   tenantId: "tenant-1",

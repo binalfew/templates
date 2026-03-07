@@ -1,22 +1,26 @@
-export class ConflictError extends Error {
-  public readonly statusCode = 409;
-  public readonly code = "CONFLICT";
+import { ServiceError } from "~/utils/errors/service-error.server";
+
+export class ConflictError extends ServiceError {
   public readonly currentResource: Record<string, unknown>;
 
   constructor(message: string, currentResource: Record<string, unknown>) {
-    super(message);
+    super(message, 409, "CONFLICT");
     this.name = "ConflictError";
     this.currentResource = currentResource;
   }
 }
 
-export class PreconditionRequiredError extends Error {
-  public readonly statusCode = 428;
-  public readonly code = "PRECONDITION_REQUIRED";
-
+export class PreconditionRequiredError extends ServiceError {
   constructor(message: string) {
-    super(message);
+    super(message, 428, "PRECONDITION_REQUIRED");
     this.name = "PreconditionRequiredError";
+  }
+}
+
+export class NotFoundError extends ServiceError {
+  constructor(message: string) {
+    super(message, 404, "NOT_FOUND");
+    this.name = "NotFoundError";
   }
 }
 
@@ -68,16 +72,6 @@ export function withVersionCheck(
     ...where,
     updatedAt: expectedVersion,
   };
-}
-
-export class NotFoundError extends Error {
-  public readonly statusCode = 404;
-  public readonly code = "NOT_FOUND";
-
-  constructor(message: string) {
-    super(message);
-    this.name = "NotFoundError";
-  }
 }
 
 export function isPrismaNotFoundError(error: unknown): boolean {
