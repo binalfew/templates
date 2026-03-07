@@ -1,22 +1,20 @@
 /**
  * Post-install setup script.
  *
- * Runs automatically after `npm install` (via the "postinstall" hook).
- * Fully automates project bootstrap in 10 phases (0–9).
+ * Run via `npm run setup` after scaffolding a new project.
  * Idempotent — skips steps that are already done.
  * No phase failure aborts the script; each catches errors and warns.
  *
  * Phases:
- *  0. Marker check     — `.setup-done` exists → skip all, only re-init Husky
- *  1. Copy .env        — `.env.example` → `.env`
+ *  0. Marker check     — `.setup-done` exists → skip all
+ *  1. Copy .env        — `.env.example` → `.env`, remove `.env.example`
  *  2. SESSION_SECRET   — Generate random 32-char secret
- *  3. Detect ports     — Probe free ports, update .env + derived vars
- *  4. Package name     — Replace template name with folder name
- *  5. Husky            — Init git hooks
- *  6. Prisma generate  — Generate Prisma client
- *  7. Cleanup          — Remove template docs (CLAUDE.md, docs/)
- *  8. Docker           — Start containers if Docker is available
- *  9. DB push + seed   — Wait for DB, then push schema and seed
+ *  3. Package + DB name — Replace template name with folder name
+ *  4. Husky            — Init git hooks
+ *  5. Prisma generate  — Generate Prisma client
+ *  6. Cleanup          — Remove template docs (CLAUDE.md, docs/)
+ *  7. Docker           — Start containers if Docker is available
+ *  8. DB push + seed   — Wait for DB, then push schema and seed
  */
 
 import {
@@ -29,7 +27,6 @@ import {
 } from "node:fs";
 import { execSync } from "node:child_process";
 import { randomBytes } from "node:crypto";
-import { createServer } from "node:net";
 import { resolve, dirname, basename } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -39,23 +36,6 @@ const ROOT = resolve(__dirname, "..");
 const ENV_EXAMPLE = resolve(ROOT, ".env.example");
 const ENV_FILE = resolve(ROOT, ".env");
 const MARKER = resolve(ROOT, ".setup-done");
-
-// ─── Default ports from .env.example ────────────────────
-const DEFAULT_PORTS = {
-  DB_PORT: 5432,
-  DB_TEST_PORT: 5433,
-  MAILPIT_UI_PORT: 8025,
-  MAILPIT_SMTP_PORT: 1025,
-  PORT: 3000,
-};
-
-const PORT_RANGES = {
-  DB_PORT: [5432, 5499],
-  DB_TEST_PORT: [5432, 5499],
-  MAILPIT_UI_PORT: [8025, 8099],
-  MAILPIT_SMTP_PORT: [1025, 1099],
-  PORT: [3000, 3099],
-};
 
 // ─── Helpers ─────────────────────────────────────────────
 
@@ -84,40 +64,6 @@ function isGitRepo() {
   }
 }
 
-/**
- * Check if a port is free by attempting to listen on it.
- * Returns a promise that resolves to true if free, false if in use.
- */
-function isPortFree(port) {
-  return new Promise((resolve) => {
-    const server = createServer();
-    server.once("error", () => resolve(false));
-    server.once("listening", () => {
-      server.close(() => resolve(true));
-    });
-    server.listen(port, "0.0.0.0");
-  });
-}
-
-/**
- * Find a free port in [rangeStart, rangeEnd], starting with preferred.
- * Returns the free port, or preferred if none found (best-effort).
- */
-async function findFreePort(preferred, rangeStart, rangeEnd) {
-  // Try preferred first
-  if (await isPortFree(preferred)) return preferred;
-
-  // Scan the range
-  for (let port = rangeStart; port <= rangeEnd; port++) {
-    if (port === preferred) continue;
-    if (await isPortFree(port)) return port;
-  }
-
-  // Fallback to preferred — Docker will report the conflict clearly
-  warn(`No free port found in ${rangeStart}–${rangeEnd}, using ${preferred}`);
-  return preferred;
-}
-
 function isDockerRunning() {
   try {
     execSync("docker info", { stdio: "ignore" });
@@ -140,19 +86,6 @@ function sanitizeDbName(name) {
     .replace(/[^a-z0-9_]/g, "_")
     .replace(/^_+/, "")
     .replace(/_+$/g, "");
-}
-
-function initHusky() {
-  if (isGitRepo()) {
-    try {
-      execSync("npx husky", { cwd: ROOT, stdio: "ignore" });
-      log("Phase 5: Initialized Husky git hooks.");
-    } catch {
-      warn("Phase 5: Could not initialize Husky — run `npm run prepare` manually.");
-    }
-  } else {
-    log("Phase 5: Not a git repository — skipping Husky.");
-  }
 }
 
 // ─── Phase 0: Marker check ─────────────────────────────
@@ -200,120 +133,28 @@ try {
   warn(`Phase 2: Failed to generate SESSION_SECRET — ${err.message}`);
 }
 
-// ─── Phase 3: Detect & assign ports ─────────────────────
-
-let portsChanged = false;
-
-try {
-  if (existsSync(ENV_FILE)) {
-    let env = readFileSync(ENV_FILE, "utf-8");
-
-    // Parse current port values from .env
-    const currentPorts = {};
-    for (const key of Object.keys(DEFAULT_PORTS)) {
-      const match = env.match(new RegExp(`^${key}=(\\d+)`, "m"));
-      currentPorts[key] = match ? parseInt(match[1], 10) : DEFAULT_PORTS[key];
-    }
-
-    // Check if any port has already been changed from default
-    const alreadyCustomized = Object.keys(DEFAULT_PORTS).some(
-      (key) => currentPorts[key] !== DEFAULT_PORTS[key],
-    );
-
-    if (alreadyCustomized) {
-      log("Phase 3: Ports already customized — skipping.");
-    } else {
-      const assignedPorts = {};
-      const usedPorts = new Set();
-
-      // Assign ports sequentially to avoid conflicts between our own services
-      for (const key of Object.keys(DEFAULT_PORTS)) {
-        const preferred = DEFAULT_PORTS[key];
-        const [rangeStart, rangeEnd] = PORT_RANGES[key];
-
-        let port = preferred;
-        if (!(await isPortFree(preferred)) || usedPorts.has(preferred)) {
-          // Find an alternative
-          for (let p = rangeStart; p <= rangeEnd; p++) {
-            if (p === preferred || usedPorts.has(p)) continue;
-            if (await isPortFree(p)) {
-              port = p;
-              break;
-            }
-          }
-        }
-
-        assignedPorts[key] = port;
-        usedPorts.add(port);
-      }
-
-      // Check if any port actually changed
-      const anyChanged = Object.keys(DEFAULT_PORTS).some(
-        (key) => assignedPorts[key] !== DEFAULT_PORTS[key],
-      );
-
-      if (anyChanged) {
-        // Update individual port variables
-        for (const [key, port] of Object.entries(assignedPorts)) {
-          env = env.replace(new RegExp(`^${key}=\\d+`, "m"), `${key}=${port}`);
-        }
-
-        // Update derived variables
-        const dbPort = assignedPorts.DB_PORT;
-        const appPort = assignedPorts.PORT;
-
-        env = env.replace(
-          /^DATABASE_URL="postgresql:\/\/postgres:postgres@localhost:\d+\/app"/m,
-          `DATABASE_URL="postgresql://postgres:postgres@localhost:${dbPort}/app"`,
-        );
-        env = env.replace(
-          /^BASE_URL="http:\/\/localhost:\d+"/m,
-          `BASE_URL="http://localhost:${appPort}"`,
-        );
-        env = env.replace(
-          /^CORS_ORIGINS="http:\/\/localhost:\d+"/m,
-          `CORS_ORIGINS="http://localhost:${appPort}"`,
-        );
-
-        writeFileSync(ENV_FILE, env);
-        portsChanged = true;
-
-        const changed = Object.entries(assignedPorts)
-          .filter(([key, port]) => port !== DEFAULT_PORTS[key])
-          .map(([key, port]) => `${key}=${port}`)
-          .join(", ");
-        log(`Phase 3: Assigned free ports — ${changed}`);
-      } else {
-        log("Phase 3: All default ports are free — no changes needed.");
-      }
-    }
-  }
-} catch (err) {
-  warn(`Phase 3: Port detection failed — ${err.message}`);
-}
-
-// ─── Phase 4: Package name + DB name ────────────────────
+// ─── Phase 3: Package name + DB name ────────────────────
 
 try {
   const folderName = basename(ROOT);
   const newName = sanitizePackageName(folderName);
   const dbName = sanitizeDbName(folderName);
 
-  // 4a: Update package.json name
+  // 3a: Update package.json name
   const pkgPath = resolve(ROOT, "package.json");
   const pkg = JSON.parse(readFileSync(pkgPath, "utf-8"));
 
   if (pkg.name !== "react-router-template") {
-    log("Phase 4a: Package name already changed — skipping.");
+    log("Phase 3a: Package name already changed — skipping.");
   } else if (newName && newName !== "react-router-template") {
     pkg.name = newName;
     writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + "\n");
-    log(`Phase 4a: Updated package name to "${newName}".`);
+    log(`Phase 3a: Updated package name to "${newName}".`);
   } else {
-    log("Phase 4a: Folder name matches template — skipping.");
+    log("Phase 3a: Folder name matches template — skipping.");
   }
 
-  // 4b: Update DB names in .env (independent of package name check)
+  // 3b: Update DB names in .env (independent of package name check)
   if (existsSync(ENV_FILE) && dbName && dbName !== "app") {
     let env = readFileSync(ENV_FILE, "utf-8");
     const hasDefault = env.match(/^DB_NAME=app$/m);
@@ -330,37 +171,46 @@ try {
         `$1${dbName}$2`,
       );
       writeFileSync(ENV_FILE, env);
-      log(`Phase 4b: Updated DB name to "${dbName}".`);
+      log(`Phase 3b: Updated DB name to "${dbName}".`);
     } else {
-      log("Phase 4b: DB name already customized — skipping.");
+      log("Phase 3b: DB name already customized — skipping.");
     }
   } else {
-    log("Phase 4b: DB name unchanged — skipping.");
+    log("Phase 3b: DB name unchanged — skipping.");
   }
 } catch (err) {
-  warn(`Phase 4: Failed to update package/DB name — ${err.message}`);
+  warn(`Phase 3: Failed to update package/DB name — ${err.message}`);
 }
 
-// ─── Phase 5: Husky ─────────────────────────────────────
+// ─── Phase 4: Husky ─────────────────────────────────────
 
-initHusky();
+if (isGitRepo()) {
+  try {
+    execSync("npx husky", { cwd: ROOT, stdio: "ignore" });
+    log("Phase 4: Initialized Husky git hooks.");
+  } catch {
+    warn("Phase 4: Could not initialize Husky — run `npm run prepare` manually.");
+  }
+} else {
+  log("Phase 4: Not a git repository — skipping Husky.");
+}
 
-// ─── Phase 6: Prisma generate ───────────────────────────
+// ─── Phase 5: Prisma generate ───────────────────────────
 
 try {
   const prismaOutput = resolve(ROOT, "app", "generated", "prisma");
   if (existsSync(prismaOutput) && readdirSync(prismaOutput).length > 0) {
-    log("Phase 6: Prisma client already generated — skipping.");
+    log("Phase 5: Prisma client already generated — skipping.");
   } else {
-    log("Phase 6: Generating Prisma client…");
+    log("Phase 5: Generating Prisma client…");
     execSync("npx prisma generate", { cwd: ROOT, stdio: "inherit" });
-    log("Phase 6: Prisma client generated.");
+    log("Phase 5: Prisma client generated.");
   }
 } catch (err) {
-  warn(`Phase 6: Prisma generate failed — ${err.message}`);
+  warn(`Phase 5: Prisma generate failed — ${err.message}`);
 }
 
-// ─── Phase 7: Cleanup template docs ─────────────────────
+// ─── Phase 6: Cleanup template docs ─────────────────────
 
 try {
   let cleaned = false;
@@ -377,46 +227,46 @@ try {
   }
 
   if (cleaned) {
-    log("Phase 7: Removed template docs (CLAUDE.md, docs/).");
+    log("Phase 6: Removed template docs (CLAUDE.md, docs/).");
   } else {
-    log("Phase 7: Template docs already removed — skipping.");
+    log("Phase 6: Template docs already removed — skipping.");
   }
 } catch (err) {
-  warn(`Phase 7: Cleanup failed — ${err.message}`);
+  warn(`Phase 6: Cleanup failed — ${err.message}`);
 }
 
-// ─── Phase 8: Docker ────────────────────────────────────
+// ─── Phase 7: Docker ────────────────────────────────────
 
 let dockerStarted = false;
 
 try {
   if (isDockerRunning()) {
-    log("Phase 8: Starting Docker containers…");
+    log("Phase 7: Starting Docker containers…");
     execSync("docker compose up -d", { cwd: ROOT, stdio: "inherit" });
     dockerStarted = true;
-    log("Phase 8: Docker containers started.");
+    log("Phase 7: Docker containers started.");
   } else {
-    warn("Phase 8: Docker not running — skipping. Start Docker and run:");
+    warn("Phase 7: Docker not running — skipping. Start Docker and run:");
     console.log("  npm run docker:up && npm run db:push && npm run db:seed");
   }
 } catch (err) {
-  warn(`Phase 8: Docker start failed — ${err.message}`);
+  warn(`Phase 7: Docker start failed — ${err.message}`);
   console.log("  Run manually: npm run docker:up && npm run db:push && npm run db:seed");
 }
 
-// ─── Phase 9: DB push + seed ────────────────────────────
+// ─── Phase 8: DB push + seed ────────────────────────────
 
 if (dockerStarted) {
   try {
     // Read the DB port from .env for pg_isready
-    let dbPort = DEFAULT_PORTS.DB_PORT;
+    let dbPort = 5432;
     if (existsSync(ENV_FILE)) {
       const env = readFileSync(ENV_FILE, "utf-8");
       const match = env.match(/^DB_PORT=(\d+)/m);
       if (match) dbPort = parseInt(match[1], 10);
     }
 
-    log("Phase 9: Waiting for database to be ready…");
+    log("Phase 8: Waiting for database to be ready…");
     let ready = false;
     for (let i = 0; i < 30; i++) {
       try {
@@ -424,27 +274,26 @@ if (dockerStarted) {
         ready = true;
         break;
       } catch {
-        // Wait 1 second before retrying
         execSync("sleep 1", { stdio: "ignore" });
       }
     }
 
     if (ready) {
-      log("Phase 9: Database is ready. Pushing schema…");
+      log("Phase 8: Database is ready. Pushing schema…");
       execSync("npx prisma db push", { cwd: ROOT, stdio: "inherit" });
-      log("Phase 9: Schema pushed. Seeding database…");
+      log("Phase 8: Schema pushed. Seeding database…");
       execSync("npx prisma db seed", { cwd: ROOT, stdio: "inherit" });
-      log("Phase 9: Database seeded.");
+      log("Phase 8: Database seeded.");
     } else {
-      warn("Phase 9: Database not ready after 30s — run manually:");
+      warn("Phase 8: Database not ready after 30s — run manually:");
       console.log("  npm run db:push && npm run db:seed");
     }
   } catch (err) {
-    warn(`Phase 9: DB setup failed — ${err.message}`);
+    warn(`Phase 8: DB setup failed — ${err.message}`);
     console.log("  Run manually: npm run db:push && npm run db:seed");
   }
 } else {
-  log("Phase 9: Skipped (Docker not started).");
+  log("Phase 8: Skipped (Docker not started).");
 }
 
 // ─── Write marker & finish ──────────────────────────────
