@@ -37,10 +37,6 @@ export async function loader({ request, params }: Route.LoaderArgs) {
   const savedViewsEnabled = await isFeatureEnabled(FEATURE_FLAG_KEYS.SAVED_VIEWS, flagContext);
   const globalSearchEnabled = await isFeatureEnabled(FEATURE_FLAG_KEYS.GLOBAL_SEARCH, flagContext);
   const twoFactorEnabled = await isFeatureEnabled(FEATURE_FLAG_KEYS.TWO_FACTOR, flagContext);
-  const dataImportExportEnabled = await isFeatureEnabled(
-    FEATURE_FLAG_KEYS.DATA_IMPORT_EXPORT,
-    flagContext,
-  );
   const invitationsEnabled = await isFeatureEnabled(FEATURE_FLAG_KEYS.INVITATIONS, flagContext);
 
   const enabledFeatures: Record<string, boolean> = {
@@ -50,7 +46,6 @@ export async function loader({ request, params }: Route.LoaderArgs) {
     FF_SAVED_VIEWS: savedViewsEnabled,
     FF_GLOBAL_SEARCH: globalSearchEnabled,
     FF_TWO_FACTOR: twoFactorEnabled,
-    FF_DATA_IMPORT_EXPORT: dataImportExportEnabled,
     FF_INVITATIONS: invitationsEnabled,
   };
 

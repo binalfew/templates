@@ -59,10 +59,7 @@ async function main() {
     { resource: "api-key", action: "manage" },
     { resource: "webhook", action: "manage" },
     { resource: "saved-view", action: "manage" },
-    { resource: "custom-field", action: "manage" },
-    { resource: "broadcast", action: "manage" },
     { resource: "file-upload", action: "manage" },
-    { resource: "custom-object", action: "manage" },
   ];
 
   const permissions = await Promise.all(
@@ -146,18 +143,12 @@ async function main() {
     { key: "FF_I18N", description: "Internationalization and multi-language support" },
     { key: "FF_PWA", description: "Progressive Web App shell and service worker" },
     { key: "FF_OFFLINE_MODE", description: "Offline mode with IndexedDB" },
-    { key: "FF_ANALYTICS", description: "Analytics dashboard" },
     { key: "FF_REST_API", description: "REST API with API key authentication" },
     { key: "FF_WEBHOOKS", description: "Webhook subscriptions and event delivery" },
     { key: "FF_SAVED_VIEWS", description: "Saved table/grid/kanban views" },
-    { key: "FF_CUSTOM_FIELDS", description: "Dynamic custom field definitions" },
-    { key: "FF_BROADCASTS", description: "Message templates and broadcasts" },
     { key: "FF_GLOBAL_SEARCH", description: "Global cross-entity search" },
-    { key: "FF_CUSTOM_OBJECTS", description: "Runtime custom object definitions" },
-    { key: "FF_FORM_DESIGNER", description: "Visual drag-and-drop form designer" },
     { key: "FF_TWO_FACTOR", description: "Two-factor authentication (TOTP)" },
     { key: "FF_INVITATIONS", description: "User invitations via email" },
-    { key: "FF_DATA_IMPORT_EXPORT", description: "CSV/JSON data import and export" },
   ];
 
   for (const flag of defaultFlags) {

@@ -84,7 +84,6 @@ export function buildNavigationGroups(basePrefix: string): NavGroup[] {
           url: `${basePrefix}/data`,
           icon: Database,
           roles: [...ADMIN_ONLY],
-          featureFlag: "FF_DATA_IMPORT_EXPORT",
         },
         {
           title: "Logs",
