@@ -12,9 +12,8 @@
  *  3. Package + DB name — Replace template name with folder name
  *  4. Husky            — Init git hooks
  *  5. Prisma generate  — Generate Prisma client
- *  6. Cleanup          — Remove template docs (CLAUDE.md, docs/)
- *  7. Docker           — Start containers if Docker is available
- *  8. DB push + seed   — Wait for DB, then push schema and seed
+ *  6. Docker           — Start containers if Docker is available
+ *  7. DB push + seed   — Wait for DB, then push schema and seed
  */
 
 import {
@@ -210,51 +209,26 @@ try {
   warn(`Phase 5: Prisma generate failed — ${err.message}`);
 }
 
-// ─── Phase 6: Cleanup template docs ─────────────────────
-
-try {
-  let cleaned = false;
-  const claudeMd = resolve(ROOT, "CLAUDE.md");
-  const docsDir = resolve(ROOT, "docs");
-
-  if (existsSync(claudeMd)) {
-    rmSync(claudeMd);
-    cleaned = true;
-  }
-  if (existsSync(docsDir)) {
-    rmSync(docsDir, { recursive: true, force: true });
-    cleaned = true;
-  }
-
-  if (cleaned) {
-    log("Phase 6: Removed template docs (CLAUDE.md, docs/).");
-  } else {
-    log("Phase 6: Template docs already removed — skipping.");
-  }
-} catch (err) {
-  warn(`Phase 6: Cleanup failed — ${err.message}`);
-}
-
-// ─── Phase 7: Docker ────────────────────────────────────
+// ─── Phase 6: Docker ────────────────────────────────────
 
 let dockerStarted = false;
 
 try {
   if (isDockerRunning()) {
-    log("Phase 7: Starting Docker containers…");
+    log("Phase 6: Starting Docker containers…");
     execSync("docker compose up -d", { cwd: ROOT, stdio: "inherit" });
     dockerStarted = true;
-    log("Phase 7: Docker containers started.");
+    log("Phase 6: Docker containers started.");
   } else {
-    warn("Phase 7: Docker not running — skipping. Start Docker and run:");
+    warn("Phase 6: Docker not running — skipping. Start Docker and run:");
     console.log("  npm run docker:up && npm run db:push && npm run db:seed");
   }
 } catch (err) {
-  warn(`Phase 7: Docker start failed — ${err.message}`);
+  warn(`Phase 6: Docker start failed — ${err.message}`);
   console.log("  Run manually: npm run docker:up && npm run db:push && npm run db:seed");
 }
 
-// ─── Phase 8: DB push + seed ────────────────────────────
+// ─── Phase 7: DB push + seed ────────────────────────────
 
 if (dockerStarted) {
   try {
@@ -266,7 +240,7 @@ if (dockerStarted) {
       if (match) dbPort = parseInt(match[1], 10);
     }
 
-    log("Phase 8: Waiting for database to be ready…");
+    log("Phase 7: Waiting for database to be ready…");
     let ready = false;
     for (let i = 0; i < 30; i++) {
       try {
@@ -279,21 +253,21 @@ if (dockerStarted) {
     }
 
     if (ready) {
-      log("Phase 8: Database is ready. Pushing schema…");
+      log("Phase 7: Database is ready. Pushing schema…");
       execSync("npx prisma db push", { cwd: ROOT, stdio: "inherit" });
-      log("Phase 8: Schema pushed. Seeding database…");
+      log("Phase 7: Schema pushed. Seeding database…");
       execSync("npx prisma db seed", { cwd: ROOT, stdio: "inherit" });
-      log("Phase 8: Database seeded.");
+      log("Phase 7: Database seeded.");
     } else {
-      warn("Phase 8: Database not ready after 30s — run manually:");
+      warn("Phase 7: Database not ready after 30s — run manually:");
       console.log("  npm run db:push && npm run db:seed");
     }
   } catch (err) {
-    warn(`Phase 8: DB setup failed — ${err.message}`);
+    warn(`Phase 7: DB setup failed — ${err.message}`);
     console.log("  Run manually: npm run db:push && npm run db:seed");
   }
 } else {
-  log("Phase 8: Skipped (Docker not started).");
+  log("Phase 7: Skipped (Docker not started).");
 }
 
 // ─── Write marker & finish ──────────────────────────────
