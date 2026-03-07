@@ -39,7 +39,6 @@ export type DashboardLayoutProps = {
   theme?: Theme | null;
   i18nEnabled: boolean;
   pwaEnabled: boolean;
-  offlineEnabled: boolean;
   unreadCount: number;
   recentNotifications: NotificationItem[];
   enabledFeatures?: Record<string, boolean>;
@@ -56,7 +55,6 @@ export function DashboardLayout({
   theme,
   i18nEnabled,
   pwaEnabled,
-  offlineEnabled,
   unreadCount,
   recentNotifications,
   enabledFeatures,
@@ -88,7 +86,6 @@ export function DashboardLayout({
           basePrefix={basePrefix}
           theme={theme}
           i18nEnabled={i18nEnabled}
-          offlineEnabled={offlineEnabled}
           unreadCount={unreadCount}
           notifications={recentNotifications}
           settingsChildren={settingsChildren}

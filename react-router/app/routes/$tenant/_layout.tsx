@@ -25,7 +25,6 @@ export async function loader({ request, params }: Route.LoaderArgs) {
 
   const i18nEnabled = await isFeatureEnabled(FEATURE_FLAG_KEYS.I18N, flagContext);
   const pwaEnabled = await isFeatureEnabled(FEATURE_FLAG_KEYS.PWA, flagContext);
-  const offlineEnabled = await isFeatureEnabled(FEATURE_FLAG_KEYS.OFFLINE_MODE, flagContext);
   const restApiEnabled = await isFeatureEnabled(FEATURE_FLAG_KEYS.REST_API, flagContext);
   const webhooksEnabled = await isFeatureEnabled(FEATURE_FLAG_KEYS.WEBHOOKS, flagContext);
   const savedViewsEnabled = await isFeatureEnabled(FEATURE_FLAG_KEYS.SAVED_VIEWS, flagContext);
@@ -54,7 +53,6 @@ export async function loader({ request, params }: Route.LoaderArgs) {
     theme: getTheme(request),
     i18nEnabled,
     pwaEnabled,
-    offlineEnabled,
     unreadCount: await getUnreadCount(user.id),
     recentNotifications: (await listNotifications(user.id, { perPage: 5 })).notifications.map(
       (n: any) => ({
@@ -95,7 +93,6 @@ export default function TenantLayout() {
       theme={loaderData.theme}
       i18nEnabled={loaderData.i18nEnabled}
       pwaEnabled={loaderData.pwaEnabled}
-      offlineEnabled={loaderData.offlineEnabled}
       unreadCount={loaderData.unreadCount}
       recentNotifications={loaderData.recentNotifications}
       enabledFeatures={loaderData.enabledFeatures}

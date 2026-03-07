@@ -14,7 +14,7 @@ import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert";
 import { Label } from "~/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "~/components/ui/radio-group";
 import { Separator } from "~/components/ui/separator";
-import type { Route } from "./+types/security";
+import type { Route } from "./+types/twofactor";
 
 export const handle = { breadcrumb: "Security" };
 
@@ -70,7 +70,7 @@ export async function action({ request }: Route.ActionArgs) {
     },
   );
 
-  return redirect(`/${request.url.split("/")[3]}/settings/security`);
+  return redirect(`/${request.url.split("/")[3]}/settings/twofactor`);
 }
 
 export default function SecuritySettingsPage() {

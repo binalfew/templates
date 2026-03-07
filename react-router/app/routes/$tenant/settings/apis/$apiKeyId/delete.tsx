@@ -37,7 +37,7 @@ export async function action({ request, params }: Route.ActionArgs) {
 
   try {
     await revokeApiKey(params.apiKeyId, ctx);
-    return redirect(`/${params.tenant}/settings/api-keys`);
+    return redirect(`/${params.tenant}/settings/apis`);
   } catch (error) {
     return handleServiceError(error);
   }
@@ -119,7 +119,7 @@ export default function RevokeApiKeyPage() {
               </Button>
             </Form>
             <Button variant="outline" asChild className="w-full sm:w-auto">
-              <Link to={`${base}/settings/api-keys`}>Cancel</Link>
+              <Link to={`${base}/settings/apis`}>Cancel</Link>
             </Button>
           </div>
         </CardContent>

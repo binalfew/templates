@@ -89,7 +89,7 @@ export default function ApiKeyDetailPage() {
         </div>
         <div className="flex flex-col gap-2 sm:flex-row">
           <Button variant="outline" size="sm" asChild className="w-full sm:w-auto">
-            <Link to={`${base}/settings/api-keys`}>
+            <Link to={`${base}/settings/apis`}>
               <ArrowLeft className="mr-1.5 size-3.5" />
               Back
             </Link>
@@ -132,7 +132,7 @@ export default function ApiKeyDetailPage() {
           {apiKey.status === "ACTIVE" && (
             <Button variant="outline" size="sm" asChild className="w-full sm:w-auto">
               <Link
-                to={`${base}/settings/api-keys/${apiKey.id}/delete`}
+                to={`${base}/settings/apis/${apiKey.id}/delete`}
                 className="text-destructive"
               >
                 <Trash2 className="mr-1.5 size-3.5" />

@@ -92,7 +92,7 @@ export default function ApiKeysIndexPage() {
         <div className="flex items-center gap-2">
           <Key className="size-4 text-muted-foreground shrink-0" />
           <Link
-            to={`${base}/settings/api-keys/${row.id}`}
+            to={`${base}/settings/apis/${row.id}`}
             className="hover:underline truncate max-w-xs"
           >
             {row.name}
@@ -162,7 +162,7 @@ export default function ApiKeysIndexPage() {
         searchConfig={{ placeholder: "Search API keys..." }}
         filters={filters}
         toolbarActions={[
-          { label: "Create API Key", icon: Plus, href: `${base}/settings/api-keys/new` },
+          { label: "Create API Key", icon: Plus, href: `${base}/settings/apis/new` },
         ]}
         rowActions={[
           {

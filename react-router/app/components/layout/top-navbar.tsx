@@ -30,7 +30,6 @@ import {
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
 import { NotificationBell } from "~/components/notification-bell";
-import { OfflineIndicator } from "~/components/offline-indicator";
 import { LanguageSwitcher } from "~/components/layout/language-switcher";
 import { ThemeSwitch } from "~/routes/resources/theme-switch";
 import { cn } from "~/utils/misc";
@@ -53,7 +52,6 @@ type TopNavbarProps = {
   unreadCount?: number;
   notifications?: NotificationItem[];
   i18nEnabled?: boolean;
-  offlineEnabled?: boolean;
   settingsChildren?: NavChild[];
   securityChildren?: NavChild[];
   dataChildren?: NavChild[];
@@ -113,7 +111,6 @@ export function TopNavbar({
   unreadCount = 0,
   notifications = [],
   i18nEnabled = false,
-  offlineEnabled = false,
   settingsChildren = [],
   securityChildren = [],
   dataChildren = [],
@@ -259,9 +256,6 @@ export function TopNavbar({
         )}
 
         <ThemeSwitch userPreference={theme} />
-
-        {/* Offline indicator */}
-        {offlineEnabled && <OfflineIndicator />}
 
         {/* Notifications */}
         <NotificationBell

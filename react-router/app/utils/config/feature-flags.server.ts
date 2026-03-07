@@ -29,7 +29,6 @@ export interface FlagWithStatus {
 export const FEATURE_FLAG_KEYS = {
   I18N: "FF_I18N",
   PWA: "FF_PWA",
-  OFFLINE_MODE: "FF_OFFLINE_MODE",
   REST_API: "FF_REST_API",
   WEBHOOKS: "FF_WEBHOOKS",
   SAVED_VIEWS: "FF_SAVED_VIEWS",

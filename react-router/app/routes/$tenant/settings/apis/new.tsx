@@ -115,7 +115,7 @@ export default function NewApiKeyPage() {
     return (
       <RawKeyAlert rawKey={actionData.rawKey}>
         <Button asChild className="w-full sm:w-auto">
-          <Link to={`${base}/settings/api-keys`}>Go to API Keys</Link>
+          <Link to={`${base}/settings/apis`}>Go to API Keys</Link>
         </Button>
       </RawKeyAlert>
     );
@@ -223,7 +223,7 @@ export default function NewApiKeyPage() {
             Create Key
           </Button>
           <Button type="button" variant="outline" asChild className="w-full sm:w-auto">
-            <Link to={`${base}/settings/api-keys`}>Cancel</Link>
+            <Link to={`${base}/settings/apis`}>Cancel</Link>
           </Button>
         </div>
       </Form>

@@ -68,7 +68,6 @@ describe("feature-flags.server", () => {
       expect(FEATURE_FLAG_KEYS.SAVED_VIEWS).toBe("FF_SAVED_VIEWS");
       expect(FEATURE_FLAG_KEYS.TWO_FACTOR).toBe("FF_TWO_FACTOR");
       expect(FEATURE_FLAG_KEYS.I18N).toBe("FF_I18N");
-      expect(FEATURE_FLAG_KEYS.OFFLINE_MODE).toBe("FF_OFFLINE_MODE");
       expect(FEATURE_FLAG_KEYS.REST_API).toBe("FF_REST_API");
     });
   });

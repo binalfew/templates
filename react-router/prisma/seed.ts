@@ -139,7 +139,6 @@ async function main() {
   const defaultFlags = [
     { key: "FF_I18N", description: "Internationalization and multi-language support" },
     { key: "FF_PWA", description: "Progressive Web App shell and service worker" },
-    { key: "FF_OFFLINE_MODE", description: "Offline mode with IndexedDB" },
     { key: "FF_REST_API", description: "REST API with API key authentication" },
     { key: "FF_WEBHOOKS", description: "Webhook subscriptions and event delivery" },
     { key: "FF_SAVED_VIEWS", description: "Saved table/grid/kanban views" },
