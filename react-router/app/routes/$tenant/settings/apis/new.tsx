@@ -1,5 +1,7 @@
 import { useState, useCallback } from "react";
 import { data, useActionData, Form, Link } from "react-router";
+import { useForm, getFormProps, getInputProps } from "@conform-to/react";
+import { parseWithZod } from "@conform-to/zod/v4";
 
 export const handle = { breadcrumb: "Create API Key" };
 
@@ -9,10 +11,10 @@ import { FEATURE_FLAG_KEYS } from "~/utils/config/feature-flags.server";
 import { createApiKey } from "~/services/api-keys.server";
 import { handleServiceError } from "~/utils/errors/handle-service-error.server";
 import { buildServiceContext } from "~/utils/request-context.server";
+import { createApiKeySchema } from "~/utils/schemas/api-keys";
 import { useBasePrefix } from "~/hooks/use-base-prefix";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
-import { Label } from "~/components/ui/label";
 import { Checkbox } from "~/components/ui/checkbox";
 import {
   NativeSelect,
@@ -20,6 +22,7 @@ import {
 } from "~/components/ui/native-select";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { Badge } from "~/components/ui/badge";
+import { Field } from "~/components/ui/field";
 import { Shield } from "lucide-react";
 import { RawKeyAlert } from "./shared";
 import type { Route } from "./+types/new";
@@ -87,21 +90,13 @@ export async function action({ request, params }: Route.ActionArgs) {
   const { user, tenantId } = await requireRoleAndFeature(request, [...ADMIN_OR_TENANT_ADMIN], FEATURE_FLAG_KEYS.REST_API);
 
   const formData = await request.formData();
-  const name = formData.get("name") as string;
-  const description = formData.get("description") as string;
-  const permissions = formData.getAll("permissions") as string[];
-  const rateLimitValue = parseInt((formData.get("rateLimitTier") as string) || "100");
-  const expiresIn = formData.get("expiresIn") as string;
-  const allowedIps =
-    (formData.get("allowedIps") as string)
-      ?.split(",")
-      .map((ip) => ip.trim())
-      .filter(Boolean) ?? [];
+  const submission = parseWithZod(formData, { schema: createApiKeySchema });
 
-  if (!name) return data({ error: "Name is required" }, { status: 400 });
-  if (permissions.length === 0) {
-    return data({ error: "At least one permission is required" }, { status: 400 });
+  if (submission.status !== "success") {
+    return data({ result: submission.reply() }, { status: 400 });
   }
+
+  const { name, description, permissions, rateLimitTier, expiresIn, allowedIps } = submission.value;
 
   let expiresAt: Date | undefined;
   if (expiresIn) {
@@ -110,6 +105,12 @@ export async function action({ request, params }: Route.ActionArgs) {
       expiresAt = new Date(Date.now() + days * 24 * 60 * 60 * 1000);
     }
   }
+
+  const parsedIps =
+    allowedIps
+      ?.split(",")
+      .map((ip) => ip.trim())
+      .filter(Boolean) ?? [];
 
   const ctx = buildServiceContext(request, user, tenantId);
 
@@ -120,16 +121,16 @@ export async function action({ request, params }: Route.ActionArgs) {
         description,
         permissions,
         rateLimitTier: "CUSTOM" as const,
-        rateLimitCustom: rateLimitValue,
+        rateLimitCustom: rateLimitTier,
         expiresAt,
-        allowedIps,
+        allowedIps: parsedIps,
       },
       ctx,
     );
 
     return data({ success: true, rawKey: result.rawKey, keyId: result.apiKey.id });
   } catch (error) {
-    return handleServiceError(error);
+    return handleServiceError(error, { submission });
   }
 }
 
@@ -144,12 +145,20 @@ export default function NewApiKeyPage() {
   const base = useBasePrefix();
   const [selected, setSelected] = useState<Set<string>>(new Set());
 
+  const [form, fields] = useForm({
+    lastResult: actionData && "result" in actionData ? actionData.result : undefined,
+    onValidate({ formData }) {
+      return parseWithZod(formData, { schema: createApiKeySchema });
+    },
+    shouldValidate: "onBlur",
+    shouldRevalidate: "onInput",
+  });
+
   const toggle = useCallback((value: string) => {
     setSelected((prev) => {
       const next = new Set(prev);
       if (next.has(value)) next.delete(value);
       else next.add(value);
-      // If wildcard is unchecked after individual change, remove it
       if (value !== "*" && next.has("*") && !ALL_PERMISSION_VALUES.every((v) => next.has(v))) {
         next.delete("*");
       }
@@ -204,45 +213,44 @@ export default function NewApiKeyPage() {
         </p>
       </div>
 
-      {actionData && "error" in actionData && (
-        <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
-          {actionData.error}
-        </div>
-      )}
+      <Form method="post" {...getFormProps(form)} className="space-y-6">
+        {form.errors && form.errors.length > 0 && (
+          <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
+            {form.errors.map((error, i) => (
+              <p key={i}>{error}</p>
+            ))}
+          </div>
+        )}
 
-      <Form method="post" className="space-y-6">
         <Card>
           <CardHeader>
             <CardTitle>Key Configuration</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <div className="space-y-2">
-                <Label htmlFor="name">Name</Label>
+              <Field fieldId={fields.name.id} label="Name" required errors={fields.name.errors}>
                 <Input
-                  id="name"
-                  name="name"
+                  {...getInputProps(fields.name, { type: "text" })}
+                  key={fields.name.key}
                   placeholder="e.g., Mobile App Integration"
-                  required
                   className="w-full"
                 />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="description">Description</Label>
+              </Field>
+              <Field fieldId={fields.description.id} label="Description" errors={fields.description.errors}>
                 <Input
-                  id="description"
-                  name="description"
+                  {...getInputProps(fields.description, { type: "text" })}
+                  key={fields.description.key}
                   placeholder="Optional description"
                   className="w-full"
                 />
-              </div>
+              </Field>
             </div>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <div className="space-y-2">
-                <Label htmlFor="rateLimitTier">Rate Limit Tier</Label>
+              <Field fieldId={fields.rateLimitTier.id} label="Rate Limit Tier" errors={fields.rateLimitTier.errors}>
                 <NativeSelect
-                  id="rateLimitTier"
-                  name="rateLimitTier"
+                  id={fields.rateLimitTier.id}
+                  name={fields.rateLimitTier.name}
+                  key={fields.rateLimitTier.key}
                   defaultValue="100"
                   className="w-full"
                 >
@@ -252,27 +260,24 @@ export default function NewApiKeyPage() {
                     </NativeSelectOption>
                   ))}
                 </NativeSelect>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="expiresIn">Expires In (days)</Label>
+              </Field>
+              <Field fieldId={fields.expiresIn.id} label="Expires In (days)" errors={fields.expiresIn.errors}>
                 <Input
-                  id="expiresIn"
-                  name="expiresIn"
-                  type="number"
+                  {...getInputProps(fields.expiresIn, { type: "number" })}
+                  key={fields.expiresIn.key}
                   placeholder="Leave empty for no expiry"
                   className="w-full"
                 />
-              </div>
+              </Field>
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="allowedIps">Allowed IPs (comma-separated)</Label>
+            <Field fieldId={fields.allowedIps.id} label="Allowed IPs (comma-separated)" errors={fields.allowedIps.errors}>
               <Input
-                id="allowedIps"
-                name="allowedIps"
+                {...getInputProps(fields.allowedIps, { type: "text" })}
+                key={fields.allowedIps.key}
                 placeholder="Leave empty to allow all IPs"
                 className="w-full"
               />
-            </div>
+            </Field>
           </CardContent>
         </Card>
 
@@ -289,6 +294,9 @@ export default function NewApiKeyPage() {
             </div>
           </CardHeader>
           <CardContent className="space-y-4">
+            {fields.permissions.errors && fields.permissions.errors.length > 0 && (
+              <p className="text-sm text-destructive">{fields.permissions.errors[0]}</p>
+            )}
             <div className="flex items-center justify-between rounded-md border bg-muted/50 p-3">
               <label className="flex items-center gap-2 text-sm font-medium cursor-pointer">
                 <Checkbox

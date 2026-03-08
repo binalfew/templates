@@ -33,6 +33,7 @@ export const BRAND_THEMES = [
   { value: "cosmic", label: "Cosmic" },
   { value: "elegant", label: "Elegant" },
   { value: "mono", label: "Mono" },
+  { value: "auc", label: "AUC" },
 ] as const;
 
 export const createTenantSchema = z

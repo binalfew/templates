@@ -78,7 +78,7 @@ export default function UserRolesPage() {
           <CardTitle>Roles</CardTitle>
         </CardHeader>
         <CardContent>
-          <Form method="post" className="space-y-4">
+          <Form method="post" className="space-y-4" noValidate>
             {allRoles.length === 0 ? (
               <p className="text-sm text-muted-foreground">No roles available.</p>
             ) : (

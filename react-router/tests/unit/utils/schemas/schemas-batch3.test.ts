@@ -451,7 +451,7 @@ describe("updateDocumentTypeSchema", () => {
 describe("createApiKeySchema", () => {
   const validApiKey = {
     name: "My API Key",
-    permissions: "read:users,write:users",
+    permissions: ["read:users", "write:users"],
   };
 
   it("accepts valid data with required fields only", () => {
@@ -459,8 +459,8 @@ describe("createApiKeySchema", () => {
     expect(result.success).toBe(true);
     if (result.success) {
       expect(result.data.name).toBe("My API Key");
-      expect(result.data.permissions).toBe("read:users,write:users");
-      expect(result.data.rateLimitTier).toBe("STANDARD");
+      expect(result.data.permissions).toEqual(["read:users", "write:users"]);
+      expect(result.data.rateLimitTier).toBe(100);
     }
   });
 
@@ -468,22 +468,20 @@ describe("createApiKeySchema", () => {
     const result = createApiKeySchema.safeParse({
       ...validApiKey,
       description: "Key for external integrations",
-      rateLimitTier: "PREMIUM",
-      rateLimitCustom: 5000,
-      expiresAt: "2027-01-01T00:00:00Z",
+      rateLimitTier: 500,
+      expiresIn: "30",
       allowedIps: "192.168.1.1,10.0.0.1",
     });
     expect(result.success).toBe(true);
     if (result.success) {
-      expect(result.data.rateLimitTier).toBe("PREMIUM");
-      expect(result.data.rateLimitCustom).toBe(5000);
-      expect(result.data.expiresAt).toBe("2027-01-01T00:00:00Z");
+      expect(result.data.rateLimitTier).toBe(500);
+      expect(result.data.expiresIn).toBe("30");
       expect(result.data.allowedIps).toBe("192.168.1.1,10.0.0.1");
     }
   });
 
   it("rejects missing name", () => {
-    const result = createApiKeySchema.safeParse({ permissions: "read:users" });
+    const result = createApiKeySchema.safeParse({ permissions: ["read:users"] });
     expect(result.success).toBe(false);
   });
 
@@ -493,19 +491,19 @@ describe("createApiKeySchema", () => {
   });
 
   it("rejects empty name", () => {
-    const result = createApiKeySchema.safeParse({ name: "", permissions: "read:users" });
+    const result = createApiKeySchema.safeParse({ name: "", permissions: ["read:users"] });
     expect(result.success).toBe(false);
   });
 
-  it("rejects empty permissions", () => {
-    const result = createApiKeySchema.safeParse({ name: "My Key", permissions: "" });
+  it("rejects empty permissions array", () => {
+    const result = createApiKeySchema.safeParse({ name: "My Key", permissions: [] });
     expect(result.success).toBe(false);
   });
 
   it("rejects name longer than 100 characters", () => {
     const result = createApiKeySchema.safeParse({
       name: "A".repeat(101),
-      permissions: "read:users",
+      permissions: ["read:users"],
     });
     expect(result.success).toBe(false);
   });
@@ -518,35 +516,18 @@ describe("createApiKeySchema", () => {
     expect(result.success).toBe(false);
   });
 
-  it("accepts valid rateLimitTier values", () => {
-    for (const tier of ["STANDARD", "ELEVATED", "PREMIUM", "CUSTOM"] as const) {
-      const result = createApiKeySchema.safeParse({ ...validApiKey, rateLimitTier: tier });
-      expect(result.success).toBe(true);
-    }
-  });
-
-  it("rejects invalid rateLimitTier", () => {
-    const result = createApiKeySchema.safeParse({ ...validApiKey, rateLimitTier: "UNLIMITED" });
-    expect(result.success).toBe(false);
-  });
-
-  it("rejects rateLimitCustom less than 1", () => {
-    const result = createApiKeySchema.safeParse({ ...validApiKey, rateLimitCustom: 0 });
-    expect(result.success).toBe(false);
-  });
-
-  it("coerces rateLimitCustom from string", () => {
-    const result = createApiKeySchema.safeParse({ ...validApiKey, rateLimitCustom: "100" });
+  it("coerces rateLimitTier from string", () => {
+    const result = createApiKeySchema.safeParse({ ...validApiKey, rateLimitTier: "100" });
     expect(result.success).toBe(true);
     if (result.success) {
-      expect(result.data.rateLimitCustom).toBe(100);
+      expect(result.data.rateLimitTier).toBe(100);
     }
   });
 
   it("accepts name at max length of 100", () => {
     const result = createApiKeySchema.safeParse({
       name: "A".repeat(100),
-      permissions: "read:users",
+      permissions: ["read:users"],
     });
     expect(result.success).toBe(true);
   });
@@ -557,36 +538,6 @@ describe("createApiKeySchema", () => {
       description: "A".repeat(500),
     });
     expect(result.success).toBe(true);
-  });
-});
-
-describe("updateApiKeySchema", () => {
-  it("accepts empty object (all fields are partial)", () => {
-    const result = updateApiKeySchema.safeParse({});
-    expect(result.success).toBe(true);
-  });
-
-  it("accepts partial updates with only name", () => {
-    const result = updateApiKeySchema.safeParse({ name: "Updated Name" });
-    expect(result.success).toBe(true);
-    if (result.success) {
-      expect(result.data.name).toBe("Updated Name");
-    }
-  });
-
-  it("accepts partial updates with only permissions", () => {
-    const result = updateApiKeySchema.safeParse({ permissions: "read:roles" });
-    expect(result.success).toBe(true);
-  });
-
-  it("still enforces max lengths on provided fields", () => {
-    const result = updateApiKeySchema.safeParse({ name: "A".repeat(101) });
-    expect(result.success).toBe(false);
-  });
-
-  it("still enforces enum values on provided rateLimitTier", () => {
-    const result = updateApiKeySchema.safeParse({ rateLimitTier: "INVALID" });
-    expect(result.success).toBe(false);
   });
 });
 

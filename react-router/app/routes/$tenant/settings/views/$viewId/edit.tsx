@@ -1,4 +1,7 @@
 import { data, redirect, useLoaderData, useActionData, Form, Link, useSearchParams } from "react-router";
+import { useForm, getFormProps, getInputProps } from "@conform-to/react";
+import { parseWithZod } from "@conform-to/zod/v4";
+
 export const handle = { breadcrumb: "Edit View" };
 
 import { requireRoleAndFeature } from "~/utils/auth/require-auth.server";
@@ -6,6 +9,7 @@ import { ADMIN_OR_TENANT_ADMIN } from "~/utils/auth/roles";
 import { FEATURE_FLAG_KEYS } from "~/utils/config/feature-flags.server";
 import { getView, updateView } from "~/services/saved-views.server";
 import { handleServiceError } from "~/utils/errors/handle-service-error.server";
+import { updateViewSchema } from "~/utils/schemas/view";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { NativeSelect, NativeSelectOption } from "~/components/ui/native-select";
@@ -30,26 +34,25 @@ export async function action({ request, params }: Route.ActionArgs) {
   const { user, tenantId } = await requireRoleAndFeature(request, [...ADMIN_OR_TENANT_ADMIN], FEATURE_FLAG_KEYS.SAVED_VIEWS);
 
   const formData = await request.formData();
-  const name = formData.get("name") as string;
-  const viewType = formData.get("viewType") as string;
-  const isShared = formData.get("isShared") === "on";
-  const isDefault = formData.get("isDefault") === "on";
+  const submission = parseWithZod(formData, { schema: updateViewSchema });
 
-  if (!name) {
-    return data({ error: "Name is required" }, { status: 400 });
+  if (submission.status !== "success") {
+    return data({ result: submission.reply() }, { status: 400 });
   }
+
+  const { name, viewType, isShared, isDefault } = submission.value;
 
   try {
     await updateView(params.viewId, user.id, tenantId, {
       name,
-      viewType: viewType as "TABLE" | "KANBAN" | "CALENDAR" | "GALLERY",
+      viewType,
       isShared,
       isDefault,
     });
     const redirectTo = new URL(request.url).searchParams.get("redirectTo");
     return redirect(redirectTo || `/${params.tenant}/settings/views`);
   } catch (error) {
-    return handleServiceError(error);
+    return handleServiceError(error, { submission });
   }
 }
 
@@ -59,6 +62,21 @@ export default function EditViewPage() {
   const basePrefix = useBasePrefix();
   const [searchParams] = useSearchParams();
   const cancelUrl = searchParams.get("redirectTo") || `${basePrefix}/settings/views`;
+
+  const [form, fields] = useForm({
+    lastResult: actionData?.result,
+    defaultValue: {
+      name: view.name,
+      viewType: view.viewType,
+      isShared: view.isShared,
+      isDefault: view.isDefault,
+    },
+    onValidate({ formData }) {
+      return parseWithZod(formData, { schema: updateViewSchema });
+    },
+    shouldValidate: "onBlur",
+    shouldRevalidate: "onInput",
+  });
 
   return (
     <div className="space-y-6">
@@ -74,15 +92,20 @@ export default function EditViewPage() {
           <CardTitle>View Details</CardTitle>
         </CardHeader>
         <CardContent>
-          <Form method="post" className="space-y-4">
-            {actionData && "error" in actionData && (
+          <Form method="post" {...getFormProps(form)} className="space-y-4">
+            {form.errors && form.errors.length > 0 && (
               <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
-                {(actionData as { error: string }).error}
+                {form.errors.map((error, i) => (
+                  <p key={i}>{error}</p>
+                ))}
               </div>
             )}
 
-            <Field fieldId="name" label="View Name" required>
-              <Input id="name" name="name" required defaultValue={view.name} />
+            <Field fieldId={fields.name.id} label="View Name" required errors={fields.name.errors}>
+              <Input
+                {...getInputProps(fields.name, { type: "text" })}
+                key={fields.name.key}
+              />
             </Field>
 
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -90,8 +113,13 @@ export default function EditViewPage() {
                 <Input id="entityType" value={view.entityType} disabled />
               </Field>
 
-              <Field fieldId="viewType" label="View Type" required>
-                <NativeSelect id="viewType" name="viewType" defaultValue={view.viewType}>
+              <Field fieldId={fields.viewType.id} label="View Type" errors={fields.viewType.errors}>
+                <NativeSelect
+                  id={fields.viewType.id}
+                  name={fields.viewType.name}
+                  key={fields.viewType.key}
+                  defaultValue={fields.viewType.initialValue}
+                >
                   <NativeSelectOption value="TABLE">Table</NativeSelectOption>
                   <NativeSelectOption value="KANBAN">Kanban</NativeSelectOption>
                   <NativeSelectOption value="CALENDAR">Calendar</NativeSelectOption>
@@ -103,24 +131,24 @@ export default function EditViewPage() {
             <div className="space-y-3">
               <div className="flex items-center gap-2">
                 <Checkbox
-                  id="isDefault"
-                  name="isDefault"
+                  id={fields.isDefault.id}
+                  name={fields.isDefault.name}
                   value="on"
                   defaultChecked={view.isDefault}
                 />
-                <label htmlFor="isDefault" className="text-sm text-foreground">
+                <label htmlFor={fields.isDefault.id} className="text-sm text-foreground">
                   Set as default view for this entity type
                 </label>
               </div>
 
               <div className="flex items-center gap-2">
                 <Checkbox
-                  id="isShared"
-                  name="isShared"
+                  id={fields.isShared.id}
+                  name={fields.isShared.name}
                   value="on"
                   defaultChecked={view.isShared}
                 />
-                <label htmlFor="isShared" className="text-sm text-foreground">
+                <label htmlFor={fields.isShared.id} className="text-sm text-foreground">
                   Share this view with other users in the organization
                 </label>
               </div>

@@ -149,3 +149,45 @@ Never use native `<input type="date">`, `<input type="datetime-local">`, or `<In
 - **Date + time**: `<DateTimePicker name="fieldName" />` from `~/components/ui/date-time-picker`
 
 Both components render a hidden input with the `name` prop, so they work seamlessly with form submissions. For edit forms, pass `defaultValue={new Date(existingValue)}` to pre-fill.
+
+### Form Handling (MANDATORY)
+
+All forms MUST use **Conform** (`@conform-to/react` + `@conform-to/zod`) with **Zod** validation schemas. Never use manual `formData.get()` with inline validation. Follow the pattern in `app/routes/$tenant/security/users/new.tsx`:
+
+**Schema** — Define a Zod schema in `app/utils/schemas/<entity>.ts`:
+```ts
+import { z } from "zod/v4";
+export const createEntitySchema = z.object({
+  name: z.string({ error: "Name is required" }).min(1, "Name is required"),
+});
+```
+
+**Action** — Use `parseWithZod` for validation, return `submission.reply()` on failure:
+```ts
+const submission = parseWithZod(formData, { schema: createEntitySchema });
+if (submission.status !== "success") {
+  return data({ result: submission.reply() }, { status: 400 });
+}
+// On service errors: return handleServiceError(error, { submission });
+```
+
+**Component** — Use `useForm` + `getFormProps` + `getInputProps` + `Field` component:
+```tsx
+const [form, fields] = useForm({
+  lastResult: actionData?.result,
+  onValidate({ formData }) { return parseWithZod(formData, { schema }); },
+  shouldValidate: "onBlur",
+  shouldRevalidate: "onInput",
+});
+// <Form method="post" {...getFormProps(form)}>
+// <Field fieldId={fields.name.id} label="Name" required errors={fields.name.errors}>
+//   <Input {...getInputProps(fields.name, { type: "text" })} key={fields.name.key} />
+// </Field>
+```
+
+Key rules:
+- `getFormProps(form)` automatically sets `noValidate` — never add it manually
+- Use the `<Field>` component (`~/components/ui/field`) for label + input + error display
+- Pass `errors={fields.fieldName.errors}` to `Field` for per-field error messages
+- Form-level errors display via `form.errors` at the top of the form
+- For edit forms, pass `defaultValue` to `useForm` with existing entity data
