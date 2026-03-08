@@ -9,7 +9,20 @@ import type { Route } from "./+types/index";
 
 export const handle = { breadcrumb: "Logs" };
 
-const ACTION_TYPES = ["CREATE", "UPDATE", "DELETE", "LOGIN", "LOGOUT"] as const;
+const ACTION_TYPES = [
+  "CREATE",
+  "UPDATE",
+  "DELETE",
+  "LOGIN",
+  "LOGOUT",
+  "CONFIGURE",
+  "FILE_UPLOAD",
+  "FILE_UPLOAD_BLOCKED",
+  "TWO_FACTOR_ENABLE",
+  "TWO_FACTOR_DISABLE",
+  "IMPERSONATE_START",
+  "IMPERSONATE_END",
+] as const;
 
 export async function loader({ request }: Route.LoaderArgs) {
   const { user } = await requireRole(request, "ADMIN");
@@ -84,11 +97,18 @@ function actionBadgeVariant(action: string) {
     case "CREATE":
       return "default" as const;
     case "UPDATE":
+    case "CONFIGURE":
       return "secondary" as const;
     case "DELETE":
+    case "FILE_UPLOAD_BLOCKED":
       return "destructive" as const;
     case "LOGIN":
     case "LOGOUT":
+    case "FILE_UPLOAD":
+    case "TWO_FACTOR_ENABLE":
+    case "TWO_FACTOR_DISABLE":
+    case "IMPERSONATE_START":
+    case "IMPERSONATE_END":
       return "outline" as const;
     default:
       return "secondary" as const;
