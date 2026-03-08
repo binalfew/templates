@@ -6,6 +6,7 @@ import { requireGlobalAdmin } from "~/utils/auth/require-auth.server";
 export function ErrorBoundary() {
   return <RouteErrorBoundary context="feature flags" />;
 }
+import { clearFlagCache } from "~/utils/config/feature-flags.server";
 import { prisma } from "~/utils/db/db.server";
 import {
   Table,
@@ -42,6 +43,8 @@ export async function action({ request }: Route.ActionArgs) {
     where: { id: flagId },
     data: { enabled },
   });
+
+  clearFlagCache();
 
   return { ok: true };
 }
