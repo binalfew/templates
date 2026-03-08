@@ -4,7 +4,7 @@ import { requireAuth, toClientUser } from "~/utils/auth/require-auth.server";
 import { getImpersonationState } from "~/utils/auth/session.server";
 import { resolveTenant } from "~/utils/tenant.server";
 import { getSidebarState, getSidebarGroupState } from "~/utils/sidebar.server";
-import { getTheme } from "~/utils/theme.server";
+import { getTheme, brandCookie } from "~/utils/theme.server";
 import { isFeatureEnabled, FEATURE_FLAG_KEYS } from "~/utils/config/feature-flags.server";
 import { getUnreadCount, listNotifications } from "~/services/notifications.server";
 import { getActiveAnnouncements } from "~/services/announcements.server";
@@ -43,7 +43,11 @@ export async function loader({ request, params }: Route.LoaderArgs) {
     ? { isImpersonating: true as const, impersonatedUserName: user.name || user.email }
     : undefined;
 
-  return {
+  const headers = new Headers();
+  headers.set("Set-Cookie", await brandCookie.serialize(tenant.slug));
+
+  return data(
+    {
     user: { id: user.id, name: user.name, email: user.email, photoUrl: user.photoUrl },
     clientUser: toClientUser(user),
     roles,
@@ -81,7 +85,9 @@ export async function loader({ request, params }: Route.LoaderArgs) {
     enabledFeatures,
     inactivityTimeoutMinutes: 60,
     impersonation,
-  };
+    },
+    { headers },
+  );
 }
 
 export function ErrorBoundary() {

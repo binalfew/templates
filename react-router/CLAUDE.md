@@ -140,3 +140,12 @@ All UI components and pages MUST be responsive. Every interactive element (butto
 - **Wrapper divs for toolbar items**: `className="w-full sm:w-auto"`
 
 On small screens, every toolbar item should stack vertically and take full width. On `sm` and above, they sit in a single row. Never hardcode fixed widths without a `w-full` mobile fallback. This applies everywhere: DataTable toolbars, ViewSwitcher, form layouts, action button groups, etc.
+
+### Date & Time Inputs (MANDATORY)
+
+Never use native `<input type="date">`, `<input type="datetime-local">`, or `<Input type="datetime-local">` for date/time fields. Always use the shadcn-based picker components:
+
+- **Date only**: `<DatePicker name="fieldName" />` from `~/components/ui/date-picker`
+- **Date + time**: `<DateTimePicker name="fieldName" />` from `~/components/ui/date-time-picker`
+
+Both components render a hidden input with the `name` prop, so they work seamlessly with form submissions. For edit forms, pass `defaultValue={new Date(existingValue)}` to pre-fill.

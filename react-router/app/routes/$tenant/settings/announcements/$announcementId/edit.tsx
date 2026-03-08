@@ -12,17 +12,10 @@ import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { Checkbox } from "~/components/ui/checkbox";
+import { DateTimePicker } from "~/components/ui/date-time-picker";
 import { NativeSelect, NativeSelectOption } from "~/components/ui/native-select";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import type { Route } from "./+types/edit";
-
-function toDatetimeLocal(dateStr: string | Date | null | undefined): string {
-  if (!dateStr) return "";
-  const d = new Date(dateStr);
-  const offset = d.getTimezoneOffset();
-  const local = new Date(d.getTime() - offset * 60000);
-  return local.toISOString().slice(0, 16);
-}
 
 export async function loader({ request, params }: Route.LoaderArgs) {
   const { user } = await requireAnyRole(request, [...ADMIN_OR_TENANT_ADMIN]);
@@ -99,7 +92,7 @@ export default function EditAnnouncementPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <div>
+              <div className="grid gap-2">
                 <Label htmlFor="title">Title</Label>
                 <Input
                   id="title"
@@ -110,7 +103,7 @@ export default function EditAnnouncementPage() {
                   className="w-full"
                 />
               </div>
-              <div>
+              <div className="grid gap-2">
                 <Label htmlFor="type">Type</Label>
                 <NativeSelect
                   id="type"
@@ -124,7 +117,7 @@ export default function EditAnnouncementPage() {
                 </NativeSelect>
               </div>
             </div>
-            <div>
+            <div className="grid gap-2">
               <Label htmlFor="message">Message</Label>
               <textarea
                 id="message"
@@ -145,24 +138,20 @@ export default function EditAnnouncementPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <div>
-                <Label htmlFor="startsAt">Starts At</Label>
-                <Input
-                  id="startsAt"
+              <div className="grid gap-2">
+                <Label>Starts At</Label>
+                <DateTimePicker
                   name="startsAt"
-                  type="datetime-local"
-                  defaultValue={toDatetimeLocal(announcement.startsAt)}
-                  className="w-full"
+                  defaultValue={announcement.startsAt ? new Date(announcement.startsAt) : undefined}
+                  placeholder="Pick start date & time"
                 />
               </div>
-              <div>
-                <Label htmlFor="endsAt">Ends At (optional)</Label>
-                <Input
-                  id="endsAt"
+              <div className="grid gap-2">
+                <Label>Ends At (optional)</Label>
+                <DateTimePicker
                   name="endsAt"
-                  type="datetime-local"
-                  defaultValue={toDatetimeLocal(announcement.endsAt)}
-                  className="w-full"
+                  defaultValue={announcement.endsAt ? new Date(announcement.endsAt) : undefined}
+                  placeholder="Pick end date & time"
                 />
               </div>
             </div>

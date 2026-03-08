@@ -12,6 +12,7 @@ import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { Checkbox } from "~/components/ui/checkbox";
+import { DateTimePicker } from "~/components/ui/date-time-picker";
 import { NativeSelect, NativeSelectOption } from "~/components/ui/native-select";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import type { Route } from "./+types/new";
@@ -85,7 +86,7 @@ export default function NewAnnouncementPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <div>
+              <div className="grid gap-2">
                 <Label htmlFor="title">Title</Label>
                 <Input
                   id="title"
@@ -95,7 +96,7 @@ export default function NewAnnouncementPage() {
                   className="w-full"
                 />
               </div>
-              <div>
+              <div className="grid gap-2">
                 <Label htmlFor="type">Type</Label>
                 <NativeSelect id="type" name="type" className="w-full">
                   <NativeSelectOption value="INFO">Info</NativeSelectOption>
@@ -104,7 +105,7 @@ export default function NewAnnouncementPage() {
                 </NativeSelect>
               </div>
             </div>
-            <div>
+            <div className="grid gap-2">
               <Label htmlFor="message">Message</Label>
               <textarea
                 id="message"
@@ -124,23 +125,13 @@ export default function NewAnnouncementPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <div>
-                <Label htmlFor="startsAt">Starts At</Label>
-                <Input
-                  id="startsAt"
-                  name="startsAt"
-                  type="datetime-local"
-                  className="w-full"
-                />
+              <div className="grid gap-2">
+                <Label>Starts At</Label>
+                <DateTimePicker name="startsAt" placeholder="Pick start date & time" />
               </div>
-              <div>
-                <Label htmlFor="endsAt">Ends At (optional)</Label>
-                <Input
-                  id="endsAt"
-                  name="endsAt"
-                  type="datetime-local"
-                  className="w-full"
-                />
+              <div className="grid gap-2">
+                <Label>Ends At (optional)</Label>
+                <DateTimePicker name="endsAt" placeholder="Pick end date & time" />
               </div>
             </div>
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-6">

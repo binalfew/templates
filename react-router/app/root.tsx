@@ -6,7 +6,6 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
-  useMatches,
   useRouteLoaderData,
 } from "react-router";
 
@@ -70,13 +69,20 @@ function usePwaEnabled(): boolean {
 }
 
 function useBrandTheme(): string {
-  const matches = useMatches();
-  for (const match of matches) {
-    const matchData = match.data as any;
-    if (matchData?.tenant?.brandTheme) {
-      return matchData.tenant.brandTheme;
-    }
+  const tenantData = useRouteLoaderData("routes/$tenant/_layout") as
+    | { tenant?: { brandTheme?: string } }
+    | undefined;
+  if (tenantData?.tenant?.brandTheme) {
+    return tenantData.tenant.brandTheme;
   }
+
+  const authData = useRouteLoaderData("routes/auth/_layout") as
+    | { brandTheme?: string }
+    | undefined;
+  if (authData?.brandTheme) {
+    return authData.brandTheme;
+  }
+
   return "";
 }
 
