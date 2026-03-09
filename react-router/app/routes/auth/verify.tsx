@@ -12,9 +12,10 @@ import {
 } from "~/utils/auth/verification.server";
 import { verifyEmailSchema as verifySchema } from "~/utils/schemas/auth";
 import { Button } from "~/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
+import { AuthContent } from "~/components/auth/auth-layout";
+import { Mail, CheckCircle2 } from "lucide-react";
 import { buildMeta } from "~/utils/meta";
 import type { Route } from "./+types/verify";
 
@@ -104,73 +105,75 @@ export default function VerifyPage({ loaderData, actionData }: Route.ComponentPr
   });
 
   return (
-    <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
-      <div className="w-full max-w-sm">
-        <div className="flex flex-col gap-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-2xl">Verify your email</CardTitle>
-              <CardDescription>We sent a 6-digit code to {maskedEmail}</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Form method="post" {...getFormProps(form)}>
-                <input type="hidden" name="intent" value="verify" />
-                <div className="flex flex-col gap-6">
-                  {form.errors && form.errors.length > 0 && (
-                    <div className="rounded-md bg-destructive/10 p-3">
-                      <p className="text-sm text-destructive">{form.errors[0]}</p>
-                    </div>
-                  )}
-
-                  {actionData && "status" in actionData && actionData.status === "resent" && (
-                    <div className="rounded-md bg-green-50 p-3 dark:bg-green-950">
-                      <p className="text-sm text-green-700 dark:text-green-300">
-                        A new code has been sent to your email.
-                      </p>
-                    </div>
-                  )}
-
-                  <div className="grid gap-2">
-                    <Label htmlFor={fields.code.id}>Verification Code</Label>
-                    {(() => {
-                      const { key, ...codeProps } = getInputProps(fields.code, { type: "text" });
-                      return (
-                        <Input
-                          key={key}
-                          {...codeProps}
-                          placeholder="000000"
-                          autoComplete="one-time-code"
-                          inputMode="numeric"
-                          maxLength={6}
-                          autoFocus
-                          className="text-center text-lg tracking-widest"
-                        />
-                      );
-                    })()}
-                    {fields.code.errors && (
-                      <p className="text-sm text-destructive">{fields.code.errors[0]}</p>
-                    )}
-                  </div>
-
-                  <Button type="submit" className="w-full">
-                    Verify
-                  </Button>
-
-                  <div className="text-center">
-                    <Form method="post">
-                      <input type="hidden" name="intent" value="resend" />
-                      <Button type="submit" variant="link" className="text-sm">
-                        Didn't receive a code? Resend
-                      </Button>
-                    </Form>
-                  </div>
-                </div>
-              </Form>
-            </CardContent>
-          </Card>
-        </div>
+    <AuthContent>
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold tracking-tight text-foreground">Verify your email</h1>
+        <p className="mt-2 text-muted-foreground">We sent a 6-digit code to {maskedEmail}</p>
       </div>
-    </div>
+
+      <Form method="post" {...getFormProps(form)} className="space-y-5">
+        <input type="hidden" name="intent" value="verify" />
+
+        {form.errors && form.errors.length > 0 && (
+          <div className="flex items-center gap-3 rounded-lg border border-destructive/30 bg-destructive/5 px-4 py-3 animate-[shake_0.5s_ease-in-out]">
+            <p className="text-sm text-destructive">{form.errors[0]}</p>
+          </div>
+        )}
+
+        {actionData && "status" in actionData && actionData.status === "resent" && (
+          <div className="flex items-center gap-3 rounded-lg border border-green-200 bg-green-50 px-4 py-3 dark:border-green-900 dark:bg-green-950">
+            <CheckCircle2 className="size-5 shrink-0 text-green-600 dark:text-green-400" />
+            <p className="text-sm text-green-700 dark:text-green-300">
+              A new code has been sent to your email.
+            </p>
+          </div>
+        )}
+
+        <div className="space-y-2">
+          <Label htmlFor={fields.code.id} className="text-sm font-medium">
+            Verification Code
+          </Label>
+          <div className="relative group">
+            <Mail className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground transition-colors group-focus-within:text-primary" />
+            {(() => {
+              const { key, ...codeProps } = getInputProps(fields.code, { type: "text" });
+              return (
+                <Input
+                  key={key}
+                  {...codeProps}
+                  placeholder="000000"
+                  autoComplete="one-time-code"
+                  inputMode="numeric"
+                  maxLength={6}
+                  autoFocus
+                  className="h-11 pl-10 text-center text-lg tracking-widest transition-shadow focus-visible:shadow-md focus-visible:shadow-primary/10"
+                />
+              );
+            })()}
+          </div>
+          {fields.code.errors && (
+            <p className="text-sm text-destructive">{fields.code.errors[0]}</p>
+          )}
+        </div>
+
+        <Button
+          type="submit"
+          className="w-full h-11 text-base font-medium shadow-lg shadow-primary/25 transition-all hover:shadow-xl hover:shadow-primary/30"
+          size="lg"
+        >
+          Verify
+        </Button>
+
+        <div className="text-center">
+          <Form method="post">
+            <input type="hidden" name="intent" value="resend" />
+            <Button type="submit" variant="link" className="text-sm text-muted-foreground">
+              Didn&apos;t receive a code? Resend
+            </Button>
+          </Form>
+        </div>
+      </Form>
+    </AuthContent>
   );
 }
 

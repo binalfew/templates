@@ -9,9 +9,10 @@ import { requireOnboardingEmail, getVerifySession } from "~/utils/auth/verificat
 import { onboardingSchema } from "~/utils/schemas/auth";
 import { Button } from "~/components/ui/button";
 import { Checkbox } from "~/components/ui/checkbox";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
+import { AuthContent } from "~/components/auth/auth-layout";
+import { User, Lock, AtSign } from "lucide-react";
 import { buildMeta } from "~/utils/meta";
 import type { Route } from "./+types/onboarding";
 
@@ -118,113 +119,144 @@ export default function OnboardingPage({ loaderData, actionData }: Route.Compone
   });
 
   return (
-    <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
-      <div className="w-full max-w-sm">
-        <div className="flex flex-col gap-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-2xl">Complete your profile</CardTitle>
-              <CardDescription>Setting up account for {email}</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Form method="post" {...getFormProps(form)}>
-                <div className="flex flex-col gap-4">
-                  {form.errors && form.errors.length > 0 && (
-                    <div className="rounded-md bg-destructive/10 p-3">
-                      <p className="text-sm text-destructive">{form.errors[0]}</p>
-                    </div>
-                  )}
-
-                  <div className="grid gap-2">
-                    <Label htmlFor={fields.username.id}>Username</Label>
-                    {(() => {
-                      const { key, ...props } = getInputProps(fields.username, { type: "text" });
-                      return (
-                        <Input
-                          key={key}
-                          {...props}
-                          placeholder="johndoe"
-                          autoComplete="username"
-                          autoFocus
-                        />
-                      );
-                    })()}
-                    {fields.username.errors && (
-                      <p className="text-sm text-destructive">{fields.username.errors[0]}</p>
-                    )}
-                  </div>
-
-                  <div className="grid gap-2">
-                    <Label htmlFor={fields.name.id}>Full name</Label>
-                    {(() => {
-                      const { key, ...props } = getInputProps(fields.name, { type: "text" });
-                      return (
-                        <Input key={key} {...props} placeholder="John Doe" autoComplete="name" />
-                      );
-                    })()}
-                    {fields.name.errors && (
-                      <p className="text-sm text-destructive">{fields.name.errors[0]}</p>
-                    )}
-                  </div>
-
-                  <div className="grid gap-2">
-                    <Label htmlFor={fields.password.id}>Password</Label>
-                    {(() => {
-                      const { key, ...props } = getInputProps(fields.password, {
-                        type: "password",
-                      });
-                      return <Input key={key} {...props} autoComplete="new-password" />;
-                    })()}
-                    {fields.password.errors && (
-                      <p className="text-sm text-destructive">{fields.password.errors[0]}</p>
-                    )}
-                    <p className="text-xs text-muted-foreground">
-                      8+ chars, uppercase, lowercase, digit, special character
-                    </p>
-                  </div>
-
-                  <div className="grid gap-2">
-                    <Label htmlFor={fields.confirmPassword.id}>Confirm password</Label>
-                    {(() => {
-                      const { key, ...props } = getInputProps(fields.confirmPassword, {
-                        type: "password",
-                      });
-                      return <Input key={key} {...props} autoComplete="new-password" />;
-                    })()}
-                    {fields.confirmPassword.errors && (
-                      <p className="text-sm text-destructive">
-                        {fields.confirmPassword.errors[0]}
-                      </p>
-                    )}
-                  </div>
-
-                  <div className="flex items-start gap-2 pt-2">
-                    <Checkbox
-                      id={fields.agreeToTerms.id}
-                      name={fields.agreeToTerms.name}
-                      value="on"
-                      className="mt-1"
-                    />
-                    <Label
-                      htmlFor={fields.agreeToTerms.id}
-                      className="text-sm font-normal leading-snug"
-                    >
-                      I agree to the terms of service and privacy policy
-                    </Label>
-                  </div>
-                  {fields.agreeToTerms.errors && (
-                    <p className="text-sm text-destructive">{fields.agreeToTerms.errors[0]}</p>
-                  )}
-
-                  <Button type="submit" className="w-full mt-2">
-                    Create account
-                  </Button>
-                </div>
-              </Form>
-            </CardContent>
-          </Card>
-        </div>
+    <AuthContent>
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold tracking-tight text-foreground">
+          Complete your profile
+        </h1>
+        <p className="mt-2 text-muted-foreground">Setting up account for {email}</p>
       </div>
-    </div>
+
+      <Form method="post" {...getFormProps(form)} className="space-y-5">
+        {form.errors && form.errors.length > 0 && (
+          <div className="flex items-center gap-3 rounded-lg border border-destructive/30 bg-destructive/5 px-4 py-3 animate-[shake_0.5s_ease-in-out]">
+            <p className="text-sm text-destructive">{form.errors[0]}</p>
+          </div>
+        )}
+
+        <div className="space-y-2">
+          <Label htmlFor={fields.username.id} className="text-sm font-medium">
+            Username
+          </Label>
+          <div className="relative group">
+            <AtSign className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground transition-colors group-focus-within:text-primary" />
+            {(() => {
+              const { key, ...props } = getInputProps(fields.username, { type: "text" });
+              return (
+                <Input
+                  key={key}
+                  {...props}
+                  placeholder="johndoe"
+                  autoComplete="username"
+                  autoFocus
+                  className="h-11 pl-10 transition-shadow focus-visible:shadow-md focus-visible:shadow-primary/10"
+                />
+              );
+            })()}
+          </div>
+          {fields.username.errors && (
+            <p className="text-sm text-destructive">{fields.username.errors[0]}</p>
+          )}
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor={fields.name.id} className="text-sm font-medium">
+            Full name
+          </Label>
+          <div className="relative group">
+            <User className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground transition-colors group-focus-within:text-primary" />
+            {(() => {
+              const { key, ...props } = getInputProps(fields.name, { type: "text" });
+              return (
+                <Input
+                  key={key}
+                  {...props}
+                  placeholder="John Doe"
+                  autoComplete="name"
+                  className="h-11 pl-10 transition-shadow focus-visible:shadow-md focus-visible:shadow-primary/10"
+                />
+              );
+            })()}
+          </div>
+          {fields.name.errors && (
+            <p className="text-sm text-destructive">{fields.name.errors[0]}</p>
+          )}
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor={fields.password.id} className="text-sm font-medium">
+            Password
+          </Label>
+          <div className="relative group">
+            <Lock className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground transition-colors group-focus-within:text-primary" />
+            {(() => {
+              const { key, ...props } = getInputProps(fields.password, { type: "password" });
+              return (
+                <Input
+                  key={key}
+                  {...props}
+                  autoComplete="new-password"
+                  className="h-11 pl-10 transition-shadow focus-visible:shadow-md focus-visible:shadow-primary/10"
+                />
+              );
+            })()}
+          </div>
+          {fields.password.errors && (
+            <p className="text-sm text-destructive">{fields.password.errors[0]}</p>
+          )}
+          <p className="text-xs text-muted-foreground">
+            8+ chars, uppercase, lowercase, digit, special character
+          </p>
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor={fields.confirmPassword.id} className="text-sm font-medium">
+            Confirm password
+          </Label>
+          <div className="relative group">
+            <Lock className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground transition-colors group-focus-within:text-primary" />
+            {(() => {
+              const { key, ...props } = getInputProps(fields.confirmPassword, {
+                type: "password",
+              });
+              return (
+                <Input
+                  key={key}
+                  {...props}
+                  autoComplete="new-password"
+                  className="h-11 pl-10 transition-shadow focus-visible:shadow-md focus-visible:shadow-primary/10"
+                />
+              );
+            })()}
+          </div>
+          {fields.confirmPassword.errors && (
+            <p className="text-sm text-destructive">{fields.confirmPassword.errors[0]}</p>
+          )}
+        </div>
+
+        <div className="flex items-start gap-2 pt-1">
+          <Checkbox
+            id={fields.agreeToTerms.id}
+            name={fields.agreeToTerms.name}
+            value="on"
+            className="mt-1"
+          />
+          <Label htmlFor={fields.agreeToTerms.id} className="text-sm font-normal leading-snug">
+            I agree to the terms of service and privacy policy
+          </Label>
+        </div>
+        {fields.agreeToTerms.errors && (
+          <p className="text-sm text-destructive">{fields.agreeToTerms.errors[0]}</p>
+        )}
+
+        <Button
+          type="submit"
+          className="w-full h-11 text-base font-medium shadow-lg shadow-primary/25 transition-all hover:shadow-xl hover:shadow-primary/30"
+          size="lg"
+        >
+          Create account
+        </Button>
+      </Form>
+    </AuthContent>
   );
 }

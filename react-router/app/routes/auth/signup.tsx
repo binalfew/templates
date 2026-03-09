@@ -14,9 +14,10 @@ import {
 } from "~/utils/auth/verification.server";
 import { signupSchema } from "~/utils/schemas/auth";
 import { Button } from "~/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
+import { AuthContent } from "~/components/auth/auth-layout";
+import { Mail, ArrowRight } from "lucide-react";
 import { buildMeta } from "~/utils/meta";
 import type { Route } from "./+types/signup";
 
@@ -85,58 +86,75 @@ export default function SignupPage({ actionData }: Route.ComponentProps) {
   });
 
   return (
-    <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
-      <div className="w-full max-w-sm">
-        <div className="flex flex-col gap-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-2xl">{t("signupTitle")}</CardTitle>
-              <CardDescription>{t("signupSubtitle")}</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Form method="post" {...getFormProps(form)}>
-                <div className="flex flex-col gap-6">
-                  {form.errors && form.errors.length > 0 && (
-                    <div className="rounded-md bg-destructive/10 p-3">
-                      <p className="text-sm text-destructive">{form.errors[0]}</p>
-                    </div>
-                  )}
+    <AuthContent>
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold tracking-tight text-foreground">{t("signupTitle")}</h1>
+        <p className="mt-2 text-muted-foreground">{t("signupSubtitle")}</p>
+      </div>
 
-                  <div className="grid gap-2">
-                    <Label htmlFor={fields.email.id}>{t("email")}</Label>
-                    {(() => {
-                      const { key, ...emailProps } = getInputProps(fields.email, { type: "email" });
-                      return (
-                        <Input
-                          key={key}
-                          {...emailProps}
-                          placeholder="m@example.com"
-                          autoComplete="email"
-                          autoFocus
-                        />
-                      );
-                    })()}
-                    {fields.email.errors && (
-                      <p className="text-sm text-destructive">{fields.email.errors[0]}</p>
-                    )}
-                  </div>
+      <Form method="post" {...getFormProps(form)} className="space-y-5">
+        {form.errors && form.errors.length > 0 && (
+          <div className="flex items-center gap-3 rounded-lg border border-destructive/30 bg-destructive/5 px-4 py-3 animate-[shake_0.5s_ease-in-out]">
+            <p className="text-sm text-destructive">{form.errors[0]}</p>
+          </div>
+        )}
 
-                  <Button type="submit" className="w-full">
-                    {t("continue")}
-                  </Button>
+        <div className="space-y-2">
+          <Label htmlFor={fields.email.id} className="text-sm font-medium">
+            {t("email")}
+          </Label>
+          <div className="relative group">
+            <Mail className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground transition-colors group-focus-within:text-primary" />
+            {(() => {
+              const { key, ...emailProps } = getInputProps(fields.email, { type: "email" });
+              return (
+                <Input
+                  key={key}
+                  {...emailProps}
+                  placeholder="you@company.com"
+                  autoComplete="email"
+                  autoFocus
+                  className="h-11 pl-10 transition-shadow focus-visible:shadow-md focus-visible:shadow-primary/10"
+                />
+              );
+            })()}
+          </div>
+          {fields.email.errors && (
+            <p className="text-sm text-destructive">{fields.email.errors[0]}</p>
+          )}
+        </div>
 
-                  <div className="text-center text-sm">
-                    {t("haveAccount")}{" "}
-                    <Link to="/auth/login" className="underline underline-offset-4">
-                      {t("logIn")}
-                    </Link>
-                  </div>
-                </div>
-              </Form>
-            </CardContent>
-          </Card>
+        <Button
+          type="submit"
+          className="w-full h-11 text-base font-medium shadow-lg shadow-primary/25 transition-all hover:shadow-xl hover:shadow-primary/30"
+          size="lg"
+        >
+          <span className="flex items-center gap-2">
+            {t("continue")}
+            <ArrowRight className="size-4" />
+          </span>
+        </Button>
+      </Form>
+
+      {/* Divider */}
+      <div className="relative my-8">
+        <div className="absolute inset-0 flex items-center">
+          <div className="w-full border-t border-border" />
+        </div>
+        <div className="relative flex justify-center text-xs">
+          <span className="bg-background px-3 text-muted-foreground">or</span>
         </div>
       </div>
-    </div>
+
+      <p className="text-center text-sm text-muted-foreground">
+        {t("haveAccount")}{" "}
+        <Link
+          to="/auth/login"
+          className="font-semibold text-primary hover:text-primary/80 transition-colors"
+        >
+          {t("logIn")}
+        </Link>
+      </p>
+    </AuthContent>
   );
 }
